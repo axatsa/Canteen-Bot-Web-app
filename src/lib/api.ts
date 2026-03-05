@@ -1,7 +1,7 @@
 
 // Use Docker service name 'api' for container-to-container communication
 // For local development outside Docker, use 'localhost:8000'
-const API_URL = typeof window !== 'undefined' && window.location.hostname !== 'localhost'
+export const API_URL = typeof window !== 'undefined' && window.location.hostname !== 'localhost'
     ? 'https://editorials-provides-wives-competitors.trycloudflare.com'  // Cloudflare Tunnel (HTTPS)
     : 'http://localhost:8000';     // Local development
 
@@ -45,6 +45,7 @@ export type Order = {
 };
 
 export const api = {
+    API_URL,
     getProducts: async (): Promise<Product[]> => {
         const response = await fetch(`${API_URL}/products`);
         if (!response.ok) throw new Error('Failed to fetch products');
