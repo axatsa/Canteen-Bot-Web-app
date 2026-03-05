@@ -72,8 +72,9 @@ export default function App() {
       setOrders(ordersData);
       setMasterProducts(productsData);
       setIsLoadingProducts(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading initial data:', error);
+      alert('Ошибка при загрузке продуктов с сервера! Проверьте, что сервер (' + api.API_URL + ') работает. Ошибка: ' + error.message);
       setIsLoadingProducts(false); // Stop loading even on error
     }
   };
