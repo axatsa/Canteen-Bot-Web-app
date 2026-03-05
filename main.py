@@ -123,6 +123,7 @@ TEXTS = {
         'branch_uchtepa': 'Учтепа',
         'branch_shayzantaur': 'Шайзантаур',
         'branch_olmazar': 'Олмазар',
+        'branch_all': 'Все филиалы',
     },
     'uz': {
         'welcome': "👋 Optimizer'ga xush kelibsiz!\n\nTilni tanlang:",
@@ -154,6 +155,7 @@ TEXTS = {
         'branch_uchtepa': 'Uchtepa',
         'branch_shayzantaur': 'Shayxontohur',
         'branch_olmazar': 'Olmazor',
+        'branch_all': 'Barcha filiallar',
     }
 }
 
@@ -229,8 +231,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         branch_key = f"branch_{user['branch']}"
         
         # Build message
-        if user['role'] == 'financier':
-            msg = f"👋 {get_text(lang, 'already_registered').split(',')[0]}, {user['full_name']}!\n\n🎭 {get_text(lang, 'role')}: {get_text(lang, role_key)}"
+        if user['role'] in ['financier', 'supplier']:
+            msg = get_text(lang, 'already_registered',
+                name=user['full_name'],
+                role=get_text(lang, role_key),
+                branch=get_text(lang, 'branch_all')
+            )
         else:
             msg = get_text(lang, 'already_registered',
                 name=user['full_name'],
