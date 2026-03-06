@@ -4,8 +4,8 @@ services:
   api:
     build: .
     command: python api.py
-    ports:
-      - "8000:8000"
+    # УБИРАЕМ ports: "8000:8000". 
+    # Теперь API доступен только ДРУГИМ контейнерам по внутренней сети
     volumes:
       - .:/app
     restart: unless-stopped
@@ -26,7 +26,8 @@ services:
       context: .
       dockerfile: Dockerfile.frontend
     ports:
-      - "8080:80"
+      # ФРОНТЕНД берет на себя роль единственной открытой "двери"
+      - "127.0.0.1:8000:80" 
     depends_on:
       - api
     restart: unless-stopped
