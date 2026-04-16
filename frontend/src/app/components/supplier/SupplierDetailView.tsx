@@ -40,9 +40,17 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
 
     const handleUpdateProduct = (productId: string, field: 'price' | 'comment' | 'checked' | 'deliveryDate', value: any) => {
         setLocalProducts(prev =>
-            prev.map(p =>
-                p.id === productId ? { ...p, [field]: value } : p
-            )
+            prev.map(p => {
+                if (p.id === productId) {
+                    const updated = { ...p, [field]: value };
+                    // Если отметили как отправленное, очищаем дату досыла
+                    if (field === 'checked' && value === true) {
+                        updated.deliveryDate = undefined;
+                    }
+                    return updated;
+                }
+                return p;
+            })
         );
     };
 
@@ -52,6 +60,13 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
 
         if (missingPrice) {
             alert(t('alertNoPrices'));
+            return;
+        }
+
+        // Validation: Check if all unsent products have a delivery date
+        const missingDate = localProducts.some(p => p.quantity > 0 && !p.checked && (!p.deliveryDate || p.deliveryDate === ''));
+        if (missingDate) {
+            alert(t('alertSelectDates' as any) || 'Укажите дату доставки для всех товаров, которые не отправлены сегодня!');
             return;
         }
 
@@ -275,12 +290,33 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                                                         <div className="relative">
                                                             <input
                                                                 type="date"
-                                                                value={product.deliveryDate ? new Date(product.deliveryDate).toISOString().split('T')[0] : ''}
+                                                                value={(product.deliveryDate && product.deliveryDate !== t('unknown' as any)) ? new Date(product.deliveryDate).toISOString().split('T')[0] : ''}
                                                                 onChange={(e) => handleUpdateProduct(product.id, 'deliveryDate', e.target.value)}
-                                                                className="w-full bg-gray-50 border-none rounded-2xl px-5 py-3 font-medium text-gray-700 focus:ring-2 focus:ring-orange-500 transition-all"
+                                                                className={`w-full bg-gray-50 border-none rounded-2xl px-5 py-3 font-medium text-gray-700 focus:ring-2 focus:ring-orange-500 transition-all ${!product.checked && !product.deliveryDate ? 'ring-2 ring-red-200' : ''}`}
                                                             />
                                                             <span className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xs uppercase">{t('deliveryDate')}</span>
                                                         </div>
+
+                                                        {!product.checked && (
+                                                            <div className="flex gap-2">
+                                                                <button
+                                                                    onClick={() => handleUpdateProduct(product.id, 'deliveryDate', t('unknown' as any))}
+                                                                    className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all ${product.deliveryDate === t('unknown' as any) ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-500'}`}
+                                                                >
+                                                                    {t('unknown' as any)}
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        const tomorrow = new Date();
+                                                                        tomorrow.setDate(tomorrow.getDate() + 1);
+                                                                        handleUpdateProduct(product.id, 'deliveryDate', tomorrow.toISOString().split('T')[0]);
+                                                                    }}
+                                                                    className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all ${product.deliveryDate && product.deliveryDate !== t('unknown' as any) ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-500'}`}
+                                                                >
+                                                                    Завтра
+                                                                </button>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </>
                                             )}

@@ -67,14 +67,22 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
 
     const displayProducts = localProducts.filter(p => p.quantity > 0);
     
-    // Split products for Receive mode
-    const arrivedProducts = displayProducts.filter(p => p.received);
-    const pendingProducts = displayProducts.filter(p => !p.received);
+    // Split products for Receive mode based on Supplier's 'checked' status
+    const supplierSent = displayProducts.filter(p => p.checked);
+    const supplierNotSent = displayProducts.filter(p => !p.checked);
 
     // Helpers to render products
     const renderProductEditCard = (product: Product) => (
         <div key={product.id} className="bg-white p-4 rounded-3xl shadow-md border border-gray-100">
-            <h4 className="font-bold text-gray-900 mb-2">{product.name}</h4>
+            <div className="mb-3">
+                <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t('productName')}</label>
+                <input
+                    type="text"
+                    value={product.name}
+                    onChange={(e) => handleUpdateProduct(product.id, 'name', e.target.value)}
+                    className="w-full bg-gray-50 rounded-xl px-3 py-2 font-bold text-gray-900 border-none focus:ring-1 focus:ring-[#2E7D32]"
+                />
+            </div>
             <div className="grid grid-cols-2 gap-2">
                 <div>
                      <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t('quantity')} ({product.unit})</label>
@@ -99,7 +107,7 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
         </div>
     );
 
-    const renderProductCheckCard = (product: Product, isArrived: boolean) => (
+    const renderProductCheckCard = (product: Product) => (
         <div key={product.id} className="bg-white p-4 rounded-3xl shadow-md border border-gray-100 flex items-start gap-3 transition-all active:scale-[0.98]" onClick={() => handleUpdateProduct(product.id, 'received', !product.received)}>
             <button
                 className={`mt-1 w-6 h-6 rounded-md border-2 transition-all flex items-center justify-center flex-shrink-0 ${product.received
@@ -119,18 +127,24 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                          <span>• {(product.quantity * product.price).toLocaleString()} {t('sum')}</span>
                      )}
                 </div>
-                {!product.received && (
-                    <div className="mt-2" onClick={(e) => e.stopPropagation()}>
-                        <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t('expectedDateLabel')}</label>
-                        <input
-                            type="text"
-                            value={product.expectedDate || ''}
-                            onChange={(e) => handleUpdateProduct(product.id, 'expectedDate', e.target.value)}
-                            placeholder="..."
-                            className="w-full bg-gray-50 rounded-xl px-3 py-2 text-sm border-none focus:ring-1 focus:ring-[#2E7D32]"
-                        />
-                    </div>
-                )}
+            </div>
+        </div>
+    );
+
+    const renderDelayedProductCard = (product: Product) => (
+        <div key={product.id} className="bg-gray-100/50 p-4 rounded-3xl border border-gray-200 opacity-80">
+            <h4 className="font-bold text-lg text-gray-600 leading-tight mb-1">
+                {product.name}
+            </h4>
+            <div className="flex flex-wrap gap-2 text-xs text-gray-400 font-bold mb-2">
+                 <span>{product.quantity} {product.unit}</span>
+                 {product.price && product.price > 0 && (
+                     <span>• {(product.quantity * product.price).toLocaleString()} {t('sum')}</span>
+                 )}
+            </div>
+            <div className="bg-orange-50 text-orange-600 px-3 py-2 rounded-xl border border-orange-100 flex items-center justify-between">
+                <span className="text-[10px] uppercase font-bold">{t('estimatedDelivery')}:</span>
+                <span className="font-bold text-sm">{product.deliveryDate || t('unknown' as any)}</span>
             </div>
         </div>
     );
@@ -156,17 +170,19 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                 
                 {isReceiveMode && (
                     <div className="space-y-8">
-                        {pendingProducts.length > 0 && (
+                        {supplierSent.length > 0 && (
                             <div className="space-y-3">
-                                <h3 className="text-lg font-bold text-gray-800 border-l-4 pl-2 border-[#2E7D32]">{t('pendingProducts')} ({pendingProducts.length})</h3>
-                                {pendingProducts.map(p => renderProductCheckCard(p, false))}
+                                <h3 className="text-lg font-bold text-gray-800 border-l-4 pl-2 border-[#2E7D32]">{t('arrivedProducts')} ({supplierSent.length})</h3>
+                                {supplierSent.map(p => renderProductCheckCard(p))}
                             </div>
                         )}
 
-                        {arrivedProducts.length > 0 && (
+                        {supplierNotSent.length > 0 && (
                             <div className="space-y-3">
-                                <h3 className="text-lg font-bold text-gray-500 border-l-4 pl-2 border-gray-400">{t('arrivedProducts')} ({arrivedProducts.length})</h3>
-                                {arrivedProducts.map(p => renderProductCheckCard(p, true))}
+                                <h3 className="text-lg font-bold text-orange-600 border-l-4 pl-2 border-orange-500">Не отправлено / Yuborilmagan ({supplierNotSent.length})</h3>
+                                <div className="space-y-3">
+                                    {supplierNotSent.map(p => renderDelayedProductCard(p))}
+                                </div>
                             </div>
                         )}
                     </div>
@@ -197,8 +213,8 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                         </button>
                         <button
                             onClick={handleCompleteReceive}
-                            disabled={pendingProducts.length > 0}
-                            className={`flex-[1.5] text-white font-bold py-3 px-2 rounded-2xl shadow-lg active:scale-95 transition-all text-sm flex items-center justify-center gap-1 ${pendingProducts.length === 0 ? 'bg-[#2E7D32]' : 'bg-gray-300 opacity-50'}`}
+                            disabled={supplierSent.some(p => !p.received)}
+                            className={`flex-[1.5] text-white font-bold py-3 px-2 rounded-2xl shadow-lg active:scale-95 transition-all text-sm flex items-center justify-center gap-1 ${supplierSent.every(p => p.received) ? 'bg-[#2E7D32]' : 'bg-gray-300 opacity-50'}`}
                         >
                             <Send className="w-4 h-4" />
                             {t('completeReceive')}

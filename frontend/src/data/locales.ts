@@ -34,6 +34,7 @@ export const translations = {
         sum: 'сум',
         readOnly: 'Только чтение',
         noOrders: 'Нет заявок',
+        unknown: 'Неизвестно',
 
         // Branches
         branchChilanzar: 'Чиланзар (Новза)',
@@ -121,6 +122,7 @@ export const translations = {
         alertNoPrices: 'Стоп! Укажите цену для всех товаров. Финансист не примет без цен 💰',
         alertNoDeliveries: 'Пока ничего не привезли 📭',
         alertDeleteConfirm: 'Удалить этот продукт?',
+        alertSelectDates: 'Укажите дату доставки для всех товаров, которые не отправлены сегодня! 📅',
 
         // Example products
         exampleProduct: 'Например: Помидоры Черри',
@@ -154,6 +156,7 @@ export const translations = {
         sum: 'so\'m',
         readOnly: 'Faqat o\'qish',
         noOrders: 'Buyurtmalar yo\'q',
+        unknown: 'Noma\'lum',
 
         // Branches
         branchChilanzar: 'Chilonzor (Novza)',
@@ -241,6 +244,7 @@ export const translations = {
         alertNoPrices: 'To\'xtang! Barcha mahsulotlar uchun narx kiriting. Moliyachi narxsiz qabul qilmaydi 💰',
         alertNoDeliveries: 'Hozircha yetkazib berish yo\'q 📭',
         alertDeleteConfirm: 'Bu mahsulotni o\'chirish kerakmi?',
+        alertSelectDates: 'Yuborilmagan mahsulotlar uchun yetkazib berish sanasini kiriting! 📅',
 
         // Example products
         exampleProduct: 'Masalan: Pomidor Cherri',
