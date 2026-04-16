@@ -1,26 +1,15 @@
 import sqlite3
-import json
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import List, Optional
-from datetime import datetime
+import os
 
-app = FastAPI()
+DB_PATH = os.getenv('DB_PATH', 'database.db')
 
-# Enable CORS for the frontend
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-DB_PATH = "database.db"
+def get_db_connection():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 def init_db():
-    conn = sqlite3.connect(DB_PATH)
+    conn = get_db_connection()
     cursor = conn.cursor()
     
     # Users table
@@ -73,7 +62,7 @@ def init_db():
 
 def seed_db():
     # Only seed if products table is empty
-    conn = sqlite3.connect(DB_PATH)
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(*) FROM master_products")
     if cursor.fetchone()[0] == 0:
@@ -163,119 +152,3 @@ def seed_db():
         cursor.executemany("INSERT INTO master_products (id, name, category, unit) VALUES (?, ?, ?, ?)", products)
         conn.commit()
     conn.close()
-
-init_db()
-seed_db()
-
-class Product(BaseModel):
-    id: str
-    name: str
-    category: str
-    quantity: float
-    unit: str
-    price: Optional[float] = None
-    comment: Optional[str] = None
-    checked: Optional[bool] = None
-    chefComment: Optional[str] = None
-    deliveryDate: Optional[str] = None
-    lastPrice: Optional[float] = None
-
-class Order(BaseModel):
-    id: str
-    status: str
-    products: List[Product]
-    createdAt: str
-    deliveredAt: Optional[str] = None
-    estimatedDeliveryDate: Optional[str] = None
-    branch: str
-
-@app.get("/products")
-async def get_products():
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM master_products")
-    rows = cursor.fetchall()
-    conn.close()
-    
-    products = []
-    for row in rows:
-        # row: (id, name, category, unit, last_price)
-        # Note: newer rows might have 5 columns, older table definitions might need migration if not handled by init_db
-        last_price = row[4] if len(row) > 4 else None
-        
-        products.append({
-            "id": row[0],
-            "name": row[1],
-            "category": row[2],
-            "unit": row[3],
-            "quantity": 0, # Default for selection
-            "lastPrice": last_price
-        })
-    return products
-
-@app.get("/orders")
-async def get_orders():
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM orders")
-    rows = cursor.fetchall()
-    conn.close()
-    
-    # Fetch last prices map
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, last_price FROM master_products")
-    # Store as dict for O(1) access
-    last_prices = {row[0]: row[1] for row in cursor.fetchall()}
-    conn.close()
-
-    orders = []
-    for row in rows:
-        order_products = json.loads(row[2])
-        # Inject lastPrice into products if not present or just to be sure
-        for p in order_products:
-            if 'id' in p and p['id'] in last_prices:
-                p['lastPrice'] = last_prices[p['id']]
-                
-        orders.append({
-            "id": row[0],
-            "status": row[1],
-            "products": order_products,
-            "createdAt": row[3],
-            "deliveredAt": row[4],
-            "estimatedDeliveryDate": row[5],
-            "branch": row[6]
-        })
-    return orders
-
-@app.post("/orders/upsert")
-async def upsert_order(order: Order):
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    
-    products_json = json.dumps([p.dict() for p in order.products])
-    
-    cursor.execute('''
-    INSERT INTO orders (id, status, products, createdAt, deliveredAt, estimatedDeliveryDate, branch)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(id) DO UPDATE SET
-        status=excluded.status,
-        products=excluded.products,
-        createdAt=excluded.createdAt,
-        deliveredAt=excluded.deliveredAt,
-        estimatedDeliveryDate=excluded.estimatedDeliveryDate,
-        branch=excluded.branch
-    ''', (order.id, order.status, products_json, order.createdAt, order.deliveredAt, order.estimatedDeliveryDate, order.branch))
-    
-    # Update last_price for products with valid price
-    for p in order.products:
-        if p.price and p.price > 0:
-            cursor.execute("UPDATE master_products SET last_price = ? WHERE id = ?", (p.price, p.id))
-    
-    conn.commit()
-    conn.close()
-    return {"status": "success"}
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)

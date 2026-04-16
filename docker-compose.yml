@@ -2,27 +2,27 @@ version: '3.8'
 
 services:
   api:
-    build: .
-    command: python api.py
+    build: ./backend
+    command: python main.py api
     volumes:
-      - .:/app
+      - ./backend:/app
     restart: unless-stopped
     env_file: .env
 
   bot:
-    build: .
-    command: python main.py
+    build: ./backend
+    command: python main.py bot
     depends_on:
       - api
     volumes:
-      - .:/app
+      - ./backend:/app
     restart: unless-stopped
     env_file: .env
 
   frontend:
     build:
-      context: .
-      dockerfile: Dockerfile.frontend
+      context: ./frontend
+      dockerfile: Dockerfile
     depends_on:
       - api
     restart: unless-stopped
