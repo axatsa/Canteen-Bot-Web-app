@@ -11,6 +11,8 @@ export const translations = {
         selectRole: 'Выберите вашу роль для продолжения',
         chef: 'Шеф-повар',
         chefDesc: 'Создание списка продуктов',
+        snabjenec: 'Снабженец',
+        snabjenecDesc: 'Контроль закупки и приемка',
         financier: 'Финансист',
         financierDesc: 'Проверка и корректировка',
         supplier: 'Поставщик',
@@ -46,6 +48,15 @@ export const translations = {
         orSelectBranch: 'Или выберите филиал',
         hasDelivery: 'Есть привоз для проверки',
 
+        // Snabjenec View
+        snabjenecTitle: 'Снабженец',
+        sendToSupplier: 'Отправить Поставщику',
+        saveProgress: 'Сохранить прогресс',
+        completeReceive: 'Окончательно отправить',
+        arrivedProducts: 'Полученные товары',
+        pendingProducts: 'Ожидаемые товары',
+        expectedDateLabel: 'Когда привезут?',
+
         // Chef View
         chefTitle: 'Шеф-повар',
         sendToFinancier: 'Отправить',
@@ -59,6 +70,7 @@ export const translations = {
         incomingOrders: 'Входящие заявки',
         finalCheckOrders: 'Заявки на финальную проверку',
         archive: 'Архив',
+        archiveAction: 'В архив',
         orderFromChef: 'Заявка от шеф-повара',
         orderFromSupplier: 'Заявка от поставщика',
         orderAfterChefCheck: 'Заявка после проверки шеф-повара',
@@ -88,7 +100,10 @@ export const translations = {
 
         // Status
         statusSentToChef: 'Отправлено шефу',
+        statusReviewSnabjenec: 'Проверка снабженцем',
+        statusWaitingSnabjenecReceive: 'Ожидание привоза',
         statusSentToFinancier: 'У финансиста',
+        statusArchived: 'В архиве',
         statusSentToSupplier: 'У поставщика',
         statusSupplierCollecting: 'Сборка заказа',
         statusSupplierDelivering: 'Доставка',
@@ -116,6 +131,8 @@ export const translations = {
         selectRole: 'Davom etish uchun rolingizni tanlang',
         chef: 'Oshpaz',
         chefDesc: 'Mahsulotlar ro\'yxatini yaratish',
+        snabjenec: 'Ta\'minotchi',
+        snabjenecDesc: 'Tekshirish va qabul qilish',
         financier: 'Moliyachi',
         financierDesc: 'Tekshirish va tuzatish',
         supplier: 'Yetkazuvchi',
@@ -151,6 +168,15 @@ export const translations = {
         orSelectBranch: 'Yoki filialni tanlang',
         hasDelivery: 'Tekshirish uchun mahsulot kelgan',
 
+        // Snabjenec View
+        snabjenecTitle: 'Ta\'minotchi',
+        sendToSupplier: 'Yetkazuvchiga yuborish',
+        saveProgress: 'Saqlash',
+        completeReceive: 'Moliyachiga yuborish',
+        arrivedProducts: 'Olingan mahsulotlar',
+        pendingProducts: 'Kutilayotgan mahsulotlar',
+        expectedDateLabel: 'Qachon keladi?',
+
         // Chef View
         chefTitle: 'Oshpaz',
         sendToFinancier: 'Yuborish',
@@ -164,6 +190,7 @@ export const translations = {
         incomingOrders: 'Kiruvchi buyurtmalar',
         finalCheckOrders: 'Yakuniy tekshiruv uchun buyurtmalar',
         archive: 'Arxiv',
+        archiveAction: 'Arxivlash',
         orderFromChef: 'Oshpazdan buyurtma',
         orderFromSupplier: 'Yetkazuvchidan buyurtma',
         orderAfterChefCheck: 'Oshpaz tekshiruvidan so\'ng buyurtma',
@@ -193,7 +220,10 @@ export const translations = {
 
         // Status
         statusSentToChef: 'Oshpazga yuborildi',
+        statusReviewSnabjenec: 'Ta\'minotchi tekshiruvi',
+        statusWaitingSnabjenecReceive: 'Kelishi kutilmoqda',
         statusSentToFinancier: 'Moliyachida',
+        statusArchived: 'Arxivlangan',
         statusSentToSupplier: 'Yetkazuvchida',
         statusSupplierCollecting: 'Buyurtma yig\'ilmoqda',
         statusSupplierDelivering: 'Yetkazilmoqda',

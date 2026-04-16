@@ -12,6 +12,7 @@ declare global {
 import { ChefView } from '@/app/components/ChefView';
 import { FinancierView } from '@/app/components/FinancierView';
 import { SupplierView } from '@/app/components/SupplierView';
+import { SnabjenecView } from '@/app/components/SnabjenecView';
 import { RoleSelector } from '@/app/components/RoleSelector';
 import { BranchSelector } from '@/app/components/BranchSelector';
 import { LanguageProvider, useLanguage } from '@/app/context/LanguageContext';
@@ -215,6 +216,34 @@ export default function App() {
 
     return (
       <SupplierView
+        orders={orders}
+        onSelectOrder={setSelectedOrderId}
+        onBackToRoles={handleBackToStart}
+        onRefresh={loadOrders}
+        isFromBot={isFromBot}
+      />
+    );
+  }
+
+  // Для снабженца
+  if (selectedRole === 'snabjenec') {
+    const selectedOrder = selectedOrderId ? orders.find(o => o.id === selectedOrderId) : null;
+
+    if (selectedOrder) {
+      return (
+        <SnabjenecView
+          order={selectedOrder}
+          onUpdateOrder={saveOrder}
+          onBackToRoles={() => setSelectedOrderId(null)}
+          branch={selectedOrder.branch}
+          onRefresh={loadOrders}
+          isFromBot={isFromBot}
+        />
+      );
+    }
+
+    return (
+      <SnabjenecView
         orders={orders}
         onSelectOrder={setSelectedOrderId}
         onBackToRoles={handleBackToStart}

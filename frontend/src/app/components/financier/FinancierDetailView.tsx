@@ -92,14 +92,14 @@ export function FinancierDetailView({ order, onUpdateOrder, onBackToRoles, branc
             onUpdateOrder({
                 ...order,
                 products: localProducts,
-                status: 'sent_to_supplier',
+                status: 'archived',
             });
-            alert(t('alertApproved'));
+            alert(t('alertApproved') || 'Утверждено и отправлено в архив');
         } else if (order.status === 'financier_checking') {
             onUpdateOrder({
                 ...order,
                 products: localProducts,
-                status: 'completed',
+                status: 'archived',
             });
             alert(t('alertOrderComplete'));
         }
@@ -509,11 +509,11 @@ export function FinancierDetailView({ order, onUpdateOrder, onBackToRoles, branc
                             className="bg-[#003366] text-white font-bold py-3 px-6 rounded-2xl shadow-lg shadow-blue-900/20 active:scale-95 transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:active:scale-100"
                         >
                             <Send className="w-4 h-4" />
-                            {order.status === 'sent_to_financier' ? 'Утвердить' : 'Завершить'}
+                            {order.status === 'sent_to_financier' ? t('archiveAction') : 'Завершить'}
                         </button>
                     ) : (
                         <div className="px-4 py-2 bg-gray-100 rounded-xl border border-gray-200">
-                            <p className="text-gray-500 text-xs font-bold">{order.status}</p>
+                            <p className="text-gray-500 text-xs font-bold">{order.status === 'archived' ? t('statusArchived') : order.status}</p>
                         </div>
                     )}
                 </div>

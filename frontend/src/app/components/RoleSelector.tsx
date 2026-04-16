@@ -1,7 +1,7 @@
 import type { Role } from '@/lib/api';
 import logo from '@/assets/logo.png';
 import { useLanguage } from '@/app/context/LanguageContext';
-import { ChefHat, Wallet, Truck } from 'lucide-react';
+import { ChefHat, Wallet, Truck, Package } from 'lucide-react';
 
 type RoleSelectorProps = {
   onSelectRole: (role: Role) => void;
@@ -44,6 +44,21 @@ export function RoleSelector({ onSelectRole, onBack }: RoleSelectorProps) {
                 <div className="flex-1 text-left">
                   <h2 className="text-xl font-bold text-gray-900">{t('chef')}</h2>
                   <p className="text-sm text-gray-500">{t('chefDesc')}</p>
+                </div>
+              </div>
+            </button>
+
+            <button
+              onClick={() => onSelectRole('snabjenec')}
+              className="w-full bg-gray-50 rounded-3xl p-6 shadow-sm active:scale-95 transition-all border border-gray-100 hover:bg-gray-100/50"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(to bottom right, #4CAF50, #2E7D32)' }}>
+                  <Package className="w-8 h-8 text-white" />
+                </div>
+                <div className="flex-1 text-left">
+                  <h2 className="text-xl font-bold text-gray-900">{t('snabjenec')}</h2>
+                  <p className="text-sm text-gray-500">{t('snabjenecDesc')}</p>
                 </div>
               </div>
             </button>

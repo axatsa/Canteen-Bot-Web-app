@@ -7,8 +7,11 @@ type StatusBadgeProps = {
 
 const statusConfig: Record<Status, { labelKey: string; color: string; bgColor: string }> = {
   sent_to_chef: { labelKey: 'statusSentToChef', color: '#1a237e', bgColor: '#e8eaf6' },
-  sent_to_financier: { labelKey: 'statusSentToFinancier', color: '#1a237e', bgColor: '#e8eaf6' },
+  review_snabjenec: { labelKey: 'statusReviewSnabjenec', color: '#827717', bgColor: '#f9fbe7' },
   sent_to_supplier: { labelKey: 'statusSentToSupplier', color: '#1a237e', bgColor: '#e8eaf6' },
+  waiting_snabjenec_receive: { labelKey: 'statusWaitingSnabjenecReceive', color: '#006064', bgColor: '#e0f7fa' },
+  sent_to_financier: { labelKey: 'statusSentToFinancier', color: '#1a237e', bgColor: '#e8eaf6' },
+  archived: { labelKey: 'statusArchived', color: '#424242', bgColor: '#eeeeee' },
   supplier_collecting: { labelKey: 'statusSupplierCollecting', color: '#f57c00', bgColor: '#fff3e0' },
   supplier_delivering: { labelKey: 'statusSupplierDelivering', color: '#f57c00', bgColor: '#fff3e0' },
   chef_checking: { labelKey: 'statusChefChecking', color: '#d32f2f', bgColor: '#ffebee' },

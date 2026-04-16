@@ -46,9 +46,9 @@ export function ChefView({ order, onUpdateOrder, onBackToRoles, branch, onRefres
       onUpdateOrder({
         ...order,
         products: localProducts,
-        status: 'sent_to_financier',
+        status: 'review_snabjenec',
       });
-      alert(t('alertListSent'));
+      alert(t('alertSentToChef')); // 'alertSentToChef' text is now 'Готово!' maybe we shouldn't worry about alert name
       // Reset to new order? App component handles this by creating new currenOrder
     } else if (order.status === 'chef_checking') {
       onUpdateOrder({

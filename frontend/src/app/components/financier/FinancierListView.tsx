@@ -23,8 +23,8 @@ export function FinancierListView({ orders, onSelectOrder, onBackToRoles, onRefr
         : orders.filter(o => o.branch === branchFilter);
 
     const incomingOrders = filteredByBranch.filter(o => o.status === 'sent_to_financier');
-    const checkingOrders = filteredByBranch.filter(o => o.status === 'financier_checking');
-    const archiveOrders = filteredByBranch.filter(o => o.status === 'completed');
+    const checkingOrders = filteredByBranch.filter(o => o.status === 'financier_checking'); // Probably unused now, but keeping for backward compatibility
+    const archiveOrders = filteredByBranch.filter(o => o.status === 'archived' || o.status === 'completed');
 
     // Функция для расчета общей суммы заявки
     const calculateTotal = (order: Order) => {

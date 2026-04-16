@@ -26,6 +26,7 @@ ROLE_PASSWORDS = {
     'chef': 'P123',
     'financier': 'F123',
     'supplier': 'C123',
+    'snabjenec': 'S123',
 }
 
 # Translations
@@ -52,6 +53,7 @@ TEXTS = {
         'branch_changed': '✅ Филиал изменён на: {branch}',
         'already_registered': '👋 С возвращением, {name}!\n\n🎭 Роль: {role}\n🏢 Филиал: {branch}\n\nНажмите кнопку ниже, чтобы открыть приложение:',
         'role_chef': '👨‍🍳 Шеф-повар',
+        'role_snabjenec': '📦 Снабженец',
         'role_financier': '💼 Финансист',
         'role_supplier': '🚚 Поставщик',
         'branch_chilanzar': 'Чиланзар (Новза)',
@@ -82,6 +84,7 @@ TEXTS = {
         'branch_changed': "✅ Filial o'zgartirildi: {branch}",
         'already_registered': "👋 Qaytib kelganingizdan xursandmiz, {name}!\n\n🎭 Rol: {role}\n🏢 Filial: {branch}\n\nIlovani ochish uchun quyidagi tugmani bosing:",
         'role_chef': '👨‍🍳 Oshpaz',
+        'role_snabjenec': "📦 Ta'minotchi",
         'role_financier': '💼 Moliyachi',
         'role_supplier': '🚚 Yetkazuvchi',
         'branch_chilanzar': 'Chilonzor (Novza)',
@@ -147,6 +150,7 @@ async def fio_entered(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
 
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton(get_text(lang, 'role_chef'), callback_data='role_chef')],
+        [InlineKeyboardButton(get_text(lang, 'role_snabjenec'), callback_data='role_snabjenec')],
         [InlineKeyboardButton(get_text(lang, 'role_financier'), callback_data='role_financier')],
         [InlineKeyboardButton(get_text(lang, 'role_supplier'), callback_data='role_supplier')],
         [InlineKeyboardButton(get_text(lang, 'back'), callback_data='back_to_fio')]
@@ -179,6 +183,7 @@ async def password_entered(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         back_callback = 'back_to_settings' if context.user_data.get('changing_setting') == 'role' else 'back_to_fio'
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton(get_text(lang, 'role_chef'), callback_data='role_chef')],
+            [InlineKeyboardButton(get_text(lang, 'role_snabjenec'), callback_data='role_snabjenec')],
             [InlineKeyboardButton(get_text(lang, 'role_financier'), callback_data='role_financier')],
             [InlineKeyboardButton(get_text(lang, 'role_supplier'), callback_data='role_supplier')],
             [InlineKeyboardButton(get_text(lang, 'back'), callback_data=back_callback)]
@@ -190,7 +195,7 @@ async def password_entered(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         await update.message.reply_text(get_text(lang, 'wrong_password'), reply_markup=get_back_keyboard(lang))
         return PASSWORD
     
-    if role in ['financier', 'supplier']:
+    if role in ['financier', 'supplier', 'snabjenec']:
         context.user_data['branch'] = 'all'
         return await finalize_registration(update, context)
     
@@ -212,6 +217,7 @@ async def branch_selected(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         await query.delete_message()
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton(get_text(lang, 'role_chef'), callback_data='role_chef')],
+            [InlineKeyboardButton(get_text(lang, 'role_snabjenec'), callback_data='role_snabjenec')],
             [InlineKeyboardButton(get_text(lang, 'role_financier'), callback_data='role_financier')],
             [InlineKeyboardButton(get_text(lang, 'role_supplier'), callback_data='role_supplier')],
             [InlineKeyboardButton(get_text(lang, 'back'), callback_data='back_to_fio')]
@@ -285,6 +291,7 @@ async def setting_role_handle(update: Update, context: ContextTypes.DEFAULT_TYPE
     context.user_data.update({'language': lang, 'full_name': user['full_name'], 'changing_setting': 'role'})
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton(get_text(lang, 'role_chef'), callback_data='role_chef')],
+        [InlineKeyboardButton(get_text(lang, 'role_snabjenec'), callback_data='role_snabjenec')],
         [InlineKeyboardButton(get_text(lang, 'role_financier'), callback_data='role_financier')],
         [InlineKeyboardButton(get_text(lang, 'role_supplier'), callback_data='role_supplier')],
         [InlineKeyboardButton(get_text(lang, 'back'), callback_data='back_to_settings')]

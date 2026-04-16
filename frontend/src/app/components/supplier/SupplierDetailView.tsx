@@ -58,10 +58,10 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
         onUpdateOrder({
             ...order,
             products: localProducts,
-            status: 'chef_checking',
+            status: 'waiting_snabjenec_receive',
             estimatedDeliveryDate: estimatedDate ? new Date(estimatedDate) : undefined,
         });
-        alert(t('alertSentToChef'));
+        alert(t('alertListSent'));
     };
 
     const handleExportExcel = () => {

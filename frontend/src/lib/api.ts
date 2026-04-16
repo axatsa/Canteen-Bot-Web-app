@@ -18,19 +18,24 @@ export type Product = {
     chefComment?: string;
     deliveryDate?: string;
     lastPrice?: number;
+    received?: boolean;
+    expectedDate?: string;
 };
 
 export type Status =
     | 'sent_to_chef'
-    | 'sent_to_financier'
+    | 'review_snabjenec'
     | 'sent_to_supplier'
+    | 'waiting_snabjenec_receive'
+    | 'sent_to_financier'
+    | 'archived'
     | 'supplier_collecting'
     | 'supplier_delivering'
     | 'chef_checking'
     | 'financier_checking'
     | 'completed';
 
-export type Role = 'chef' | 'financier' | 'supplier';
+export type Role = 'chef' | 'financier' | 'supplier' | 'snabjenec';
 
 export type Branch = 'chilanzar' | 'uchtepa' | 'shayzantaur' | 'olmazar';
 
