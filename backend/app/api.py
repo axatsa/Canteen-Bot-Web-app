@@ -28,3 +28,23 @@ async def upsert_order(order: schemas.Order):
     if not success:
         raise HTTPException(status_code=500, detail="Failed to save order")
     return {"status": "success"}
+
+@app.post("/users/register")
+async def register_user(user: schemas.UserRegister):
+    success = crud.save_user(
+        user.telegram_id, 
+        user.full_name, 
+        user.role, 
+        user.branch, 
+        user.language
+    )
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to register user")
+    return {"status": "success"}
+
+@app.get("/users/{telegram_id}")
+async def get_user(telegram_id: int):
+    user = crud.get_user_by_telegram_id(telegram_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user

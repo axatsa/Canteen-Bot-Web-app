@@ -35,6 +35,8 @@ export default function App() {
 
   // Добавляем флаг "из бота"
   const [isFromBot, setIsFromBot] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [isTestMode, setIsTestMode] = useState(false);
 
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
@@ -47,6 +49,8 @@ export default function App() {
     const urlParams = new URLSearchParams(window.location.search);
     const role = urlParams.get('role') as Role | null;
     const branch = urlParams.get('branch') as Branch | 'all' | null;
+    const fio = urlParams.get('fio');
+    const isTest = urlParams.get('isTest') === 'true';
 
     if (role) {
       console.log('🔗 Detected role from URL:', role);
@@ -56,6 +60,12 @@ export default function App() {
     if (branch && branch !== 'all') {
       console.log('🔗 Detected branch from URL:', branch);
       setSelectedBranch(branch as Branch);
+    }
+    if (fio) {
+      setUserName(fio);
+    }
+    if (isTest) {
+      setIsTestMode(true);
     }
   }, []);
 
@@ -136,7 +146,7 @@ export default function App() {
   };
 
   const handleBackToStart = () => {
-    if (!isFromBot) {
+    if (!isFromBot && !isTestMode) {
       setSelectedRole(null);
       setSelectedBranch(null);
       setSelectedOrderId(null);
@@ -357,6 +367,18 @@ export default function App() {
           onSetChefTab={setChefTab}
         />
       ) : null}
+      {isTestMode && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none">
+          <div className="bg-black/80 backdrop-blur-md text-white px-4 py-2 rounded-full shadow-2xl border border-white/20 flex items-center gap-3 text-xs font-semibold">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span>{userName || 'Test User'}</span>
+            <span className="opacity-40">|</span>
+            <span className="uppercase">{selectedRole}</span>
+            <span className="opacity-40">|</span>
+            <span className="capitalize">{String(selectedBranch)}</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

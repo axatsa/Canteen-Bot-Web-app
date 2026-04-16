@@ -20,6 +20,7 @@ type ChefViewProps = {
 export function ChefView({ order, onUpdateOrder, onBackToRoles, branch, onRefresh, isFromBot, chefTab, onSetChefTab }: ChefViewProps) {
   const { t } = useLanguage();
   const [localProducts, setLocalProducts] = useState(order.products);
+  const [customProductName, setCustomProductName] = useState('');
 
   // Синхронизация localProducts при изменении order.products
   useEffect(() => {
@@ -32,6 +33,19 @@ export function ChefView({ order, onUpdateOrder, onBackToRoles, branch, onRefres
         p.id === productId ? { ...p, [field]: value } : p
       )
     );
+  };
+
+  const handleAddCustomProduct = () => {
+    if (!customProductName.trim()) return;
+    const newProduct = {
+      id: 'custom_' + Date.now().toString(),
+      name: customProductName.trim(),
+      category: 'Дополнительные товары',
+      unit: 'шт', // по умолчанию
+      quantity: 1, // ставим 1 по умолчанию для удобства
+    };
+    setLocalProducts(prev => [...prev, newProduct]);
+    setCustomProductName('');
   };
 
   const handleSend = () => {
@@ -211,6 +225,31 @@ export function ChefView({ order, onUpdateOrder, onBackToRoles, branch, onRefres
                 </div>
               );
             })}
+
+            {!isCheckingMode && !isReadOnly && (
+              <div className="mt-8 mb-4 bg-white p-4 rounded-3xl shadow-sm border border-gray-100 opacity-95">
+                <h3 className="text-md font-bold text-gray-800 mb-3 pl-2 border-l-4" style={{ borderColor: '#8B0000' }}>
+                  Нет в списке? Добавьте:
+                </h3>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={customProductName}
+                    onChange={(e) => setCustomProductName(e.target.value)}
+                    placeholder="Название нового товара..."
+                    className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm focus:ring-1 focus:outline-none transition-all"
+                    style={{ focusRingColor: '#8B0000' }}
+                  />
+                  <button 
+                    onClick={handleAddCustomProduct}
+                    disabled={!customProductName.trim()}
+                    className="bg-[#8B0000] text-white px-4 py-3 rounded-2xl shadow hover:opacity-90 active:scale-95 transition-all disabled:opacity-50"
+                  >
+                    <Plus className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </main>

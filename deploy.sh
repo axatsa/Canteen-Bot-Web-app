@@ -5,9 +5,10 @@ set -e
 
 echo "🚀 Начинаем деплой проекта..."
 
-# Получаем последние изменения из ветки
-echo "📥 Выполняем git pull..."
-git pull origin main
+# Получаем последние изменения из ветки и принудительно перезаписываем (Force Pull)
+echo "📥 Выполняем принудительный git pull (сброс локальных изменений)..."
+git fetch --all
+git reset --hard origin/main
 
 # Проверяем наличие docker-compose.yml (может быть docker-compose.yml или docker-compose.yaml)
 if [ -f "docker-compose.yml" ] || [ -f "docker-compose.yaml" ]; then

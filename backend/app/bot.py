@@ -148,6 +148,10 @@ async def fio_entered(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
         await update.message.reply_text(get_text(lang, 'fio_changed', name=text), reply_markup=ReplyKeyboardRemove())
         return await settings_menu(update, context)
 
+    # Remove physical keyboard
+    msg = await update.message.reply_text("⏳", reply_markup=ReplyKeyboardRemove())
+    await msg.delete()
+
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton(get_text(lang, 'role_chef'), callback_data='role_chef')],
         [InlineKeyboardButton(get_text(lang, 'role_snabjenec'), callback_data='role_snabjenec')],
@@ -194,6 +198,10 @@ async def password_entered(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     if text != ROLE_PASSWORDS.get(role):
         await update.message.reply_text(get_text(lang, 'wrong_password'), reply_markup=get_back_keyboard(lang))
         return PASSWORD
+    
+    # Remove physical keyboard
+    msg = await update.message.reply_text("⏳", reply_markup=ReplyKeyboardRemove())
+    await msg.delete()
     
     if role in ['financier', 'supplier', 'snabjenec']:
         context.user_data['branch'] = 'all'

@@ -82,5 +82,14 @@ export const api = {
             body: JSON.stringify(payload),
         });
         if (!response.ok) throw new Error('Failed to upsert order');
+    },
+
+    registerUser: async (user: { telegram_id: number; full_name: string; role: string; branch: string; language?: string }): Promise<void> => {
+        const response = await fetch(`${API_URL}/users/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...user, language: user.language || 'ru' }),
+        });
+        if (!response.ok) throw new Error('Failed to register user');
     }
 };

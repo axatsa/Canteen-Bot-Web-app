@@ -22,3 +22,10 @@ class Order(BaseModel):
     deliveredAt: Optional[str] = None
     estimatedDeliveryDate: Optional[str] = None
     branch: str
+
+class UserRegister(BaseModel):
+    telegram_id: int
+    full_name: str
+    role: str
+    branch: str
+    language: str = "ru"
