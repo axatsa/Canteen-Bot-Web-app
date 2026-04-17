@@ -118,9 +118,12 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                 <CheckSquare className="w-4 h-4" />
             </button>
             <div className="flex-1" onClick={(e) => e.stopPropagation()}>
-                <h4 className={`font-bold text-lg leading-tight mb-1 ${product.received ? 'text-gray-400 line-through' : 'text-gray-900'}`}>
-                    {product.name}
-                </h4>
+                <input
+                    type="text"
+                    value={product.name}
+                    onChange={(e) => handleUpdateProduct(product.id, 'name', e.target.value)}
+                    className={`w-full bg-transparent border-none p-0 font-bold text-lg leading-tight mb-1 focus:ring-0 ${product.received ? 'text-gray-400 line-through' : 'text-gray-900'}`}
+                />
                 <div className="flex gap-2 text-sm text-gray-500 font-bold mb-1">
                      <span>{product.quantity} {product.unit}</span>
                      {product.price && product.price > 0 && (
@@ -133,9 +136,12 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
 
     const renderDelayedProductCard = (product: Product) => (
         <div key={product.id} className="bg-gray-100/50 p-4 rounded-3xl border border-gray-200 opacity-80">
-            <h4 className="font-bold text-lg text-gray-600 leading-tight mb-1">
-                {product.name}
-            </h4>
+            <input
+                type="text"
+                value={product.name}
+                onChange={(e) => handleUpdateProduct(product.id, 'name', e.target.value)}
+                className="w-full bg-transparent border-none p-0 font-bold text-lg text-gray-600 leading-tight mb-1 focus:ring-0"
+            />
             <div className="flex flex-wrap gap-2 text-xs text-gray-400 font-bold mb-2">
                  <span>{product.quantity} {product.unit}</span>
                  {product.price && product.price > 0 && (
