@@ -4,6 +4,14 @@ import type { Order, Branch, Product } from '@/lib/api';
 import { StatusBadge } from '@/app/components/StatusBadge';
 import { useLanguage } from '@/app/context/LanguageContext';
 
+/** "2026-04-17" → "17.04.2026", passes through if already formatted */
+function isoToDmy(iso: string): string {
+    if (!iso || iso.includes('.') || iso.length < 10) return iso;
+    const [y, m, d] = iso.split('-');
+    if (!d || !m || !y) return iso;
+    return `${d}.${m}.${y}`;
+}
+
 interface SnabjenecDetailViewProps {
     order: Order;
     onUpdateOrder: (order: Order) => void;
@@ -150,7 +158,7 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
             </div>
             <div className="bg-orange-50 text-orange-600 px-3 py-2 rounded-xl border border-orange-100 flex items-center justify-between">
                 <span className="text-[10px] uppercase font-bold">{t('estimatedDelivery')}:</span>
-                <span className="font-bold text-sm">{product.deliveryDate || t('unknown' as any)}</span>
+                <span className="font-bold text-sm">{isoToDmy(product.deliveryDate) || t('unknown' as any)}</span>
             </div>
         </div>
     );

@@ -1,10 +1,69 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Send, MessageSquare, Truck, Check, RefreshCcw, AlignJustify, LayoutGrid, Download, Calendar } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import type { Order, Branch } from '@/lib/api';
 import { StatusBadge } from '@/app/components/StatusBadge';
 import { useLanguage } from '@/app/context/LanguageContext';
+
+// ── Date helpers ────────────────────────────────────────────────────────────
+/** "2026-04-17" → "17.04.2026" */
+function isoToDmy(iso: string): string {
+    if (!iso || iso.includes('.') || iso.length < 10) return iso;
+    const [y, m, d] = iso.split('-');
+    if (!d || !m || !y) return iso;
+    return `${d}.${m}.${y}`;
+}
+/** "17.04.2026" → "2026-04-17" (returns '' if not 8 digits yet) */
+function dmyToIso(dmy: string): string {
+    const digits = dmy.replace(/\D/g, '');
+    if (digits.length < 8) return '';
+    return `${digits.slice(4, 8)}-${digits.slice(2, 4)}-${digits.slice(0, 2)}`;
+}
+/** Auto-insert dots: "1704" → "17.04" */
+function formatDateInput(raw: string): string {
+    const d = raw.replace(/\D/g, '').slice(0, 8);
+    if (d.length <= 2) return d;
+    if (d.length <= 4) return `${d.slice(0, 2)}.${d.slice(2)}`;
+    return `${d.slice(0, 2)}.${d.slice(2, 4)}.${d.slice(4)}`;
+}
+
+// ── DateInput component ──────────────────────────────────────────────────────
+interface DateInputProps {
+    value: string;           // ISO "YYYY-MM-DD" or ''
+    onChange: (iso: string) => void;
+    className?: string;
+    placeholder?: string;
+}
+function DateInput({ value, onChange, className, placeholder = 'ДД.ММ.ГГГГ' }: DateInputProps) {
+    const [display, setDisplay] = useState(() => isoToDmy(value));
+    const prevIso = useRef(value);
+    useEffect(() => {
+        // Only update display from outside if ISO value actually changed
+        if (value !== prevIso.current) {
+            prevIso.current = value;
+            setDisplay(isoToDmy(value));
+        }
+    }, [value]);
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const formatted = formatDateInput(e.target.value);
+        setDisplay(formatted);
+        const iso = dmyToIso(formatted);
+        if (iso) { prevIso.current = iso; onChange(iso); }
+        else if (!formatted) { prevIso.current = ''; onChange(''); }
+    };
+    return (
+        <input
+            type="text"
+            inputMode="numeric"
+            value={display}
+            onChange={handleChange}
+            placeholder={placeholder}
+            className={className}
+        />
+    );
+}
+// ────────────────────────────────────────────────────────────────────────────
 
 const branchNames: Record<Branch, string> = {
     chilanzar: 'Чиланзар (Новза)',
@@ -226,10 +285,9 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                                                             />
                                                             <MessageSquare className="absolute left-2 top-1.5 w-3.5 h-3.5 text-gray-300" />
                                                         </div>
-                                                        <input
-                                                            type="date"
-                                                            value={product.deliveryDate ? new Date(product.deliveryDate).toISOString().split('T')[0] : ''}
-                                                            onChange={(e) => handleUpdateProduct(product.id, 'deliveryDate', e.target.value)}
+                                                        <DateInput
+                                                            value={product.deliveryDate && product.deliveryDate !== 'Неизвестно' && product.deliveryDate !== 'Noma\'lum' ? product.deliveryDate : ''}
+                                                            onChange={(iso) => handleUpdateProduct(product.id, 'deliveryDate', iso)}
                                                             className="w-32 bg-gray-50 rounded-lg px-2 py-1.5 text-sm font-bold text-gray-700 focus:ring-1 focus:ring-orange-500 outline-none"
                                                         />
                                                     </div>
@@ -288,10 +346,9 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                                                         </div>
 
                                                         <div className="relative">
-                                                            <input
-                                                                type="date"
-                                                                value={(product.deliveryDate && product.deliveryDate !== t('unknown' as any)) ? new Date(product.deliveryDate).toISOString().split('T')[0] : ''}
-                                                                onChange={(e) => handleUpdateProduct(product.id, 'deliveryDate', e.target.value)}
+                                                            <DateInput
+                                                                value={(product.deliveryDate && product.deliveryDate !== t('unknown' as any)) ? product.deliveryDate : ''}
+                                                                onChange={(iso) => handleUpdateProduct(product.id, 'deliveryDate', iso)}
                                                                 className={`w-full bg-gray-50 border-none rounded-2xl px-5 py-3 font-medium text-gray-700 focus:ring-2 focus:ring-orange-500 transition-all ${!product.checked && !product.deliveryDate ? 'ring-2 ring-red-200' : ''}`}
                                                             />
                                                             <span className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xs uppercase">{t('deliveryDate')}</span>
@@ -333,10 +390,9 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                 <div className="flex items-center gap-2 mb-3">
                     <Calendar className="w-4 h-4 text-gray-400" />
                     <span className="text-xs text-gray-500 font-medium">{t('deliveryDate')}:</span>
-                    <input
-                        type="date"
+                    <DateInput
                         value={estimatedDate}
-                        onChange={(e) => setEstimatedDate(e.target.value)}
+                        onChange={(iso) => setEstimatedDate(iso)}
                         className="flex-1 bg-gray-100 border-none rounded-xl px-3 py-2 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-orange-500 outline-none"
                     />
                 </div>
