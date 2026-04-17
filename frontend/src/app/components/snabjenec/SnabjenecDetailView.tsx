@@ -57,9 +57,14 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
         alert(t('saveProgress') + " \u2714\uFE0F");
     };
 
+    const displayProducts = localProducts.filter(p => p.quantity > 0);
+    
+    // Split products for Receive mode based on Supplier's 'checked' status
+    const supplierSent = displayProducts.filter(p => p.checked);
+    const supplierNotSent = displayProducts.filter(p => !p.checked);
+
     const handleCompleteReceive = () => {
-        const activeProducts = localProducts.filter(p => p.quantity > 0);
-        const allReceived = activeProducts.every(p => p.received);
+        const allReceived = supplierSent.every(p => p.received);
         if (!allReceived) {
             alert('Сначала отметьте все товары как полученные! / Dastlab barchasini olingan deb belgilang!');
             return;
@@ -72,12 +77,6 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
         });
         alert(t('alertCheckComplete'));
     };
-
-    const displayProducts = localProducts.filter(p => p.quantity > 0);
-    
-    // Split products for Receive mode based on Supplier's 'checked' status
-    const supplierSent = displayProducts.filter(p => p.checked);
-    const supplierNotSent = displayProducts.filter(p => !p.checked);
 
     // Helpers to render products
     const renderProductEditCard = (product: Product) => (
