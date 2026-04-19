@@ -36,11 +36,20 @@ export const translations = {
         noOrders: 'Нет заявок',
         unknown: 'Неизвестно',
 
-        // Branches
-        branchChilanzar: 'Чиланзар (Новза)',
-        branchUchtepa: 'Учтепа',
-        branchShayzantaur: 'Шайзантаур',
-        branchOlmazar: 'Олмазар',
+        // Branches — Land
+        'branchBeltepa_land': 'Белтепа-Land',
+        'branchUchtepa_land': 'Учтепа-Land',
+        'branchRakat_land': 'Ракат-Land',
+        'branchMukumiy_land': 'Мукумий-Land',
+        'branchYunusabad_land': 'Юнусабад-Land',
+        'branchNovoi_land': 'Новои-Land',
+        // Branches — School
+        'branchNovza_school': 'Новза-School',
+        'branchUchtepa_school': 'Учтепа-School',
+        'branchAlmazar_school': 'Алмазар-School',
+        'branchGeneral_uzakov_school': 'Генерал Узоков-School',
+        'branchNamangan_school': 'Наманган-School',
+        'branchNovoi_school': 'Новои-School',
         branchAll: 'Все филиалы',
         selectBranch: 'Выберите филиал',
         selectBranchDesc: 'С каким филиалом вы работаете?',
@@ -158,11 +167,20 @@ export const translations = {
         noOrders: 'Buyurtmalar yo\'q',
         unknown: 'Noma\'lum',
 
-        // Branches
-        branchChilanzar: 'Chilonzor (Novza)',
-        branchUchtepa: 'Uchtepa',
-        branchShayzantaur: 'Shayxontohur',
-        branchOlmazar: 'Olmazor',
+        // Branches — Land
+        'branchBeltepa_land': 'Белтепа-Land',
+        'branchUchtepa_land': 'Учтепа-Land',
+        'branchRakat_land': 'Ракат-Land',
+        'branchMukumiy_land': 'Мукумий-Land',
+        'branchYunusabad_land': 'Юнусабад-Land',
+        'branchNovoi_land': 'Новои-Land',
+        // Branches — School
+        'branchNovza_school': 'Новза-School',
+        'branchUchtepa_school': 'Учтепа-School',
+        'branchAlmazar_school': 'Алмазар-School',
+        'branchGeneral_uzakov_school': 'Генерал Узоков-School',
+        'branchNamangan_school': 'Наманган-School',
+        'branchNovoi_school': 'Новои-School',
         branchAll: 'Barcha filiallar',
         selectBranch: 'Filialni tanlang',
         selectBranchDesc: 'Qaysi filial bilan ishleysiz?',

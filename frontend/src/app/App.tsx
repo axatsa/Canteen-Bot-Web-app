@@ -11,6 +11,7 @@ declare global {
 
 import { ChefView } from '@/app/components/ChefView';
 import { FinancierView } from '@/app/components/FinancierView';
+import { FinancierDesktop } from '@/app/components/financierDesktop/FinancierDesktop';
 import { SupplierView } from '@/app/components/SupplierView';
 import { SnabjenecView } from '@/app/components/SnabjenecView';
 import { RoleSelector } from '@/app/components/RoleSelector';
@@ -179,32 +180,9 @@ export default function App() {
     );
   }
 
-  // Если выбрали финансиста - сразу показываем список заявок
+  // Финансист — полная ПК-админка
   if (selectedRole === 'financier') {
-    const selectedOrder = selectedOrderId ? orders.find(o => o.id === selectedOrderId) : null;
-
-    if (selectedOrder) {
-      return (
-        <FinancierView
-          order={selectedOrder}
-          onUpdateOrder={saveOrder}
-          onBackToRoles={() => setSelectedOrderId(null)}
-          branch={selectedOrder.branch}
-          onRefresh={loadOrders}
-          isFromBot={isFromBot}
-        />
-      );
-    }
-
-    return (
-      <FinancierView
-        orders={orders}
-        onSelectOrder={setSelectedOrderId}
-        onBackToRoles={handleBackToStart}
-        onRefresh={loadOrders}
-        isFromBot={isFromBot}
-      />
-    );
+    return <FinancierDesktop />;
   }
 
   // Для поставщика тоже сразу показываем список заявок (без выбора филиала)

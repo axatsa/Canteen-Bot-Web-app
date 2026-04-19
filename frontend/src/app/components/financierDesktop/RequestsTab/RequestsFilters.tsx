@@ -15,10 +15,18 @@ const STATUSES = [
 
 const BRANCHES = [
     { value: '', label: 'Все филиалы' },
-    { value: 'chilanzar', label: 'Чиланзар' },
-    { value: 'uchtepa', label: 'Учтепа' },
-    { value: 'shayzantaur', label: 'Шайхантахур' },
-    { value: 'olmazar', label: 'Олмазор' },
+    { value: 'beltepa_land', label: 'Белтепа-Land' },
+    { value: 'uchtepa_land', label: 'Учтепа-Land' },
+    { value: 'rakat_land', label: 'Ракат-Land' },
+    { value: 'mukumiy_land', label: 'Мукумий-Land' },
+    { value: 'yunusabad_land', label: 'Юнусабад-Land' },
+    { value: 'novoi_land', label: 'Новои-Land' },
+    { value: 'novza_school', label: 'Новза-School' },
+    { value: 'uchtepa_school', label: 'Учтепа-School' },
+    { value: 'almazar_school', label: 'Алмазар-School' },
+    { value: 'general_uzakov_school', label: 'Генерал Узоков-School' },
+    { value: 'namangan_school', label: 'Наманган-School' },
+    { value: 'novoi_school', label: 'Новои-School' },
 ];
 
 export function RequestsFilters({ statusFilter, branchFilter, onStatusChange, onBranchChange, onClear }: RequestsFiltersProps) {

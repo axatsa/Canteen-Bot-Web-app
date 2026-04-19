@@ -214,7 +214,10 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                     <input
                         type="number"
                         value={product.quantity || ''}
-                        onChange={(e) => handleUpdateProduct(product.id, 'quantity', Math.max(0, parseFloat(e.target.value) || 0))}
+                        onChange={(e) => {
+                            const parsed = parseFloat(e.target.value);
+                            if (!isNaN(parsed)) handleUpdateProduct(product.id, 'quantity', Math.max(0, parsed));
+                        }}
                         className="w-full bg-gray-50 rounded-xl px-3 py-2 font-bold"
                     />
                 </div>

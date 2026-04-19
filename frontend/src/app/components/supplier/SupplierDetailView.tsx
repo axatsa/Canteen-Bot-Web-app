@@ -66,10 +66,18 @@ function DateInput({ value, onChange, className, placeholder = 'ДД.ММ.ГГГ
 // ────────────────────────────────────────────────────────────────────────────
 
 const branchNames: Record<Branch, string> = {
-    chilanzar: 'Чиланзар (Новза)',
-    uchtepa: 'Учтепа',
-    shayzantaur: 'Шайзантаур',
-    olmazar: 'Олмазар',
+    beltepa_land: 'Белтепа-Land',
+    uchtepa_land: 'Учтепа-Land',
+    rakat_land: 'Ракат-Land',
+    mukumiy_land: 'Мукумий-Land',
+    yunusabad_land: 'Юнусабад-Land',
+    novoi_land: 'Новои-Land',
+    novza_school: 'Новза-School',
+    uchtepa_school: 'Учтепа-School',
+    almazar_school: 'Алмазар-School',
+    general_uzakov_school: 'Генерал Узоков-School',
+    namangan_school: 'Наманган-School',
+    novoi_school: 'Новои-School',
 };
 
 interface SupplierDetailViewProps {

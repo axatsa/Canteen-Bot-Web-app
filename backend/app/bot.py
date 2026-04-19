@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 WEBAPP_URL = os.getenv('WEBAPP_URL', 'https://your-webapp-url.com')
 
 # Conversation states
-LANGUAGE, FIO, ROLE, PASSWORD, BRANCH, SETTINGS = range(6)
+LANGUAGE, TYPE, FIO, ROLE, PASSWORD, BRANCH, SETTINGS = range(7)
 
 # Role passwords
 ROLE_PASSWORDS = {
@@ -29,15 +29,39 @@ ROLE_PASSWORDS = {
     'snabjenec': 'S123',
 }
 
+# Branch data
+LAND_BRANCHES = [
+    ('beltepa_land', 'Белтепа-Land'),
+    ('uchtepa_land', 'Учтепа-Land'),
+    ('rakat_land', 'Ракат-Land'),
+    ('mukumiy_land', 'Мукумий-Land'),
+    ('yunusabad_land', 'Юнусабад-Land'),
+    ('novoi_land', 'Новои-Land'),
+]
+SCHOOL_BRANCHES = [
+    ('novza_school', 'Новза-School'),
+    ('uchtepa_school', 'Учтепа-School'),
+    ('almazar_school', 'Алмазар-School'),
+    ('general_uzakov_school', 'Генерал Узоков-School'),
+    ('namangan_school', 'Наманган-School'),
+    ('novoi_school', 'Новои-School'),
+]
+ALL_BRANCHES = LAND_BRANCHES + SCHOOL_BRANCHES
+BRANCH_NAMES = {bid: name for bid, name in ALL_BRANCHES}
+BRANCH_NAMES['all'] = 'Все филиалы'
+
 # Translations
 TEXTS = {
     'ru': {
         'welcome': '👋 Добро пожаловать в Optimizer!\n\nВыберите язык:',
+        'select_type': '🏫 Вы работаете в садике или школе?',
+        'type_land': '🌱 Садик',
+        'type_school': '🎓 Школа',
         'enter_fio': '📝 Введите ваше ФИО (Фамилия Имя Отчество):',
         'select_role': '👤 Выберите вашу роль:',
         'enter_password': '🔐 Введите пароль для роли "{role}":',
         'wrong_password': '❌ Неверный пароль. Попробуйте ещё раз:',
-        'select_branch': '🏢 Выберите филиал:',
+        'select_branch': '🏢 Выберите ваш филиал:',
         'registration_complete': '✅ Отлично! Регистрация завершена.\n\n👤 {name}\n🎭 Роль: {role}\n🏢 Филиал: {branch}\n\nНажмите кнопку ниже, чтобы открыть приложение:',
         'open_app': '📱 Открыть Optimizer',
         'back': '⬅️ Назад',
@@ -56,14 +80,13 @@ TEXTS = {
         'role_snabjenec': '📦 Снабженец',
         'role_financier': '💼 Финансист',
         'role_supplier': '🚚 Поставщик',
-        'branch_chilanzar': 'Чиланзар (Новза)',
-        'branch_uchtepa': 'Учтепа',
-        'branch_shayzantaur': 'Шайзантаур',
-        'branch_olmazar': 'Олмазар',
         'branch_all': 'Все филиалы',
     },
     'uz': {
         'welcome': "👋 Optimizer'ga xush kelibsiz!\n\nTilni tanlang:",
+        'select_type': "🏫 Siz bog'cha yoki maktabda ishleysizmi?",
+        'type_land': "🌱 Bog'cha",
+        'type_school': '🎓 Maktab',
         'enter_fio': "📝 F.I.O. (Familiya Ism Otasining ismi) kiriting:",
         'select_role': '👤 Rolingizni tanlang:',
         'enter_password': '🔐 "{role}" roli uchun parolni kiriting:',
@@ -87,10 +110,6 @@ TEXTS = {
         'role_snabjenec': "📦 Ta'minotchi",
         'role_financier': '💼 Moliyachi',
         'role_supplier': '🚚 Yetkazuvchi',
-        'branch_chilanzar': 'Chilonzor (Novza)',
-        'branch_uchtepa': 'Uchtepa',
-        'branch_shayzantaur': 'Shayxontohur',
-        'branch_olmazar': 'Olmazor',
         'branch_all': 'Barcha filiallar',
     }
 }
@@ -104,15 +123,43 @@ def get_text(lang: str, key: str, **kwargs) -> str:
 def get_back_keyboard(lang: str) -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup([[get_text(lang, 'back')]], resize_keyboard=True)
 
+def build_branch_keyboard(inst_type: str, back_callback: str, lang: str) -> InlineKeyboardMarkup:
+    """Build branch keyboard filtered by inst_type ('land' or 'school')."""
+    branches = LAND_BRANCHES if inst_type == 'land' else SCHOOL_BRANCHES
+    rows = []
+    for i in range(0, len(branches), 2):
+        row = [InlineKeyboardButton(branches[i][1], callback_data=f'branch_{branches[i][0]}')]
+        if i + 1 < len(branches):
+            row.append(InlineKeyboardButton(branches[i + 1][1], callback_data=f'branch_{branches[i + 1][0]}'))
+        rows.append(row)
+    rows.append([InlineKeyboardButton(get_text(lang, 'back'), callback_data=back_callback)])
+    return InlineKeyboardMarkup(rows)
+
+def build_all_branches_keyboard(back_callback: str, lang: str) -> InlineKeyboardMarkup:
+    """Build branch keyboard showing all 12 branches in two groups."""
+    rows = []
+    for i in range(0, len(LAND_BRANCHES), 2):
+        row = [InlineKeyboardButton('🌱 ' + LAND_BRANCHES[i][1], callback_data=f'branch_{LAND_BRANCHES[i][0]}')]
+        if i + 1 < len(LAND_BRANCHES):
+            row.append(InlineKeyboardButton('🌱 ' + LAND_BRANCHES[i + 1][1], callback_data=f'branch_{LAND_BRANCHES[i + 1][0]}'))
+        rows.append(row)
+    for i in range(0, len(SCHOOL_BRANCHES), 2):
+        row = [InlineKeyboardButton('🎓 ' + SCHOOL_BRANCHES[i][1], callback_data=f'branch_{SCHOOL_BRANCHES[i][0]}')]
+        if i + 1 < len(SCHOOL_BRANCHES):
+            row.append(InlineKeyboardButton('🎓 ' + SCHOOL_BRANCHES[i + 1][1], callback_data=f'branch_{SCHOOL_BRANCHES[i + 1][0]}'))
+        rows.append(row)
+    rows.append([InlineKeyboardButton(get_text(lang, 'back'), callback_data=back_callback)])
+    return InlineKeyboardMarkup(rows)
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     telegram_id = update.effective_user.id
     user = crud.get_user_by_telegram_id(telegram_id)
-    
+
     if user:
         lang = user.get('language', 'ru')
         role_text = get_text(lang, f"role_{user['role']}")
-        branch_text = get_text(lang, f"branch_{user['branch']}") if user['branch'] != 'all' else get_text(lang, 'branch_all')
-        
+        branch_text = BRANCH_NAMES.get(user['branch'], user['branch'])
+
         msg = get_text(lang, 'already_registered', name=user['full_name'], role=role_text, branch=branch_text)
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton(get_text(lang, 'open_app'), web_app={'url': f"{WEBAPP_URL}?user_id={telegram_id}&lang={lang}&role={user['role']}&branch={user['branch']}"})],
@@ -120,7 +167,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         ])
         await update.effective_message.reply_text(msg, reply_markup=keyboard)
         return ConversationHandler.END
-    
+
     keyboard = InlineKeyboardMarkup([[InlineKeyboardButton('🇷🇺 Русский', callback_data='lang_ru'), InlineKeyboardButton("🇺🇿 O'zbekcha", callback_data='lang_uz')]])
     await update.effective_message.reply_text(TEXTS['ru']['welcome'], reply_markup=keyboard)
     return LANGUAGE
@@ -131,6 +178,21 @@ async def language_selected(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     lang = query.data.split('_')[1]
     context.user_data['language'] = lang
     await query.delete_message()
+    # Ask school or land
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton(get_text(lang, 'type_land'), callback_data='type_land'),
+         InlineKeyboardButton(get_text(lang, 'type_school'), callback_data='type_school')]
+    ])
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=get_text(lang, 'select_type'), reply_markup=keyboard)
+    return TYPE
+
+async def type_selected(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+    lang = context.user_data.get('language', 'ru')
+    inst_type = query.data.split('_')[1]  # 'land' or 'school'
+    context.user_data['inst_type'] = inst_type
+    await query.delete_message()
     await context.bot.send_message(chat_id=update.effective_chat.id, text=get_text(lang, 'enter_fio'), reply_markup=get_back_keyboard(lang))
     return FIO
 
@@ -140,7 +202,7 @@ async def fio_entered(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
     if text == get_text(lang, 'back'):
         if context.user_data.get('changing_setting') == 'fio': return await settings_menu(update, context)
         return await start(update, context)
-        
+
     context.user_data['full_name'] = text
     if context.user_data.get('changing_setting') == 'fio':
         user = crud.get_user_by_telegram_id(update.effective_user.id)
@@ -148,7 +210,6 @@ async def fio_entered(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
         await update.message.reply_text(get_text(lang, 'fio_changed', name=text), reply_markup=ReplyKeyboardRemove())
         return await settings_menu(update, context)
 
-    # Remove physical keyboard
     msg = await update.message.reply_text("⏳", reply_markup=ReplyKeyboardRemove())
     await msg.delete()
 
@@ -172,7 +233,7 @@ async def role_selected(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
         await query.delete_message()
         await context.bot.send_message(chat_id=update.effective_chat.id, text=get_text(lang, 'enter_fio'), reply_markup=get_back_keyboard(lang))
         return FIO
-        
+
     role = data.split('_')[1]
     context.user_data['role'] = role
     await query.delete_message()
@@ -194,26 +255,21 @@ async def password_entered(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         ])
         await update.message.reply_text(get_text(lang, 'select_role'), reply_markup=keyboard)
         return ROLE
-    
+
     if text != ROLE_PASSWORDS.get(role):
         await update.message.reply_text(get_text(lang, 'wrong_password'), reply_markup=get_back_keyboard(lang))
         return PASSWORD
-    
-    # Remove physical keyboard
+
     msg = await update.message.reply_text("⏳", reply_markup=ReplyKeyboardRemove())
     await msg.delete()
-    
+
     if role in ['financier', 'supplier', 'snabjenec']:
         context.user_data['branch'] = 'all'
         return await finalize_registration(update, context)
-    
-    keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton(get_text(lang, 'branch_chilanzar'), callback_data='branch_chilanzar')],
-        [InlineKeyboardButton(get_text(lang, 'branch_uchtepa'), callback_data='branch_uchtepa')],
-        [InlineKeyboardButton(get_text(lang, 'branch_shayzantaur'), callback_data='branch_shayzantaur')],
-        [InlineKeyboardButton(get_text(lang, 'branch_olmazar'), callback_data='branch_olmazar')],
-        [InlineKeyboardButton(get_text(lang, 'back'), callback_data='back_to_role')]
-    ])
+
+    # Chef: show branches filtered by selected type
+    inst_type = context.user_data.get('inst_type', 'land')
+    keyboard = build_branch_keyboard(inst_type, 'back_to_role', lang)
     await update.message.reply_text(get_text(lang, 'select_branch'), reply_markup=keyboard)
     return BRANCH
 
@@ -232,8 +288,9 @@ async def branch_selected(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         ])
         await context.bot.send_message(chat_id=update.effective_chat.id, text=get_text(lang, 'select_role'), reply_markup=keyboard)
         return ROLE
-    
-    context.user_data['branch'] = query.data.split('_')[1]
+
+    # Extract full branch id (e.g. 'beltepa_land' from 'branch_beltepa_land')
+    context.user_data['branch'] = query.data[7:]  # remove 'branch_' prefix
     return await finalize_registration(update, context)
 
 async def finalize_registration(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -241,11 +298,11 @@ async def finalize_registration(update: Update, context: ContextTypes.DEFAULT_TY
     lang, full_name, role = context.user_data.get('language', 'ru'), context.user_data.get('full_name'), context.user_data.get('role')
     branch = context.user_data.get('branch', 'all')
     crud.save_user(telegram_id, full_name, role, branch, lang)
-    
-    branch_text = get_text(lang, f"branch_{branch}") if branch != 'all' else get_text(lang, 'branch_all')
+
+    branch_text = BRANCH_NAMES.get(branch, branch)
     msg = get_text(lang, 'registration_complete', name=full_name, role=get_text(lang, f"role_{role}"), branch=branch_text)
     keyboard = InlineKeyboardMarkup([[InlineKeyboardButton(get_text(lang, 'open_app'), web_app={'url': f"{WEBAPP_URL}?user_id={telegram_id}&lang={lang}&role={role}&branch={branch}"})]])
-    
+
     message = update.callback_query.message if update.callback_query else update.message
     await message.reply_text(msg, reply_markup=keyboard)
     return ConversationHandler.END
@@ -256,7 +313,7 @@ async def settings_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     telegram_id = update.effective_user.id
     user = crud.get_user_by_telegram_id(telegram_id)
     if not user: return await start(update, context)
-    
+
     lang = user.get('language', 'ru')
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton(get_text(lang, 'change_language'), callback_data='setting_language')],
@@ -313,13 +370,7 @@ async def setting_branch_handle(update: Update, context: ContextTypes.DEFAULT_TY
     user = crud.get_user_by_telegram_id(update.effective_user.id)
     lang = user.get('language', 'ru')
     context.user_data.update({'language': lang, 'full_name': user['full_name'], 'role': user['role'], 'changing_setting': 'branch'})
-    keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton(get_text(lang, 'branch_chilanzar'), callback_data='branch_chilanzar')],
-        [InlineKeyboardButton(get_text(lang, 'branch_uchtepa'), callback_data='branch_uchtepa')],
-        [InlineKeyboardButton(get_text(lang, 'branch_shayzantaur'), callback_data='branch_shayzantaur')],
-        [InlineKeyboardButton(get_text(lang, 'branch_olmazar'), callback_data='branch_olmazar')],
-        [InlineKeyboardButton(get_text(lang, 'back'), callback_data='back_to_settings')]
-    ])
+    keyboard = build_all_branches_keyboard('back_to_settings', lang)
     await query.edit_message_text(get_text(lang, 'select_branch'), reply_markup=keyboard)
     return BRANCH
 
@@ -332,6 +383,7 @@ def get_bot_handler():
         entry_points=[CommandHandler('start', start), CommandHandler('settings', settings_menu), CallbackQueryHandler(settings_menu, pattern='^settings$')],
         states={
             LANGUAGE: [CallbackQueryHandler(language_selected, pattern='^lang_')],
+            TYPE: [CallbackQueryHandler(type_selected, pattern='^type_')],
             FIO: [MessageHandler(filters.TEXT & ~filters.COMMAND, fio_entered)],
             ROLE: [CallbackQueryHandler(role_selected, pattern='^role_'), CallbackQueryHandler(settings_menu, pattern='^back_to_settings$')],
             PASSWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, password_entered)],

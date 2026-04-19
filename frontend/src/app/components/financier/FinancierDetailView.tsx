@@ -1,16 +1,23 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, Send, Plus, Trash2, Edit2, Check, X, Wallet, FileText, Calendar, MessageSquare, RefreshCcw, AlignJustify, LayoutGrid, Download } from 'lucide-react';
-import * as XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
 import type { Order, Product, Unit, Branch } from '@/lib/api';
+import { api } from '@/lib/api';
 import { StatusBadge } from '@/app/components/StatusBadge';
 import { useLanguage } from '@/app/context/LanguageContext';
 
 const branchNames: Record<Branch | 'all', string> = {
-    chilanzar: 'Чиланзар (Новза)',
-    uchtepa: 'Учтепа',
-    shayzantaur: 'Шайзантаур',
-    olmazar: 'Олмазар',
+    beltepa_land: 'Белтепа-Land',
+    uchtepa_land: 'Учтепа-Land',
+    rakat_land: 'Ракат-Land',
+    mukumiy_land: 'Мукумий-Land',
+    yunusabad_land: 'Юнусабад-Land',
+    novoi_land: 'Новои-Land',
+    novza_school: 'Новза-School',
+    uchtepa_school: 'Учтепа-School',
+    almazar_school: 'Алмазар-School',
+    general_uzakov_school: 'Генерал Узоков-School',
+    namangan_school: 'Наманган-School',
+    novoi_school: 'Новои-School',
     all: 'Все филиалы',
 };
 
@@ -105,40 +112,29 @@ export function FinancierDetailView({ order, onUpdateOrder, onBackToRoles, branc
         }
     };
 
-    const handleExportExcel = () => {
-        const data = localProducts
-            .filter(p => p.quantity > 0)
-            .map(p => ({
-                [t('category')]: p.category,
-                [t('productName')]: p.name,
-                [t('quantity')]: p.quantity,
-                [t('unit')]: p.unit,
-                [t('price')]: p.price || 0,
-                [t('sum')]: (p.price || 0) * p.quantity,
-                [t('chef') as any]: p.chefComment || '',
-                [t('supplier')]: p.comment || ''
-            }));
+    const [exportLoading, setExportLoading] = useState(false);
 
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, t('financierTitle'));
-
-        const wscols = [
-            { wch: 15 }, // Category
-            { wch: 30 }, // Name
-            { wch: 10 }, // Quantity
-            { wch: 10 }, // Unit
-            { wch: 15 }, // Price
-            { wch: 15 }, // Sum
-            { wch: 20 }, // Chef
-            { wch: 20 }  // Supplier
-        ];
-        ws['!cols'] = wscols;
-
-        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-        const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
-
-        saveAs(blob, `Финансист_${branchNames[branch]}_${new Date().toLocaleDateString('ru-RU')}.xlsx`);
+    const handleExportDocx = async () => {
+        setExportLoading(true);
+        try {
+            const templates = await api.getTemplates();
+            if (!templates || templates.length === 0) {
+                alert('Шаблоны не найдены. Загрузите шаблон в настройках.');
+                return;
+            }
+            const templateId = templates[0].id;
+            const blob = await api.exportOrderTemplate(order.id, templateId, 'docx');
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Финансист_${branchNames[branch]}_${new Date().toLocaleDateString('ru-RU')}.docx`;
+            a.click();
+            URL.revokeObjectURL(url);
+        } catch {
+            alert('Ошибка при скачивании файла');
+        } finally {
+            setExportLoading(false);
+        }
     };
 
     const isReadOnly = order.status !== 'sent_to_financier';
@@ -271,7 +267,7 @@ export function FinancierDetailView({ order, onUpdateOrder, onBackToRoles, branc
                         >
                             {isCompact ? <LayoutGrid className="w-5 h-5" /> : <AlignJustify className="w-5 h-5" />}
                         </button>
-                        <button onClick={handleExportExcel} className="p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors">
+                        <button onClick={handleExportDocx} disabled={exportLoading} className="p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors disabled:opacity-50">
                             <Download className="w-5 h-5" />
                         </button>
                         {!isReadOnly && (

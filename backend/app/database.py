@@ -99,6 +99,12 @@ def init_db():
     )
     ''')
 
+    # Remove orders and users with old branch names (one-time migration)
+    old_branches = ('chilanzar', 'uchtepa', 'shayzantaur', 'olmazar')
+    placeholders = ','.join('?' * len(old_branches))
+    cursor.execute(f"DELETE FROM orders WHERE branch IN ({placeholders})", old_branches)
+    cursor.execute(f"DELETE FROM users WHERE branch IN ({placeholders})", old_branches)
+
     conn.commit()
     conn.close()
 

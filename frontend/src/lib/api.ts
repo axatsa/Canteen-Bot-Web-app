@@ -37,7 +37,9 @@ export type Status =
 
 export type Role = 'chef' | 'financier' | 'supplier' | 'snabjenec';
 
-export type Branch = 'chilanzar' | 'uchtepa' | 'shayzantaur' | 'olmazar';
+export type Branch =
+    | 'beltepa_land' | 'uchtepa_land' | 'rakat_land' | 'mukumiy_land' | 'yunusabad_land' | 'novoi_land'
+    | 'novza_school' | 'uchtepa_school' | 'almazar_school' | 'general_uzakov_school' | 'namangan_school' | 'novoi_school';
 
 export type DeliveryItemTracking = {
     ordered_qty: number;
