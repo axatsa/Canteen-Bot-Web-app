@@ -56,7 +56,49 @@ def init_db():
     except sqlite3.OperationalError:
         cursor.execute("ALTER TABLE master_products ADD COLUMN last_price REAL")
         conn.commit()
-    
+
+    # Migrate orders table: add delivery tracking columns
+    existing_cols = {row[1] for row in cursor.execute("PRAGMA table_info(orders)").fetchall()}
+    migrations = [
+        ("sent_to_supplier_at", "TEXT"),
+        ("received_from_supplier_at", "TEXT"),
+        ("delivery_tracking", "TEXT DEFAULT '{}'"),
+        ("supplier_responded", "INTEGER DEFAULT 0"),
+        ("extra_items_delivered", "TEXT DEFAULT '{}'"),
+    ]
+    for col_name, col_def in migrations:
+        if col_name not in existing_cols:
+            cursor.execute(f"ALTER TABLE orders ADD COLUMN {col_name} {col_def}")
+    conn.commit()
+
+    # Templates table
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS templates (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT,
+        file_path TEXT NOT NULL,
+        file_size INTEGER,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        created_by TEXT
+    )
+    ''')
+
+    # Export history table
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS export_history (
+        id TEXT PRIMARY KEY,
+        order_id TEXT NOT NULL,
+        template_id TEXT,
+        format TEXT,
+        file_name TEXT,
+        exported_by TEXT,
+        exported_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (order_id) REFERENCES orders(id),
+        FOREIGN KEY (template_id) REFERENCES templates(id)
+    )
+    ''')
+
     conn.commit()
     conn.close()
 

@@ -2,3 +2,5 @@ fastapi
 uvicorn
 python-telegram-bot
 python-dotenv
+docxtpl
+python-multipart
