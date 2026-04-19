@@ -129,9 +129,18 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
             return;
         }
 
+        // Fill missing delivery dates with main estimatedDate
+        const productsWithInheritedDates = localProducts.map(p => {
+            // If product is not marked as "sent today" and doesn't have a specific date, inherit main date
+            if (!p.checked && (!p.deliveryDate || p.deliveryDate === '') && estimatedDate) {
+                return { ...p, deliveryDate: estimatedDate };
+            }
+            return p;
+        });
+
         onUpdateOrder({
             ...order,
-            products: localProducts,
+            products: productsWithInheritedDates,
             status: 'waiting_snabjenec_receive',
             estimatedDeliveryDate: estimatedDate ? new Date(estimatedDate) : undefined,
         });

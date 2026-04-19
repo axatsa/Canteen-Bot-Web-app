@@ -60,7 +60,8 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
     const isLegacyReceiveMode = isReceiveMode && !order.supplierResponded;
     const canArchive = ['waiting_snabjenec_receive', 'sent_to_financier'].includes(order.status);
 
-    const displayProducts = localProducts.filter(p => p.quantity > 0);
+    // In review mode, show ALL products (user is editing). In other modes, filter out quantity=0
+    const displayProducts = isReviewMode ? localProducts : localProducts.filter(p => p.quantity > 0);
     const supplierSent = displayProducts.filter(p => p.checked);
     const supplierNotSent = displayProducts.filter(p => !p.checked);
 
