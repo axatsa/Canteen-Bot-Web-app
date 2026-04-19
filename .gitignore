@@ -5,3 +5,5 @@ github_actions_deploy
 github_actions_deploy.pub
 .venv
 __pycache__
+.agent
+.claude
