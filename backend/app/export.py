@@ -2,6 +2,7 @@ import os
 import uuid
 import logging
 from typing import Optional
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +71,9 @@ def fill_docx_template(template_path: str, context: dict) -> Optional[str]:
 
             # Insert actual data rows at the same position
             ref_tr = table.rows[marker_row_idx]._tr if marker_row_idx < len(table.rows) else None
-            for item in reversed(all_items):
+            # When inserting before ref_tr each row shifts up, so iterate reversed to get correct order
+            items_iter = reversed(all_items) if ref_tr is not None else all_items
+            for item in items_iter:
                 new_tr = deepcopy(tr_template)
                 cells = new_tr.findall(qn('w:tc'))
                 values = [
@@ -107,6 +110,26 @@ def fill_docx_template(template_path: str, context: dict) -> Optional[str]:
         return None
 
 
+BRANCH_NAMES = {
+    'beltepa_land': 'Белтепа-Land',
+    'uchtepa_land': 'Учтепа-Land',
+    'novza_school': 'Новза-School',
+    'uchtepa_school': 'Учтепа-School',
+    'almazar_school': 'Алмазар-School',
+    'rakat_land': 'Ракат-Land',
+    'mukumiy_land': 'Мукумий-Land',
+    'general_uzakov_school': 'Генерал Узаков-School',
+    'yunusabad_land': 'Юнусабад-Land',
+    'namangan_school': 'Наманган-School',
+}
+
+MONTH_NAMES = {
+    1: 'Января', 2: 'Февраля', 3: 'Марта', 4: 'Апреля',
+    5: 'Мая', 6: 'Июня', 7: 'Июля', 8: 'Августа',
+    9: 'Сентября', 10: 'Октября', 11: 'Ноября', 12: 'Декабря',
+}
+
+
 def build_export_context(order_details: dict, names: dict = None) -> dict:
     order = order_details.get('order', {})
     delivery = order_details.get('delivery', {})
@@ -115,17 +138,10 @@ def build_export_context(order_details: dict, names: dict = None) -> dict:
     extra = order_details.get('extra_items', [])
 
     created_at = order.get('created_at', '')
-    day, month, year = '', '', ''
-    if created_at:
-        parts = created_at[:10].split('-')
-        if len(parts) == 3:
-            year, month, day = parts
-            month_names = {
-                '01': 'Января', '02': 'Февраля', '03': 'Марта', '04': 'Апреля',
-                '05': 'Мая', '06': 'Июня', '07': 'Июля', '08': 'Августа',
-                '09': 'Сентября', '10': 'Октября', '11': 'Ноября', '12': 'Декабря',
-            }
-            month = month_names.get(month, month)
+    now = datetime.now()
+    day = str(now.day)
+    month = MONTH_NAMES.get(now.month, str(now.month))
+    year = str(now.year)
 
     total_ordered = sum(i.get('ordered_qty', 0) for i in delivered + not_delivered)
     total_received = sum(i.get('received_qty', 0) for i in delivered + not_delivered)
@@ -143,7 +159,7 @@ def build_export_context(order_details: dict, names: dict = None) -> dict:
 
     return {
         'order_id': order.get('id', ''),
-        'branch': order.get('branch', ''),
+        'branch': BRANCH_NAMES.get(order.get('branch', ''), order.get('branch', '')),
         'day': day,
         'month_name': month,
         'year': year,
