@@ -113,11 +113,12 @@ export const translations = {
         statusCompleted: 'Завершено',
 
         // Alerts - friendly versions
-        alertListSent: 'Готово! Список улетел к финансисту 🚀',
+        alertListSent: 'Готово! Список отправлен поставщику 🚚',
+        alertSentToSnabjenec: 'Готово! Заказ передан снабженцу на приёмку 📦',
         alertCheckComplete: 'Супер! Отправлено финансисту на финальную проверку ✅',
-        alertApproved: 'Отлично! Список одобрен и отправлен поставщику 📦',
+        alertApproved: 'Готово! Заявка архивирована ✅',
         alertOrderComplete: 'Ура! Заказ успешно завершён! 🎉',
-        alertSentToChef: 'Готово! Заявка отправлена шеф-повару на проверку 👨‍🍳',
+        alertSentToChef: 'Готово! Список отправлен снабженцу 📋',
         alertNoProducts: 'Подождите! Укажите количество хотя бы для одного продукта 📝',
         alertNoPrices: 'Стоп! Укажите цену для всех товаров. Финансист не примет без цен 💰',
         alertNoDeliveries: 'Пока ничего не привезли 📭',
@@ -235,11 +236,12 @@ export const translations = {
         statusCompleted: 'Yakunlandi',
 
         // Alerts - friendly versions
-        alertListSent: 'Tayyor! Ro\'yxat moliyachiga yuborildi 🚀',
+        alertListSent: 'Tayyor! Ro\'yxat yetkazuvchiga yuborildi 🚚',
+        alertSentToSnabjenec: 'Tayyor! Buyurtma ta\'minotchiga qabulga topshirildi 📦',
         alertCheckComplete: 'Zo\'r! Yakuniy tekshiruv uchun moliyachiga yuborildi ✅',
-        alertApproved: 'A\'lo! Ro\'yxat tasdiqlandi va yetkazuvchiga yuborildi 📦',
+        alertApproved: 'Tayyor! Buyurtma arxivlandi ✅',
         alertOrderComplete: 'Ura! Buyurtma muvaffaqiyatli yakunlandi! 🎉',
-        alertSentToChef: 'Tayyor! Buyurtma oshpazga tekshiruv uchun yuborildi 👨‍🍳',
+        alertSentToChef: 'Tayyor! Ro\'yxat ta\'minotchiga yuborildi 📋',
         alertNoProducts: 'Kuting! Kamida bitta mahsulot miqdorini kiriting 📝',
         alertNoPrices: 'To\'xtang! Barcha mahsulotlar uchun narx kiriting. Moliyachi narxsiz qabul qilmaydi 💰',
         alertNoDeliveries: 'Hozircha yetkazib berish yo\'q 📭',

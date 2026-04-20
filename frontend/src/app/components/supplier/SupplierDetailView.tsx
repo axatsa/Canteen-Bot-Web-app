@@ -135,7 +135,7 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
             status: 'waiting_snabjenec_receive',
             estimatedDeliveryDate: estimatedDate ? new Date(estimatedDate) : undefined,
         });
-        alert(t('alertListSent'));
+        alert(t('alertSentToSnabjenec' as any));
     };
 
     const handleExportExcel = () => {

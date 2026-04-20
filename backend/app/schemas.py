@@ -22,6 +22,9 @@ class Order(BaseModel):
     deliveredAt: Optional[str] = None
     estimatedDeliveryDate: Optional[str] = None
     branch: str
+    supplierResponded: Optional[bool] = False
+    deliveryTracking: Optional[Dict[str, Any]] = {}
+    extraItemsDelivered: Optional[Dict[str, Any]] = {}
 
 class UserRegister(BaseModel):
     telegram_id: int
