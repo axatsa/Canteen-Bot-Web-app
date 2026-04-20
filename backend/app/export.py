@@ -1,4 +1,5 @@
 import os
+import re
 import uuid
 import logging
 from typing import Optional
@@ -15,24 +16,31 @@ def ensure_dirs():
     os.makedirs(EXPORTS_DIR, exist_ok=True)
 
 
-def _replace_text_in_para(para, context: dict):
-    full = ''.join(r.text for r in para.runs)
-    for key, val in context.items():
-        full = full.replace('{{ ' + key + ' }}', str(val or ''))
-        full = full.replace('{{' + key + '}}', str(val or ''))
+def _set_cell_text(cell, text: str):
+    """Write text into the first paragraph/run of a table cell, preserving formatting."""
+    para = cell.paragraphs[0]
     if para.runs:
-        para.runs[0].text = full
+        para.runs[0].text = str(text)
         for r in para.runs[1:]:
             r.text = ''
+    else:
+        from docx.oxml import OxmlElement
+        r_el = OxmlElement('w:r')
+        t_el = OxmlElement('w:t')
+        t_el.text = str(text)
+        r_el.append(t_el)
+        para._p.append(r_el)
+
+
+def _normalize_product_name(raw: str) -> str:
+    """Extract Russian-only part (before '(') and lowercase-strip."""
+    russian = raw.split('(')[0].strip()
+    return russian.lower()
 
 
 def fill_docx_template(template_path: str, context: dict) -> Optional[str]:
     try:
         from docx import Document
-        from docx.shared import Pt
-        from docx.oxml.ns import qn
-        from docx.oxml import OxmlElement
-        from copy import deepcopy
     except ImportError:
         logger.error("python-docx not installed")
         return None
@@ -41,86 +49,145 @@ def fill_docx_template(template_path: str, context: dict) -> Optional[str]:
     try:
         doc = Document(template_path)
 
-        # 1. Replace simple {{ var }} placeholders in paragraphs
+        day         = context.get('day', '')
+        month_name  = context.get('month_name', '')
+        branch      = context.get('branch', '')
+        snabjenec   = context.get('snabjenec_name', '')
+        supplier    = context.get('supplier_name', '')
+        recipient   = context.get('recipient_name', '') or snabjenec
+
+        # ── Fill header paragraphs ────────────────────────────────────────────
         for para in doc.paragraphs:
-            _replace_text_in_para(para, context)
+            full = para.text
 
-        # 2. Handle table: find marker row and replace with actual data rows
-        all_items = context.get('all_items', [])
-        for table in doc.tables:
-            marker_row_idx = None
-            for i, row in enumerate(table.rows):
-                row_text = ''.join(
-                    ''.join(r.text for r in cell.paragraphs[0].runs)
-                    for cell in row.cells
+            if 'Дата:' in full and para.runs:
+                # Replace the underscores/blanks in the date run
+                # run[0] looks like: '    Дата: «          » ______________ '
+                r = para.runs[0]
+                r.text = re.sub(
+                    r'«[^»]*»\s+[_\s]+',
+                    f'« {day} » {month_name}  ',
+                    r.text
                 )
-                if 'ITEMS_ROW' in row_text or '{%tr' in row_text or 'item.product_name' in row_text:
-                    marker_row_idx = i
-                    break
 
-            if marker_row_idx is None:
-                continue
+            elif 'Филиал:' in full and para.runs:
+                # Last run is the underscores placeholder
+                for r in reversed(para.runs):
+                    if '_' in r.text:
+                        r.text = branch
+                        break
 
-            # Copy style from marker row, then remove it
-            template_row = table.rows[marker_row_idx]
-            tr_template = deepcopy(template_row._tr)
+            elif full.strip().startswith('Cнабженец:') and para.runs:
+                r = para.runs[0]
+                r.text = re.sub(r'_{5,}', lambda m, used=[False]: (
+                    snabjenec if not used[0] and not used.__setitem__(0, True)
+                    else m.group()
+                ), r.text)
 
-            # Remove marker row from table
-            tbl = table._tbl
-            tbl.remove(template_row._tr)
+            elif full.strip().startswith('Поставщик:') and para.runs:
+                r = para.runs[0]
+                r.text = re.sub(r'_{5,}', lambda m, used=[False]: (
+                    supplier if not used[0] and not used.__setitem__(0, True)
+                    else m.group()
+                ), r.text)
 
-            # Insert actual data rows at the same position
-            ref_tr = table.rows[marker_row_idx]._tr if marker_row_idx < len(table.rows) else None
-            # When inserting before ref_tr each row shifts up, so iterate reversed to get correct order
-            items_iter = reversed(all_items) if ref_tr is not None else all_items
-            for item in items_iter:
-                new_tr = deepcopy(tr_template)
-                cells = new_tr.findall(qn('w:tc'))
-                values = [
-                    str(item.get('number', '')),
-                    str(item.get('product_name', '')),
-                    str(item.get('unit', '')),
-                    str(item.get('ordered_qty', '')),
-                    str(item.get('received_qty', '')),
-                ]
-                for cell_el, val in zip(cells, values):
-                    for p_el in cell_el.findall(qn('w:p')):
-                        # Clear all runs
-                        for r_el in p_el.findall(qn('w:r')):
-                            p_el.remove(r_el)
-                        # Add single clean run
-                        r_new = OxmlElement('w:r')
-                        t_new = OxmlElement('w:t')
-                        t_new.text = val
-                        r_new.append(t_new)
-                        p_el.append(r_new)
-                        break  # only first paragraph
+            elif full.strip().startswith('Получатель:') and para.runs:
+                r = para.runs[0]
+                r.text = re.sub(r'_{5,}', lambda m, used=[False]: (
+                    recipient if not used[0] and not used.__setitem__(0, True)
+                    else m.group()
+                ), r.text)
 
-                if ref_tr is not None:
-                    tbl.insert(list(tbl).index(ref_tr), new_tr)
+        # ── Build order product lookup ────────────────────────────────────────
+        all_items = context.get('all_items', [])
+        extra_items = context.get('extra_items', [])
+
+        # keyed by normalized Russian name
+        order_lookup: dict[str, dict] = {}
+        for item in all_items:
+            key = _normalize_product_name(item.get('product_name', ''))
+            if key:
+                order_lookup[key] = item
+
+        matched_keys: set[str] = set()
+
+        # ── Fill table rows ───────────────────────────────────────────────────
+        if doc.tables:
+            table = doc.tables[0]
+            andere_rows = []  # "Другие" empty rows to fill with unmatched items
+
+            for row in table.rows:
+                cells = row.cells
+                num_text  = cells[0].text.strip()
+                name_text = cells[1].text.strip()
+
+                # Skip header row and category rows (merged / no leading number)
+                if not num_text.isdigit():
+                    continue
+
+                # "Другие" empty row
+                if name_text == '':
+                    andere_rows.append(row)
+                    continue
+
+                # Regular product row — try to match order data
+                norm = _normalize_product_name(name_text)
+                matched = None
+                if norm in order_lookup:
+                    matched = order_lookup[norm]
+                    matched_keys.add(norm)
                 else:
-                    tbl.append(new_tr)
+                    # Partial word match (multi-word keys only to avoid false positives)
+                    for ok, ov in order_lookup.items():
+                        ok_words  = set(ok.split())
+                        tmpl_words = set(norm.split())
+                        # Require at least 2 words overlap and no single-word ambiguous match
+                        common = ok_words & tmpl_words
+                        if len(common) >= 2 or (ok_words == tmpl_words):
+                            matched = ov
+                            matched_keys.add(ok)
+                            break
+
+                if matched:
+                    _set_cell_text(cells[2], matched.get('unit', ''))
+                    _set_cell_text(cells[3], matched.get('ordered_qty', ''))
+                    _set_cell_text(cells[4], matched.get('received_qty', ''))
+
+            # Fill unmatched order items into "Другие" rows
+            unmatched = [
+                item for item in all_items
+                if _normalize_product_name(item.get('product_name', '')) not in matched_keys
+            ] + list(extra_items)
+
+            for row, item in zip(andere_rows, unmatched):
+                cells = row.cells
+                _set_cell_text(cells[1], item.get('product_name', ''))
+                _set_cell_text(cells[2], item.get('unit', ''))
+                _set_cell_text(cells[3], item.get('ordered_qty', ''))
+                _set_cell_text(cells[4], item.get('received_qty', ''))
 
         out_name = f"order_{context.get('order_id', uuid.uuid4())}_{uuid.uuid4().hex[:8]}.docx"
         out_path = os.path.join(EXPORTS_DIR, out_name)
         doc.save(out_path)
         return out_path
     except Exception as e:
-        logger.error(f"Error filling DOCX template: {e}")
+        logger.exception(f"Error filling DOCX template: {e}")
         return None
 
 
 BRANCH_NAMES = {
-    'beltepa_land': 'Белтепа-Land',
-    'uchtepa_land': 'Учтепа-Land',
-    'novza_school': 'Новза-School',
-    'uchtepa_school': 'Учтепа-School',
-    'almazar_school': 'Алмазар-School',
-    'rakat_land': 'Ракат-Land',
-    'mukumiy_land': 'Мукумий-Land',
+    'beltepa_land':          'Белтепа-Land',
+    'uchtepa_land':          'Учтепа-Land',
+    'rakat_land':            'Ракат-Land',
+    'mukumiy_land':          'Мукумий-Land',
+    'yunusabad_land':        'Юнусабад-Land',
+    'novoi_land':            'Новои-Land',
+    'novza_school':          'Новза-School',
+    'uchtepa_school':        'Учтепа-School',
+    'almazar_school':        'Алмазар-School',
     'general_uzakov_school': 'Генерал Узаков-School',
-    'yunusabad_land': 'Юнусабад-Land',
-    'namangan_school': 'Наманган-School',
+    'namangan_school':       'Наманган-School',
+    'novoi_school':          'Новои-School',
 }
 
 MONTH_NAMES = {
@@ -131,50 +198,50 @@ MONTH_NAMES = {
 
 
 def build_export_context(order_details: dict, names: dict = None) -> dict:
-    order = order_details.get('order', {})
-    delivery = order_details.get('delivery', {})
-    delivered = order_details.get('delivered_items', [])
-    not_delivered = order_details.get('not_delivered_items', [])
-    extra = order_details.get('extra_items', [])
+    order           = order_details.get('order', {})
+    delivery        = order_details.get('delivery', {})
+    delivered       = order_details.get('delivered_items', [])
+    not_delivered   = order_details.get('not_delivered_items', [])
+    extra           = order_details.get('extra_items', [])
 
-    created_at = order.get('created_at', '')
     now = datetime.now()
-    day = str(now.day)
-    month = MONTH_NAMES.get(now.month, str(now.month))
-    year = str(now.year)
+    day         = str(now.day)
+    month       = MONTH_NAMES.get(now.month, str(now.month))
+    year        = str(now.year)
 
-    total_ordered = sum(i.get('ordered_qty', 0) for i in delivered + not_delivered)
+    total_ordered  = sum(i.get('ordered_qty', 0) for i in delivered + not_delivered)
     total_received = sum(i.get('received_qty', 0) for i in delivered + not_delivered)
 
     all_items = []
     for idx, item in enumerate(delivered + not_delivered, start=1):
         all_items.append({
-            'number': idx,
+            'number':       idx,
             'product_name': item.get('product_name', ''),
-            'unit': item.get('unit', ''),
-            'ordered_qty': item.get('ordered_qty', 0),
+            'unit':         item.get('unit', ''),
+            'ordered_qty':  item.get('ordered_qty', 0),
             'received_qty': item.get('received_qty', 0),
-            'status': item.get('status', ''),
+            'status':       item.get('status', ''),
         })
 
+    snabjenec_name = (names or {}).get('snabjenec_name', '')
+    supplier_name  = (names or {}).get('supplier_name', '')
+
     return {
-        'order_id': order.get('id', ''),
-        'branch': BRANCH_NAMES.get(order.get('branch', ''), order.get('branch', '')),
-        'day': day,
-        'month_name': month,
-        'year': year,
-        'time': '',
-        'delivered_items': delivered,
+        'order_id':         order.get('id', ''),
+        'branch':           BRANCH_NAMES.get(order.get('branch', ''), order.get('branch', '')),
+        'day':              day,
+        'month_name':       month,
+        'year':             year,
+        'delivered_items':  delivered,
         'not_delivered_items': not_delivered,
-        'extra_items': extra,
-        'all_items': all_items,
-        'total_ordered': total_ordered,
-        'total_received': total_received,
-        'completion_rate': delivery.get('completion_rate', ''),
-        'snabjenec_name': (names or {}).get('snabjenec_name', ''),
-        'supplier_name':  (names or {}).get('supplier_name', ''),
-        'chef_name':      (names or {}).get('chef_name', ''),
-        'recipient_name': (names or {}).get('snabjenec_name', ''),
-        'sender_name':    (names or {}).get('supplier_name', ''),
-        'signature_date': created_at[:10] if created_at else '',
+        'extra_items':      extra,
+        'all_items':        all_items,
+        'total_ordered':    total_ordered,
+        'total_received':   total_received,
+        'completion_rate':  delivery.get('completion_rate', ''),
+        'snabjenec_name':   snabjenec_name,
+        'supplier_name':    supplier_name,
+        'chef_name':        (names or {}).get('chef_name', ''),
+        'recipient_name':   snabjenec_name,
+        'sender_name':      supplier_name,
     }

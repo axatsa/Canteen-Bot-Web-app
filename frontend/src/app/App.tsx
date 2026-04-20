@@ -11,8 +11,8 @@ declare global {
 
 import { ChefView } from '@/app/components/ChefView';
 import { FinancierDesktop } from '@/app/components/financierDesktop/FinancierDesktop';
-import { SupplierView } from '@/app/components/SupplierView';
-import { SnabjenecView } from '@/app/components/SnabjenecView';
+import { SupplierView } from '@/app/components/supplier/SupplierView';
+import { SnabjenecView } from '@/app/components/snabjenec/SnabjenecView';
 import { RoleSelector } from '@/app/components/RoleSelector';
 import { BranchSelector } from '@/app/components/BranchSelector';
 import { LanguageProvider, useLanguage } from '@/app/context/LanguageContext';

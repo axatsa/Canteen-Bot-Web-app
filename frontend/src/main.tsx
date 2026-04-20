@@ -4,8 +4,6 @@ import App from './app/App';
 import TestingDashboard from './app/TestingDashboard';
 import { FinancierDesktop } from './app/components/financierDesktop/FinancierDesktop';
 import './styles/index.css';
-import './styles/theme.css';
-import './styles/tailwind.css';
 
 import { LanguageProvider } from './app/context/LanguageContext';
 
