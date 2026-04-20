@@ -247,6 +247,15 @@ def get_order_financier_details(order_id: str) -> Optional[dict]:
             "received_from_supplier_at": order.get('received_from_supplier_at'),
             "completion_rate": f"{stats['completion_rate']}%",
         },
+        "ordered_products": [
+            {
+                "product_id": str(p['id']),
+                "product_name": p.get('name', ''),
+                "unit": p.get('unit', ''),
+                "ordered_qty": p.get('quantity', 0),
+            }
+            for p in products
+        ],
         "delivered_items": stats['delivered_items'],
         "not_delivered_items": stats['not_delivered_items'],
         "extra_items": extra_items,

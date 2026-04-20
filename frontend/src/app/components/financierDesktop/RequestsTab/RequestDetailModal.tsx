@@ -74,6 +74,31 @@ export function RequestDetailModal({ orderId, onClose, templates }: RequestDetai
                                 </div>
                             </div>
 
+                            {/* Ordered products (when no delivery tracking yet) */}
+                            {details.delivered_items?.length === 0 && details.not_delivered_items?.length === 0 && details.ordered_products?.length > 0 && (
+                                <div>
+                                    <h3 className="font-bold text-gray-700 mb-2">📋 Заказано ({details.ordered_products.length})</h3>
+                                    <table className="w-full text-sm">
+                                        <thead className="bg-gray-100 text-gray-600">
+                                            <tr>
+                                                <th className="text-left p-2 rounded-tl-lg">Товар</th>
+                                                <th className="p-2">Ед.</th>
+                                                <th className="p-2 rounded-tr-lg">Кол-во</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {details.ordered_products.map((item: any, i: number) => (
+                                                <tr key={i} className="border-b border-gray-100">
+                                                    <td className="p-2 font-medium">{item.product_name}</td>
+                                                    <td className="p-2 text-center text-gray-500">{item.unit}</td>
+                                                    <td className="p-2 text-center">{item.ordered_qty}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+
                             {/* Delivered */}
                             {details.delivered_items?.length > 0 && (
                                 <div>
