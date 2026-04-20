@@ -116,10 +116,26 @@ def fill_docx_template(template_path: str, context: dict) -> Optional[str]:
             table = doc.tables[0]
             andere_rows = []  # "Другие" empty rows to fill with unmatched items
 
+            logger.info(f"[export] order_lookup keys: {list(order_lookup.keys())}")
+            logger.info(f"[export] table has {len(table.rows)} rows")
+
             for row in table.rows:
                 cells = row.cells
-                num_text  = cells[0].text.strip()
-                name_text = cells[1].text.strip()
+                # Get unique cells (merged cells can repeat)
+                unique_cells = []
+                seen = set()
+                for c in cells:
+                    if id(c) not in seen:
+                        seen.add(id(c))
+                        unique_cells.append(c)
+
+                if len(unique_cells) < 2:
+                    continue
+
+                num_text  = unique_cells[0].text.strip()
+                name_text = unique_cells[1].text.strip()
+
+                logger.info(f"[export] row: num={repr(num_text)} name={repr(name_text)} ncells={len(unique_cells)}")
 
                 # Skip header row and category rows (merged / no leading number)
                 if not num_text.isdigit():
@@ -127,7 +143,7 @@ def fill_docx_template(template_path: str, context: dict) -> Optional[str]:
 
                 # "Другие" empty row
                 if name_text == '':
-                    andere_rows.append(row)
+                    andere_rows.append((row, unique_cells))
                     continue
 
                 # Regular product row — try to match order data
@@ -136,22 +152,25 @@ def fill_docx_template(template_path: str, context: dict) -> Optional[str]:
                 if norm in order_lookup:
                     matched = order_lookup[norm]
                     matched_keys.add(norm)
+                    logger.info(f"[export] exact match: {repr(norm)}")
                 else:
-                    # Partial word match (multi-word keys only to avoid false positives)
+                    # Partial word match
                     for ok, ov in order_lookup.items():
-                        ok_words  = set(ok.split())
+                        ok_words   = set(ok.split())
                         tmpl_words = set(norm.split())
-                        # Require at least 2 words overlap and no single-word ambiguous match
                         common = ok_words & tmpl_words
                         if len(common) >= 2 or (ok_words == tmpl_words):
                             matched = ov
                             matched_keys.add(ok)
+                            logger.info(f"[export] partial match: {repr(norm)} -> {repr(ok)}")
                             break
+                    if not matched:
+                        logger.info(f"[export] NO match for: {repr(norm)}")
 
-                if matched:
-                    _set_cell_text(cells[2], matched.get('unit', ''))
-                    _set_cell_text(cells[3], matched.get('ordered_qty', ''))
-                    _set_cell_text(cells[4], matched.get('received_qty', ''))
+                if matched and len(unique_cells) >= 5:
+                    _set_cell_text(unique_cells[2], matched.get('unit', ''))
+                    _set_cell_text(unique_cells[3], matched.get('ordered_qty', ''))
+                    _set_cell_text(unique_cells[4], matched.get('received_qty', ''))
 
             # Fill unmatched order items into "Другие" rows
             unmatched = [
@@ -159,12 +178,12 @@ def fill_docx_template(template_path: str, context: dict) -> Optional[str]:
                 if _normalize_product_name(item.get('product_name', '')) not in matched_keys
             ] + list(extra_items)
 
-            for row, item in zip(andere_rows, unmatched):
-                cells = row.cells
-                _set_cell_text(cells[1], item.get('product_name', ''))
-                _set_cell_text(cells[2], item.get('unit', ''))
-                _set_cell_text(cells[3], item.get('ordered_qty', ''))
-                _set_cell_text(cells[4], item.get('received_qty', ''))
+            for (row, ucells), item in zip(andere_rows, unmatched):
+                if len(ucells) >= 5:
+                    _set_cell_text(ucells[1], item.get('product_name', ''))
+                    _set_cell_text(ucells[2], item.get('unit', ''))
+                    _set_cell_text(ucells[3], item.get('ordered_qty', ''))
+                    _set_cell_text(ucells[4], item.get('received_qty', ''))
 
         out_name = f"order_{context.get('order_id', uuid.uuid4())}_{uuid.uuid4().hex[:8]}.docx"
         out_path = os.path.join(EXPORTS_DIR, out_name)
@@ -209,14 +228,14 @@ def build_export_context(order_details: dict, names: dict = None) -> dict:
         # Fallback to ordered items if delivery tracking hasn't started
         source_items = [
             {
-                'product_name': p.get('name', ''),
+                'product_name': p.get('product_name', '') or p.get('name', ''),
                 'unit': p.get('unit', ''),
-                'ordered_qty': p.get('quantity', 0),
+                'ordered_qty': p.get('ordered_qty', 0) or p.get('quantity', 0),
                 'received_qty': '',
                 'status': 'pending'
             }
             for p in order_details.get('ordered_products', [])
-            if p.get('quantity', 0) > 0
+            if (p.get('ordered_qty', 0) or p.get('quantity', 0)) > 0
         ]
 
     now = datetime.now()
