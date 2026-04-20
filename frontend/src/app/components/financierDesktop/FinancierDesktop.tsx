@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { BarChart2, Archive, FileText, Settings, RefreshCw, HelpCircle } from 'lucide-react';
+import { BarChart2, Archive, FileText, Settings, RefreshCw, HelpCircle, ArrowLeft } from 'lucide-react';
 import { HelpModal } from '@/app/components/HelpModal';
 import { api } from '@/lib/api';
 import { SummaryCards } from './RequestsTab/SummaryCards';
@@ -12,7 +12,7 @@ import { TemplateManager } from './SettingsTab/TemplateManager';
 
 type Tab = 'requests' | 'archive' | 'statistics' | 'settings';
 
-export function FinancierDesktop() {
+export function FinancierDesktop({ onBackToRoles }: { onBackToRoles?: () => void }) {
     const [tab, setTab] = useState<Tab>('requests');
     const [orders, setOrders] = useState<any[]>([]);
     const [archiveOrders, setArchiveOrders] = useState<any[]>([]);
@@ -100,9 +100,16 @@ export function FinancierDesktop() {
         <div className="min-h-screen bg-gray-50 flex flex-col" style={{ minWidth: 1280 }}>
             {/* Header */}
             <header className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between">
-                <div>
-                    <h1 className="text-xl font-bold text-gray-900">Финансист — Dashboard</h1>
-                    <p className="text-xs text-gray-400 mt-0.5">Управление доставками и отчётами</p>
+                <div className="flex items-center gap-3">
+                    {onBackToRoles && (
+                        <button onClick={onBackToRoles} className="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                            <ArrowLeft className="w-4 h-4" />
+                        </button>
+                    )}
+                    <div>
+                        <h1 className="text-xl font-bold text-gray-900">Финансист — Dashboard</h1>
+                        <p className="text-xs text-gray-400 mt-0.5">Управление доставками и отчётами</p>
+                    </div>
                 </div>
                 <div className="flex items-center gap-3">
                     <button
