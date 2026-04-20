@@ -4,7 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from typing import List, Optional
 from . import schemas, crud
-from .database import get_db_connection
 from .export import TEMPLATES_DIR, EXPORTS_DIR, ensure_dirs, fill_docx_template, build_export_context
 
 app = FastAPI(title="Optimizer API")
@@ -190,20 +189,12 @@ async def export_order_template(order_id: str, body: schemas.ExportTemplateReque
     if not template:
         raise HTTPException(status_code=404, detail="Template not found")
 
-    branch = details.get('order', {}).get('branch', '')
-    conn = get_db_connection()
-    def get_name(role):
-        row = conn.execute(
-            "SELECT full_name FROM users WHERE role = ? AND (branch = ? OR branch IS NULL) ORDER BY created_at DESC LIMIT 1",
-            (role, branch)
-        ).fetchone()
-        return row['full_name'] if row else ''
+    order_row = crud.get_order_by_id(order_id)
     names = {
-        'snabjenec_name': get_name('snabjenec'),
-        'supplier_name':  get_name('supplier'),
-        'chef_name':      get_name('chef'),
+        'chef_name':      order_row.get('chef_name') or '',
+        'snabjenec_name': order_row.get('snabjenec_name') or '',
+        'supplier_name':  order_row.get('supplier_name') or '',
     }
-    conn.close()
 
     context = build_export_context(details, names)
     out_path = fill_docx_template(template['file_path'], context)

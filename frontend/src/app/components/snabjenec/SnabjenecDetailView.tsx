@@ -321,19 +321,30 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
     return (
         <>
         <div className="h-screen overflow-hidden bg-[#f5f5f5] flex flex-col">
-            <header className="flex-none text-white p-4 rounded-b-2xl shadow-lg relative overflow-hidden" style={{ backgroundColor: '#2E7D32' }}>
-                <div className="flex items-center justify-between mb-2">
+            <header
+                className="flex-none text-white px-4 pt-4 pb-5 rounded-b-3xl shadow-lg"
+                style={{ backgroundColor: '#2E7D32' }}
+            >
+                <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                        <button onClick={onBackToRoles} className="p-2 hover:bg-white/20 rounded-full transition-colors">
-                            <ArrowLeft className="w-5 h-5" />
+                        <button
+                            onClick={onBackToRoles}
+                            className="w-9 h-9 flex items-center justify-center bg-white/15 hover:bg-white/25 rounded-xl transition-colors"
+                        >
+                            <ArrowLeft className="w-4 h-4" />
                         </button>
-                        <button onClick={() => setShowHelp(true)} className="p-2 hover:bg-white/20 rounded-full transition-colors">
-                            <HelpCircle className="w-5 h-5" />
+                        <button
+                            onClick={() => setShowHelp(true)}
+                            className="w-9 h-9 flex items-center justify-center bg-white/15 hover:bg-white/25 rounded-xl transition-colors"
+                        >
+                            <HelpCircle className="w-4 h-4" />
                         </button>
                     </div>
                     <StatusBadge status={order.status} />
                 </div>
-                <h2 className="text-xl font-bold">{t(`branch${branch.charAt(0).toUpperCase() + branch.slice(1)}` as any)}</h2>
+                <h2 className="text-2xl font-black tracking-tight">
+                    {t(`branch${branch.charAt(0).toUpperCase() + branch.slice(1)}` as any)}
+                </h2>
             </header>
 
             <main className="flex-1 overflow-y-auto p-4 pb-[200px]">

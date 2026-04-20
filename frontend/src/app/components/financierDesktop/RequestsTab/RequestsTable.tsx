@@ -1,18 +1,33 @@
 import { useState } from 'react';
-import { ChevronUp, ChevronDown, Eye } from 'lucide-react';
+import { ChevronUp, ChevronDown, ArrowRight } from 'lucide-react';
 
 const STATUS_LABELS: Record<string, string> = {
     sent_to_supplier: 'У поставщика',
     waiting_snabjenec_receive: 'На приёмке',
-    sent_to_financier: 'У финансиста',
+    sent_to_financier: 'Ожидает финансиста',
     archived: 'Архив',
 };
 
-const STATUS_COLORS: Record<string, string> = {
-    sent_to_supplier: 'bg-blue-100 text-blue-700',
-    waiting_snabjenec_receive: 'bg-yellow-100 text-yellow-700',
-    sent_to_financier: 'bg-purple-100 text-purple-700',
-    archived: 'bg-gray-100 text-gray-600',
+const STATUS_DOT: Record<string, string> = {
+    sent_to_supplier: 'bg-blue-400',
+    waiting_snabjenec_receive: 'bg-amber-400',
+    sent_to_financier: 'bg-violet-400',
+    archived: 'bg-gray-300',
+};
+
+const BRANCH_LABELS: Record<string, string> = {
+    beltepa_land:          'Белтепа-Land',
+    uchtepa_land:          'Учтепа-Land',
+    rakat_land:            'Ракат-Land',
+    mukumiy_land:          'Мукумий-Land',
+    yunusabad_land:        'Юнусабад-Land',
+    novoi_land:            'Новои-Land',
+    novza_school:          'Новза-School',
+    uchtepa_school:        'Учтепа-School',
+    almazar_school:        'Алмазар-School',
+    general_uzakov_school: 'Ген. Узаков-School',
+    namangan_school:       'Наманган-School',
+    novoi_school:          'Новои-School',
 };
 
 interface RequestsTableProps {
@@ -45,64 +60,83 @@ export function RequestsTable({ orders, onSelectOrder }: RequestsTableProps) {
         return 0;
     });
 
-    const SortIcon = ({ k }: { k: SortKey }) => (
+    const SortIcon = ({ k }: { k: SortKey }) =>
         sortKey === k
-            ? (sortDir === 'asc' ? <ChevronUp className="w-3 h-3 inline ml-0.5" /> : <ChevronDown className="w-3 h-3 inline ml-0.5" />)
-            : null
-    );
+            ? (sortDir === 'asc' ? <ChevronUp className="w-3 h-3 inline ml-0.5 opacity-60" /> : <ChevronDown className="w-3 h-3 inline ml-0.5 opacity-60" />)
+            : null;
 
     return (
         <div className="overflow-x-auto">
             <table className="w-full text-sm">
                 <thead>
-                    <tr className="bg-gray-50 text-gray-500 uppercase text-xs">
-                        <th className="text-left p-3 rounded-tl-xl cursor-pointer hover:text-gray-700" onClick={() => handleSort('id')}>
+                    <tr className="border-b border-gray-100">
+                        <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none" onClick={() => handleSort('id')}>
                             № <SortIcon k="id" />
                         </th>
-                        <th className="text-left p-3 cursor-pointer hover:text-gray-700" onClick={() => handleSort('created_at')}>
+                        <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none" onClick={() => handleSort('created_at')}>
                             Дата <SortIcon k="created_at" />
                         </th>
-                        <th className="text-left p-3">Статус</th>
-                        <th className="text-left p-3">Филиал</th>
-                        <th className="text-right p-3">Товаров</th>
-                        <th className="text-right p-3 cursor-pointer hover:text-gray-700" onClick={() => handleSort('completion_rate')}>
-                            % Доставки <SortIcon k="completion_rate" />
+                        <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Статус</th>
+                        <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Филиал</th>
+                        <th className="text-right px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Товаров</th>
+                        <th className="text-right px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none" onClick={() => handleSort('completion_rate')}>
+                            Доставка <SortIcon k="completion_rate" />
                         </th>
-                        <th className="p-3 rounded-tr-xl"></th>
+                        <th className="px-5 py-3 w-8" />
                     </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody>
                     {sorted.length === 0 && (
-                        <tr><td colSpan={7} className="text-center py-10 text-gray-400">Нет заявок</td></tr>
+                        <tr>
+                            <td colSpan={7} className="text-center py-16 text-gray-300 text-sm font-medium">
+                                Нет заявок
+                            </td>
+                        </tr>
                     )}
                     {sorted.map(order => (
-                        <tr key={order.id} className="hover:bg-gray-50 transition-colors cursor-pointer group" onClick={() => onSelectOrder(order.id)}>
-                            <td className="p-3 font-mono text-gray-500 text-xs">#{order.id.slice(0, 6)}</td>
-                            <td className="p-3 font-medium">{order.created_at?.slice(0, 10)}</td>
-                            <td className="p-3">
-                                <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${STATUS_COLORS[order.status] ?? 'bg-gray-100 text-gray-500'}`}>
-                                    {STATUS_LABELS[order.status] ?? order.status}
+                        <tr
+                            key={order.id}
+                            className="border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer group"
+                            onClick={() => onSelectOrder(order.id)}
+                        >
+                            <td className="px-5 py-4 font-mono text-gray-400 text-xs">
+                                #{order.id.slice(0, 6)}
+                            </td>
+                            <td className="px-5 py-4 font-medium text-gray-700">
+                                {order.created_at?.slice(0, 10)}
+                            </td>
+                            <td className="px-5 py-4">
+                                <span className="flex items-center gap-1.5">
+                                    <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${STATUS_DOT[order.status] ?? 'bg-gray-300'}`} />
+                                    <span className="text-xs font-medium text-gray-600">
+                                        {STATUS_LABELS[order.status] ?? order.status}
+                                    </span>
                                 </span>
                             </td>
-                            <td className="p-3 text-gray-600">{order.branch}</td>
-                            <td className="p-3 text-right text-gray-600">
+                            <td className="px-5 py-4 text-gray-600 text-sm">
+                                {BRANCH_LABELS[order.branch] ?? order.branch}
+                            </td>
+                            <td className="px-5 py-4 text-right text-gray-500 tabular-nums">
                                 {order.total_items_received}/{order.total_items_ordered}
                             </td>
-                            <td className="p-3">
+                            <td className="px-5 py-4">
                                 <div className="flex items-center gap-2 justify-end">
-                                    <div className="w-20 bg-gray-200 rounded-full h-1.5">
+                                    <div className="w-24 bg-gray-100 rounded-full h-1">
                                         <div
-                                            className="h-1.5 rounded-full bg-green-500 transition-all"
+                                            className={`h-1 rounded-full transition-all ${
+                                                order.completion_rate >= 100 ? 'bg-green-500' :
+                                                order.completion_rate >= 50 ? 'bg-amber-400' : 'bg-red-400'
+                                            }`}
                                             style={{ width: `${Math.min(order.completion_rate, 100)}%` }}
                                         />
                                     </div>
-                                    <span className="text-xs font-bold text-gray-700 w-9 text-right">{order.completion_rate}%</span>
+                                    <span className="text-xs font-bold text-gray-700 w-9 text-right tabular-nums">
+                                        {order.completion_rate}%
+                                    </span>
                                 </div>
                             </td>
-                            <td className="p-3 text-right">
-                                <button className="text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity hover:text-blue-700">
-                                    <Eye className="w-4 h-4" />
-                                </button>
+                            <td className="px-5 py-4 text-right">
+                                <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors inline" />
                             </td>
                         </tr>
                     ))}

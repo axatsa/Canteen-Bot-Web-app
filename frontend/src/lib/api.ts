@@ -31,13 +31,13 @@ export type Status =
     | 'archived'
     | 'supplier_collecting'
     | 'supplier_delivering'
-    | 'chef_checking'
-    | 'financier_checking'
     | 'completed';
 
 export type Role = 'chef' | 'financier' | 'supplier' | 'snabjenec';
 
-export type Branch = 'chilanzar' | 'uchtepa' | 'shayzantaur' | 'olmazar';
+export type Branch =
+    | 'beltepa_land' | 'uchtepa_land' | 'rakat_land' | 'mukumiy_land' | 'yunusabad_land' | 'novoi_land'
+    | 'novza_school' | 'uchtepa_school' | 'almazar_school' | 'general_uzakov_school' | 'namangan_school' | 'novoi_school';
 
 export type DeliveryItemTracking = {
     ordered_qty: number;
@@ -53,12 +53,14 @@ export type Order = {
     deliveredAt?: Date;
     estimatedDeliveryDate?: Date;
     branch: Branch;
-    // Delivery tracking fields
     supplierResponded?: boolean;
     deliveryTracking?: Record<string, DeliveryItemTracking>;
     extraItemsDelivered?: Record<string, number>;
     sentToSupplierAt?: string;
     receivedFromSupplierAt?: string;
+    chefName?: string;
+    snabjenecName?: string;
+    supplierName?: string;
 };
 
 export const api = {
@@ -83,6 +85,9 @@ export const api = {
             extraItemsDelivered: o.extraItemsDelivered ?? {},
             sentToSupplierAt: o.sentToSupplierAt,
             receivedFromSupplierAt: o.receivedFromSupplierAt,
+            chefName: o.chefName ?? undefined,
+            snabjenecName: o.snabjenecName ?? undefined,
+            supplierName: o.supplierName ?? undefined,
         }));
     },
 

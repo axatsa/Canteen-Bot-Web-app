@@ -99,6 +99,9 @@ def get_all_orders() -> List[dict]:
             "deliveryTracking": json.loads(r['delivery_tracking'] or '{}'),
             "supplierResponded": bool(r.get('supplier_responded', 0)),
             "extraItemsDelivered": json.loads(r['extra_items_delivered'] or '{}'),
+            "chefName": r.get('chef_name'),
+            "snabjenecName": r.get('snabjenec_name'),
+            "supplierName": r.get('supplier_name'),
         })
     return orders
 
@@ -492,23 +495,30 @@ def upsert_order(order_data: dict) -> bool:
         products_json = json.dumps(order_data['products'])
         
         cursor.execute('''
-        INSERT INTO orders (id, status, products, createdAt, deliveredAt, estimatedDeliveryDate, branch)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO orders (id, status, products, createdAt, deliveredAt, estimatedDeliveryDate, branch,
+                            chef_name, snabjenec_name, supplier_name)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET
             status=excluded.status,
             products=excluded.products,
             createdAt=excluded.createdAt,
             deliveredAt=excluded.deliveredAt,
             estimatedDeliveryDate=excluded.estimatedDeliveryDate,
-            branch=excluded.branch
+            branch=excluded.branch,
+            chef_name=COALESCE(excluded.chef_name, orders.chef_name),
+            snabjenec_name=COALESCE(excluded.snabjenec_name, orders.snabjenec_name),
+            supplier_name=COALESCE(excluded.supplier_name, orders.supplier_name)
         ''', (
-            order_data['id'], 
-            order_data['status'], 
-            products_json, 
-            order_data['createdAt'], 
-            order_data.get('deliveredAt'), 
-            order_data.get('estimatedDeliveryDate'), 
-            order_data['branch']
+            order_data['id'],
+            order_data['status'],
+            products_json,
+            order_data['createdAt'],
+            order_data.get('deliveredAt'),
+            order_data.get('estimatedDeliveryDate'),
+            order_data['branch'],
+            order_data.get('chefName'),
+            order_data.get('snabjenecName'),
+            order_data.get('supplierName'),
         ))
         
         # Update last_price

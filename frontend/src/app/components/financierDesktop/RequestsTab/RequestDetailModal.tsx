@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Download } from 'lucide-react';
+import { X, Download, Package, CheckCircle2, XCircle, Star } from 'lucide-react';
 import { api } from '@/lib/api';
 
 interface RequestDetailModalProps {
@@ -40,153 +40,103 @@ export function RequestDetailModal({ orderId, onClose, templates }: RequestDetai
     };
 
     return (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col">
-                <div className="flex items-center justify-between p-5 border-b">
-                    <h2 className="text-lg font-bold text-gray-900">
-                        Заказ #{orderId.slice(0, 8)} — Детальный отчёт
-                    </h2>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
-                        <X className="w-5 h-5" />
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[88vh] flex flex-col">
+
+                {/* Header */}
+                <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+                    <div>
+                        <p className="text-xs text-gray-400 font-medium uppercase tracking-wide mb-0.5">Заявка</p>
+                        <h2 className="text-lg font-black text-gray-900 tracking-tight">
+                            #{orderId.slice(0, 8)}
+                        </h2>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors"
+                    >
+                        <X className="w-4 h-4" />
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-5 space-y-5">
+                {/* Body */}
+                <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
                     {loading ? (
-                        <div className="text-center py-12 text-gray-400">Загрузка...</div>
+                        <div className="text-center py-16 text-gray-300 font-medium">Загрузка...</div>
                     ) : !details ? (
-                        <div className="text-center py-12 text-gray-400">Данные не найдены</div>
+                        <div className="text-center py-16 text-gray-300 font-medium">Данные не найдены</div>
                     ) : (
                         <>
-                            {/* Order info */}
-                            <div className="grid grid-cols-3 gap-4 bg-gray-50 rounded-xl p-4 text-sm">
-                                <div>
-                                    <span className="text-gray-400">ID</span>
-                                    <p className="font-bold">#{details.order.id.slice(0, 8)}</p>
-                                </div>
-                                <div>
-                                    <span className="text-gray-400">Дата создания</span>
-                                    <p className="font-bold">{details.order.created_at?.slice(0, 10)}</p>
-                                </div>
-                                <div>
-                                    <span className="text-gray-400">% доставки</span>
-                                    <p className="font-bold text-blue-600">{details.delivery?.completion_rate}</p>
-                                </div>
+                            {/* Meta */}
+                            <div className="grid grid-cols-3 gap-3">
+                                {[
+                                    { label: 'Дата', value: details.order.created_at?.slice(0, 10) },
+                                    { label: 'Выполнение', value: `${details.delivery?.completion_rate ?? '—'}%` },
+                                    { label: 'Статус', value: details.order.status },
+                                ].map(m => (
+                                    <div key={m.label} className="bg-gray-50 rounded-2xl px-4 py-3">
+                                        <p className="text-xs text-gray-400 font-medium mb-1">{m.label}</p>
+                                        <p className="font-bold text-gray-900 text-sm">{m.value}</p>
+                                    </div>
+                                ))}
                             </div>
 
-                            {/* Ordered products (when no delivery tracking yet) */}
+                            {/* Ordered (no tracking yet) */}
                             {details.delivered_items?.length === 0 && details.not_delivered_items?.length === 0 && details.ordered_products?.length > 0 && (
-                                <div>
-                                    <h3 className="font-bold text-gray-700 mb-2">📋 Заказано ({details.ordered_products.length})</h3>
-                                    <table className="w-full text-sm">
-                                        <thead className="bg-gray-100 text-gray-600">
-                                            <tr>
-                                                <th className="text-left p-2 rounded-tl-lg">Товар</th>
-                                                <th className="p-2">Ед.</th>
-                                                <th className="p-2 rounded-tr-lg">Кол-во</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {details.ordered_products.map((item: any, i: number) => (
-                                                <tr key={i} className="border-b border-gray-100">
-                                                    <td className="p-2 font-medium">{item.product_name}</td>
-                                                    <td className="p-2 text-center text-gray-500">{item.unit}</td>
-                                                    <td className="p-2 text-center">{item.ordered_qty}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                <Section icon={<Package className="w-4 h-4" />} title={`Заказано (${details.ordered_products.length})`} accent="gray">
+                                    <ProductTable
+                                        items={details.ordered_products}
+                                        columns={['Товар', 'Ед.', 'Кол-во']}
+                                        rows={(item: any) => [item.product_name, item.unit, item.ordered_qty]}
+                                    />
+                                </Section>
                             )}
 
                             {/* Delivered */}
                             {details.delivered_items?.length > 0 && (
-                                <div>
-                                    <h3 className="font-bold text-green-700 mb-2">✅ Привезли ({details.delivered_items.length})</h3>
-                                    <table className="w-full text-sm">
-                                        <thead className="bg-green-50 text-green-700">
-                                            <tr>
-                                                <th className="text-left p-2 rounded-tl-lg">Товар</th>
-                                                <th className="p-2">Ед.</th>
-                                                <th className="p-2">Заказано</th>
-                                                <th className="p-2 rounded-tr-lg">Получено</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {details.delivered_items.map((item: any) => (
-                                                <tr key={item.product_id} className="border-b border-green-100">
-                                                    <td className="p-2 font-medium">{item.product_name}</td>
-                                                    <td className="p-2 text-center text-gray-500">{item.unit}</td>
-                                                    <td className="p-2 text-center">{item.ordered_qty}</td>
-                                                    <td className="p-2 text-center font-bold text-green-700">{item.received_qty}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                <Section icon={<CheckCircle2 className="w-4 h-4" />} title={`Привезли (${details.delivered_items.length})`} accent="green">
+                                    <ProductTable
+                                        items={details.delivered_items}
+                                        columns={['Товар', 'Ед.', 'Заказ', 'Получено']}
+                                        rows={(item: any) => [item.product_name, item.unit, item.ordered_qty, item.received_qty]}
+                                        highlightLast
+                                    />
+                                </Section>
                             )}
 
                             {/* Not delivered */}
                             {details.not_delivered_items?.length > 0 && (
-                                <div>
-                                    <h3 className="font-bold text-red-700 mb-2">❌ Не привезли ({details.not_delivered_items.length})</h3>
-                                    <table className="w-full text-sm">
-                                        <thead className="bg-red-50 text-red-700">
-                                            <tr>
-                                                <th className="text-left p-2 rounded-tl-lg">Товар</th>
-                                                <th className="p-2">Ед.</th>
-                                                <th className="p-2 rounded-tr-lg">Заказано</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {details.not_delivered_items.map((item: any) => (
-                                                <tr key={item.product_id} className="border-b border-red-100">
-                                                    <td className="p-2 font-medium">{item.product_name}</td>
-                                                    <td className="p-2 text-center text-gray-500">{item.unit}</td>
-                                                    <td className="p-2 text-center">{item.ordered_qty}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                <Section icon={<XCircle className="w-4 h-4" />} title={`Не привезли (${details.not_delivered_items.length})`} accent="red">
+                                    <ProductTable
+                                        items={details.not_delivered_items}
+                                        columns={['Товар', 'Ед.', 'Заказано']}
+                                        rows={(item: any) => [item.product_name, item.unit, item.ordered_qty]}
+                                    />
+                                </Section>
                             )}
 
                             {/* Extra items */}
                             {details.extra_items?.length > 0 && (
-                                <div>
-                                    <h3 className="font-bold text-yellow-700 mb-2">⭐ Доп. товары ({details.extra_items.length})</h3>
-                                    <table className="w-full text-sm">
-                                        <thead className="bg-yellow-50 text-yellow-700">
-                                            <tr>
-                                                <th className="text-left p-2 rounded-tl-lg">Товар</th>
-                                                <th className="p-2">Ед.</th>
-                                                <th className="p-2 rounded-tr-lg">Кол-во</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {details.extra_items.map((item: any) => (
-                                                <tr key={item.product_id} className="border-b border-yellow-100">
-                                                    <td className="p-2 font-medium">{item.product_name}</td>
-                                                    <td className="p-2 text-center text-gray-500">{item.unit}</td>
-                                                    <td className="p-2 text-center font-bold text-yellow-700">{item.qty}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                <Section icon={<Star className="w-4 h-4" />} title={`Доп. товары (${details.extra_items.length})`} accent="amber">
+                                    <ProductTable
+                                        items={details.extra_items}
+                                        columns={['Товар', 'Ед.', 'Кол-во']}
+                                        rows={(item: any) => [item.product_name, item.unit, item.qty]}
+                                    />
+                                </Section>
                             )}
                         </>
                     )}
                 </div>
 
                 {/* Export footer */}
-                <div className="p-5 border-t flex items-center gap-3">
+                <div className="px-6 py-4 border-t border-gray-100 flex items-center gap-3">
                     <select
                         value={selectedTemplate}
                         onChange={(e) => setSelectedTemplate(e.target.value)}
-                        className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm"
+                        className="flex-1 border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:ring-1 focus:ring-gray-400 focus:outline-none text-gray-700"
                     >
-                        <option value="">Выбрать шаблон для экспорта...</option>
+                        <option value="">Выбрать шаблон...</option>
                         {templates.map((t: any) => (
                             <option key={t.template_id} value={t.template_id}>{t.name}</option>
                         ))}
@@ -194,13 +144,78 @@ export function RequestDetailModal({ orderId, onClose, templates }: RequestDetai
                     <button
                         onClick={handleExport}
                         disabled={!selectedTemplate || exporting}
-                        className="bg-blue-600 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-2 text-sm disabled:opacity-50 hover:bg-blue-700 transition-colors"
+                        className="bg-gray-900 text-white font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm disabled:opacity-40 hover:bg-gray-800 transition-colors whitespace-nowrap"
                     >
                         <Download className="w-4 h-4" />
                         {exporting ? 'Экспорт...' : 'Скачать DOCX'}
                     </button>
                 </div>
             </div>
+        </div>
+    );
+}
+
+function Section({ icon, title, accent, children }: {
+    icon: React.ReactNode;
+    title: string;
+    accent: 'gray' | 'green' | 'red' | 'amber';
+    children: React.ReactNode;
+}) {
+    const colors = {
+        gray: 'text-gray-600 bg-gray-50',
+        green: 'text-green-700 bg-green-50',
+        red: 'text-red-700 bg-red-50',
+        amber: 'text-amber-700 bg-amber-50',
+    };
+    return (
+        <div>
+            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold mb-3 ${colors[accent]}`}>
+                {icon}
+                {title}
+            </div>
+            {children}
+        </div>
+    );
+}
+
+function ProductTable({ items, columns, rows, highlightLast }: {
+    items: any[];
+    columns: string[];
+    rows: (item: any) => (string | number)[];
+    highlightLast?: boolean;
+}) {
+    return (
+        <div className="rounded-2xl overflow-hidden border border-gray-100">
+            <table className="w-full text-sm">
+                <thead>
+                    <tr className="bg-gray-50">
+                        {columns.map((c, i) => (
+                            <th key={c} className={`px-4 py-2.5 text-xs font-semibold text-gray-400 uppercase tracking-wide ${i === 0 ? 'text-left' : 'text-center'}`}>
+                                {c}
+                            </th>
+                        ))}
+                    </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                    {items.map((item: any, i: number) => {
+                        const cells = rows(item);
+                        return (
+                            <tr key={i} className="bg-white hover:bg-gray-50 transition-colors">
+                                {cells.map((cell, ci) => (
+                                    <td
+                                        key={ci}
+                                        className={`px-4 py-3 ${ci === 0 ? 'font-medium text-gray-800' : 'text-center text-gray-500'} ${
+                                            highlightLast && ci === cells.length - 1 ? 'font-bold text-gray-900' : ''
+                                        }`}
+                                    >
+                                        {cell}
+                                    </td>
+                                ))}
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </table>
         </div>
     );
 }

@@ -65,6 +65,9 @@ def init_db():
         ("delivery_tracking", "TEXT DEFAULT '{}'"),
         ("supplier_responded", "INTEGER DEFAULT 0"),
         ("extra_items_delivered", "TEXT DEFAULT '{}'"),
+        ("chef_name", "TEXT"),
+        ("snabjenec_name", "TEXT"),
+        ("supplier_name", "TEXT"),
     ]
     for col_name, col_def in migrations:
         if col_name not in existing_cols:
