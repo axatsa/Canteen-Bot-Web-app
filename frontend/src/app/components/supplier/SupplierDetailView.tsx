@@ -182,6 +182,7 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
     const allPricesFilled = filteredProducts.length > 0 && totalWithPrice === filteredProducts.length;
 
     return (
+        <>
         <div className="h-screen overflow-hidden bg-[#f5f5f5] flex flex-col">
             <header className="flex-none text-white p-4 pb-4 rounded-b-2xl shadow-lg relative overflow-hidden" style={{ backgroundColor: '#FF6B00' }}>
                 <div className="flex items-center justify-between mb-2 relative z-10">
@@ -462,5 +463,6 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                 ]}
             />
         )}
+        </>
     );
 }
