@@ -1,6 +1,6 @@
 import type { Order, Branch } from '@/lib/api';
-import { SnabjenecListView } from './snabjenec/SnabjenecListView';
-import { SnabjenecDetailView } from './snabjenec/SnabjenecDetailView';
+import { SnabjenecListView } from './SnabjenecListView';
+import { SnabjenecDetailView } from './SnabjenecDetailView';
 
 type SnabjenecViewProps =
   | {

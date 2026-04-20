@@ -1,6 +1,6 @@
 import type { Order, Branch } from '@/lib/api';
-import { SupplierListView } from './supplier/SupplierListView';
-import { SupplierDetailView } from './supplier/SupplierDetailView';
+import { SupplierListView } from './SupplierListView';
+import { SupplierDetailView } from './SupplierDetailView';
 
 type SupplierViewProps =
   | {
