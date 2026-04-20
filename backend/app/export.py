@@ -14,20 +14,93 @@ def ensure_dirs():
     os.makedirs(EXPORTS_DIR, exist_ok=True)
 
 
+def _replace_text_in_para(para, context: dict):
+    full = ''.join(r.text for r in para.runs)
+    for key, val in context.items():
+        full = full.replace('{{ ' + key + ' }}', str(val or ''))
+        full = full.replace('{{' + key + '}}', str(val or ''))
+    if para.runs:
+        para.runs[0].text = full
+        for r in para.runs[1:]:
+            r.text = ''
+
+
 def fill_docx_template(template_path: str, context: dict) -> Optional[str]:
     try:
-        from docxtpl import DocxTemplate
+        from docx import Document
+        from docx.shared import Pt
+        from docx.oxml.ns import qn
+        from docx.oxml import OxmlElement
+        from copy import deepcopy
     except ImportError:
-        logger.error("docxtpl not installed. Run: pip install docxtpl")
+        logger.error("python-docx not installed")
         return None
 
     ensure_dirs()
     try:
-        tpl = DocxTemplate(template_path)
-        tpl.render(context)
+        doc = Document(template_path)
+
+        # 1. Replace simple {{ var }} placeholders in paragraphs
+        for para in doc.paragraphs:
+            _replace_text_in_para(para, context)
+
+        # 2. Handle table: find marker row and replace with actual data rows
+        all_items = context.get('all_items', [])
+        for table in doc.tables:
+            marker_row_idx = None
+            for i, row in enumerate(table.rows):
+                row_text = ''.join(
+                    ''.join(r.text for r in cell.paragraphs[0].runs)
+                    for cell in row.cells
+                )
+                if 'ITEMS_ROW' in row_text or '{%tr' in row_text or 'item.product_name' in row_text:
+                    marker_row_idx = i
+                    break
+
+            if marker_row_idx is None:
+                continue
+
+            # Copy style from marker row, then remove it
+            template_row = table.rows[marker_row_idx]
+            tr_template = deepcopy(template_row._tr)
+
+            # Remove marker row from table
+            tbl = table._tbl
+            tbl.remove(template_row._tr)
+
+            # Insert actual data rows at the same position
+            ref_tr = table.rows[marker_row_idx]._tr if marker_row_idx < len(table.rows) else None
+            for item in reversed(all_items):
+                new_tr = deepcopy(tr_template)
+                cells = new_tr.findall(qn('w:tc'))
+                values = [
+                    str(item.get('number', '')),
+                    str(item.get('product_name', '')),
+                    str(item.get('unit', '')),
+                    str(item.get('ordered_qty', '')),
+                    str(item.get('received_qty', '')),
+                ]
+                for cell_el, val in zip(cells, values):
+                    for p_el in cell_el.findall(qn('w:p')):
+                        # Clear all runs
+                        for r_el in p_el.findall(qn('w:r')):
+                            p_el.remove(r_el)
+                        # Add single clean run
+                        r_new = OxmlElement('w:r')
+                        t_new = OxmlElement('w:t')
+                        t_new.text = val
+                        r_new.append(t_new)
+                        p_el.append(r_new)
+                        break  # only first paragraph
+
+                if ref_tr is not None:
+                    tbl.insert(list(tbl).index(ref_tr), new_tr)
+                else:
+                    tbl.append(new_tr)
+
         out_name = f"order_{context.get('order_id', uuid.uuid4())}_{uuid.uuid4().hex[:8]}.docx"
         out_path = os.path.join(EXPORTS_DIR, out_name)
-        tpl.save(out_path)
+        doc.save(out_path)
         return out_path
     except Exception as e:
         logger.error(f"Error filling DOCX template: {e}")
