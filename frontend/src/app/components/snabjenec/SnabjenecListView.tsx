@@ -1,6 +1,8 @@
-import { ArrowLeft, Package, RefreshCcw, FileText, Calendar } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, Package, RefreshCcw, FileText, Calendar, HelpCircle } from 'lucide-react';
 import type { Order, Branch } from '@/lib/api';
 import { StatusBadge } from '@/app/components/StatusBadge';
+import { HelpModal } from '@/app/components/HelpModal';
 import { useLanguage } from '@/app/context/LanguageContext';
 
 interface SnabjenecListViewProps {
@@ -13,22 +15,29 @@ interface SnabjenecListViewProps {
 
 export function SnabjenecListView({ orders, onSelectOrder, onBackToRoles, onRefresh, isFromBot }: SnabjenecListViewProps) {
     const { t, language } = useLanguage();
+    const [showHelp, setShowHelp] = useState(false);
 
     const activeOrders = orders.filter(o => 
         o.status === 'review_snabjenec' || o.status === 'waiting_snabjenec_receive'
     );
 
     return (
+        <>
         <div className="h-screen overflow-hidden bg-[#f5f5f5] flex flex-col">
             <header className="flex-none text-white p-4 pb-4 rounded-b-2xl shadow-lg relative overflow-hidden" style={{ backgroundColor: '#2E7D32' }}>
                 <div className="flex items-center justify-between mb-2 relative z-10">
-                    {!isFromBot ? (
-                        <button onClick={onBackToRoles} className="p-2 hover:bg-white/20 rounded-full transition-colors">
-                            <ArrowLeft className="w-5 h-5" />
+                    <div className="flex items-center gap-1">
+                        {!isFromBot ? (
+                            <button onClick={onBackToRoles} className="p-2 hover:bg-white/20 rounded-full transition-colors">
+                                <ArrowLeft className="w-5 h-5" />
+                            </button>
+                        ) : (
+                            <div className="w-9" />
+                        )}
+                        <button onClick={() => setShowHelp(true)} className="p-2 hover:bg-white/20 rounded-full transition-colors">
+                            <HelpCircle className="w-5 h-5" />
                         </button>
-                    ) : (
-                        <div className="w-9" />
-                    )}
+                    </div>
                     <div className="flex items-center gap-2">
                         <Package className="w-4 h-4" />
                         <h1 className="text-lg font-bold">{t('snabjenecTitle')}</h1>
@@ -95,5 +104,38 @@ export function SnabjenecListView({ orders, onSelectOrder, onBackToRoles, onRefr
                 </div>
             </main>
         </div>
+
+        {showHelp && (
+            <HelpModal
+                title="Снабженец"
+                color="#2E7D32"
+                onClose={() => setShowHelp(false)}
+                sections={[
+                    {
+                        label: 'Что делать',
+                        items: [
+                            'Получить список от шефа и отправить поставщику',
+                            'При получении товара отметить каждую позицию',
+                            'Нажать «Окончательно отправить» для передачи финансисту',
+                        ],
+                    },
+                    {
+                        label: 'Обязательные условия',
+                        items: [
+                            'Для товаров не на сегодня — обязательно указать дату доставки',
+                            'Нельзя завершить приёмку если есть ожидаемые товары с будущей датой',
+                        ],
+                    },
+                    {
+                        label: 'Нельзя',
+                        items: [
+                            'Завершить приёмку с незаполненными датами доставки',
+                            'Отправить поставщику без сохранения списка',
+                        ],
+                    },
+                ]}
+            />
+        )}
+        </>
     );
 }
