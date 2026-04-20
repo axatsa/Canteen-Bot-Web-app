@@ -2,17 +2,21 @@ import { useState } from 'react';
 import { ChevronUp, ChevronDown, ArrowRight } from 'lucide-react';
 
 const STATUS_LABELS: Record<string, string> = {
-    sent_to_supplier: 'У поставщика',
+    sent_to_chef:              'У шефа',
+    review_snabjenec:          'У снабженца',
+    sent_to_supplier:          'У поставщика',
     waiting_snabjenec_receive: 'На приёмке',
-    sent_to_financier: 'Ожидает финансиста',
-    archived: 'Архив',
+    sent_to_financier:         'Ожидает меня',
+    archived:                  'Архив',
 };
 
 const STATUS_DOT: Record<string, string> = {
-    sent_to_supplier: 'bg-blue-400',
+    sent_to_chef:              'bg-slate-400',
+    review_snabjenec:          'bg-yellow-400',
+    sent_to_supplier:          'bg-blue-400',
     waiting_snabjenec_receive: 'bg-amber-400',
-    sent_to_financier: 'bg-violet-400',
-    archived: 'bg-gray-300',
+    sent_to_financier:         'bg-violet-500',
+    archived:                  'bg-gray-300',
 };
 
 const BRANCH_LABELS: Record<string, string> = {

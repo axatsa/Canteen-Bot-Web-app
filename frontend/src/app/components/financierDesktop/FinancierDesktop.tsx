@@ -28,9 +28,9 @@ export function FinancierDesktop({ onBackToRoles }: { onBackToRoles?: () => void
         setLoading(true);
         try {
             const data = await api.getFinancierAllOrders({
-                status: statusFilter || 'sent_to_supplier,waiting_snabjenec_receive,sent_to_financier',
+                status: statusFilter || undefined,
                 branch: branchFilter || undefined,
-                limit: 100,
+                limit: 200,
             });
             setOrders(data.orders ?? []);
         } catch (e) {
@@ -80,11 +80,11 @@ export function FinancierDesktop({ onBackToRoles }: { onBackToRoles?: () => void
         else if (tab === 'statistics') loadStatistics();
     }, [tab, loadOrders, loadArchive, loadStatistics, loadTemplates]);
 
-    const inReceiving = orders.filter(o => o.status === 'waiting_snabjenec_receive').length;
-    const ready = orders.filter(o => o.status === 'sent_to_financier').length;
-    const avgCompletion = orders.length
-        ? Math.round(orders.reduce((s, o) => s + (o.completion_rate ?? 0), 0) / orders.length)
-        : 0;
+    const atChef       = orders.filter(o => o.status === 'sent_to_chef').length;
+    const atSnabjenec  = orders.filter(o => o.status === 'review_snabjenec').length;
+    const atSupplier   = orders.filter(o => o.status === 'sent_to_supplier').length;
+    const inReceiving  = orders.filter(o => o.status === 'waiting_snabjenec_receive').length;
+    const ready        = orders.filter(o => o.status === 'sent_to_financier').length;
 
     const navItems: { key: Tab; label: string; icon: React.ReactNode }[] = [
         { key: 'requests', label: 'Заявки', icon: <BarChart2 className="w-4 h-4" /> },
@@ -151,9 +151,11 @@ export function FinancierDesktop({ onBackToRoles }: { onBackToRoles?: () => void
                     <div>
                         <SummaryCards
                             total={orders.length}
+                            atChef={atChef}
+                            atSnabjenec={atSnabjenec}
+                            atSupplier={atSupplier}
                             inReceiving={inReceiving}
                             ready={ready}
-                            avgCompletion={avgCompletion}
                         />
                         <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
                             <div className="px-5 pt-5 pb-4 border-b border-gray-50">

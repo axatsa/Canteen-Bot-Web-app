@@ -7,10 +7,12 @@ interface RequestsFiltersProps {
 }
 
 const STATUSES = [
-    { value: '', label: 'Все статусы' },
+    { value: '', label: 'Все' },
+    { value: 'sent_to_chef', label: 'У шефа' },
+    { value: 'review_snabjenec', label: 'У снабженца' },
     { value: 'sent_to_supplier', label: 'У поставщика' },
-    { value: 'waiting_snabjenec_receive', label: 'На приёмке' },
-    { value: 'sent_to_financier', label: 'Ожидает' },
+    { value: 'waiting_snabjenec_receive', label: 'Приёмка' },
+    { value: 'sent_to_financier', label: 'Ожидает меня' },
 ];
 
 const BRANCHES = [
