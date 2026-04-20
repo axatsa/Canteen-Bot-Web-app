@@ -106,41 +106,14 @@ def create_template(filename, branch_label):
         add_cell_text(table.rows[0].cells[i], hdr, bold=True, size=10)
         set_cell_border(table.rows[0].cells[i])
 
-    # Template row — loop tags must be in their OWN paragraph (docxtpl requirement)
+    # Template row — contains ITEMS_ROW marker so export.py knows to replace it
     row = table.rows[1]
-
-    # Cell 0: loop START tag in separate paragraph, then number
-    c0 = row.cells[0]
-    c0.paragraphs[0].clear()
-    c0.paragraphs[0].add_run('{%tr for item in all_items %}').font.size = Pt(1)
-    p = c0.add_paragraph('{{ item.number }}')
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p.runs[0].font.size = Pt(10)
-    set_cell_border(c0)
-
-    # Cell 1: product name
-    c1 = row.cells[1]
-    add_cell_text(c1, '{{ item.product_name }}', size=10, align=WD_ALIGN_PARAGRAPH.LEFT)
-    set_cell_border(c1)
-
-    # Cell 2: unit
-    c2 = row.cells[2]
-    add_cell_text(c2, '{{ item.unit }}', size=10)
-    set_cell_border(c2)
-
-    # Cell 3: ordered qty
-    c3 = row.cells[3]
-    add_cell_text(c3, '{{ item.ordered_qty }}', size=10)
-    set_cell_border(c3)
-
-    # Cell 4: received qty, then loop END tag in separate paragraph
-    c4 = row.cells[4]
-    c4.paragraphs[0].clear()
-    c4.paragraphs[0].add_run('{{ item.received_qty }}').font.size = Pt(10)
-    c4.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p4 = c4.add_paragraph('{%tr endfor %}')
-    p4.runs[0].font.size = Pt(1)
-    set_cell_border(c4)
+    cells_content = ['ITEMS_ROW', '', '', '', '']
+    aligns = [WD_ALIGN_PARAGRAPH.CENTER, WD_ALIGN_PARAGRAPH.LEFT,
+              WD_ALIGN_PARAGRAPH.CENTER, WD_ALIGN_PARAGRAPH.CENTER, WD_ALIGN_PARAGRAPH.CENTER]
+    for i, (txt, aln) in enumerate(zip(cells_content, aligns)):
+        add_cell_text(row.cells[i], txt, size=10, align=aln)
+        set_cell_border(row.cells[i])
 
     doc.add_paragraph()
     doc.add_paragraph()
