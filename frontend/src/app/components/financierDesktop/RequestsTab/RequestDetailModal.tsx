@@ -142,7 +142,11 @@ function ColorTable({ details }: { details: any }) {
                                 <td className="px-4 py-3 font-medium text-gray-500">{item.product_name}</td>
                                 <td className="px-4 py-3 text-center text-gray-400 text-xs">{item.unit}</td>
                                 <td className="px-4 py-3 text-center">
-                                    <span className="inline-block px-2 py-0.5 rounded-lg text-xs font-bold tabular-nums bg-gray-100 text-gray-700">
+                                    <span className={`inline-block px-2 py-0.5 rounded-lg text-xs font-bold tabular-nums ${
+                                        item.ordered_qty === 0 ? 'bg-gray-100 text-gray-400' :
+                                        item.received ? 'bg-green-100 text-green-700' :
+                                        'bg-red-100 text-red-600'
+                                    }`}>
                                         {item.ordered_qty}
                                     </span>
                                 </td>
