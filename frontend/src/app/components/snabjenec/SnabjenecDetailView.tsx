@@ -319,6 +319,7 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
     const extraItemEntries = Object.entries(localExtraItems).filter(([, qty]) => qty > 0);
 
     return (
+        <>
         <div className="h-screen overflow-hidden bg-[#f5f5f5] flex flex-col">
             <header className="flex-none text-white p-4 rounded-b-2xl shadow-lg relative overflow-hidden" style={{ backgroundColor: '#2E7D32' }}>
                 <div className="flex items-center justify-between mb-2">
@@ -546,6 +547,7 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                 ]}
             />
         )}
+        </>
     );
 }
 

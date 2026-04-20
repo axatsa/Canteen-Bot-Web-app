@@ -89,6 +89,7 @@ export function ChefView({ order, onUpdateOrder, onBackToRoles, branch, onRefres
   const isEmptyDelivery = isCheckingMode && displayProducts.length === 0 && order.id === 'empty';
 
   return (
+    <>
     <div className="h-screen overflow-hidden bg-[#f5f5f5] flex flex-col">
       <header className="flex-none text-white p-4 pb-4 rounded-b-2xl shadow-lg relative overflow-hidden" style={{ backgroundColor: '#8B0000' }}>
         <div className="flex items-center justify-between mb-2 relative z-10">
@@ -310,5 +311,6 @@ export function ChefView({ order, onUpdateOrder, onBackToRoles, branch, onRefres
         ]}
       />
     )}
+    </>
   );
 }
