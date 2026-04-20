@@ -5,10 +5,18 @@ import { HelpModal } from '@/app/components/HelpModal';
 import { useLanguage } from '@/app/context/LanguageContext';
 
 const BRANCH_LABELS: Record<string, string> = {
-    chilanzar: 'Чиланзар',
-    uchtepa: 'Учтепа',
-    shayzantaur: 'Шайхантахур',
-    olmazar: 'Олмазор',
+    beltepa_land:          'Белтепа-Land',
+    uchtepa_land:          'Учтепа-Land',
+    rakat_land:            'Ракат-Land',
+    mukumiy_land:          'Мукумий-Land',
+    yunusabad_land:        'Юнусабад-Land',
+    novoi_land:            'Новои-Land',
+    novza_school:          'Новза-School',
+    uchtepa_school:        'Учтепа-School',
+    almazar_school:        'Алмазар-School',
+    general_uzakov_school: 'Ген. Узаков-School',
+    namangan_school:       'Наманган-School',
+    novoi_school:          'Новои-School',
 };
 
 const STATUS_PILL: Record<string, { label: string; cls: string }> = {

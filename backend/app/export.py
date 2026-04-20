@@ -203,23 +203,38 @@ def build_export_context(order_details: dict, names: dict = None) -> dict:
     delivered       = order_details.get('delivered_items', [])
     not_delivered   = order_details.get('not_delivered_items', [])
     extra           = order_details.get('extra_items', [])
+    
+    source_items = delivered + not_delivered
+    if not source_items:
+        # Fallback to ordered items if delivery tracking hasn't started
+        source_items = [
+            {
+                'product_name': p.get('name', ''),
+                'unit': p.get('unit', ''),
+                'ordered_qty': p.get('quantity', 0),
+                'received_qty': '',
+                'status': 'pending'
+            }
+            for p in order_details.get('ordered_products', [])
+            if p.get('quantity', 0) > 0
+        ]
 
     now = datetime.now()
     day         = str(now.day)
     month       = MONTH_NAMES.get(now.month, str(now.month))
     year        = str(now.year)
 
-    total_ordered  = sum(i.get('ordered_qty', 0) for i in delivered + not_delivered)
-    total_received = sum(i.get('received_qty', 0) for i in delivered + not_delivered)
+    total_ordered  = sum(i.get('ordered_qty', 0) for i in source_items)
+    total_received = sum(i.get('received_qty', 0) if isinstance(i.get('received_qty'), int) else 0 for i in source_items)
 
     all_items = []
-    for idx, item in enumerate(delivered + not_delivered, start=1):
+    for idx, item in enumerate(source_items, start=1):
         all_items.append({
             'number':       idx,
             'product_name': item.get('product_name', ''),
             'unit':         item.get('unit', ''),
-            'ordered_qty':  item.get('ordered_qty', 0),
-            'received_qty': item.get('received_qty', 0),
+            'ordered_qty':  item.get('ordered_qty', 0) or '',
+            'received_qty': item.get('received_qty', 0) if item.get('received_qty') != '' else '',
             'status':       item.get('status', ''),
         })
 

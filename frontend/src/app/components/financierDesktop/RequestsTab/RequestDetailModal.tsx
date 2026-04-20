@@ -141,7 +141,11 @@ function ColorTable({ details }: { details: any }) {
                             <tr key={i} className="bg-white">
                                 <td className="px-4 py-3 font-medium text-gray-500">{item.product_name}</td>
                                 <td className="px-4 py-3 text-center text-gray-400 text-xs">{item.unit}</td>
-                                <td className="px-4 py-3 text-center text-gray-500 tabular-nums">{item.ordered_qty}</td>
+                                <td className="px-4 py-3 text-center">
+                                    <span className="inline-block px-2 py-0.5 rounded-lg text-xs font-bold tabular-nums bg-gray-100 text-gray-700">
+                                        {item.ordered_qty}
+                                    </span>
+                                </td>
                             </tr>
                         ))}
                     </tbody>

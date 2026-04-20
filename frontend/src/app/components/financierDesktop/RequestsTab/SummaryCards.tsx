@@ -21,9 +21,9 @@ export function SummaryCards({ total, atChef, atSnabjenec, atSupplier, inReceivi
     return (
         <div className="mb-6 space-y-3">
             {/* Total */}
-            <div className="bg-gray-900 rounded-2xl px-5 py-4 flex items-baseline justify-between">
-                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Всего активных заявок</span>
-                <span className="text-4xl font-black text-white tabular-nums">{total}</span>
+            <div className="bg-white border border-gray-100 rounded-2xl px-5 py-4 flex items-baseline justify-between shadow-sm">
+                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Всего активных заявок</span>
+                <span className="text-4xl font-black text-gray-900 tabular-nums">{total}</span>
             </div>
 
             {/* Pipeline breakdown */}
