@@ -8,6 +8,15 @@ interface RequestDetailModalProps {
     templates: any[];
 }
 
+const STATUS_LABELS: Record<string, string> = {
+    sent_to_chef:              'У шефа',
+    review_snabjenec:          'У снабженца',
+    sent_to_supplier:          'У поставщика',
+    waiting_snabjenec_receive: 'На приёмке',
+    sent_to_financier:         'Ожидает меня',
+    archived:                  'Архив',
+};
+
 export function RequestDetailModal({ orderId, onClose, templates }: RequestDetailModalProps) {
     const [details, setDetails] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -73,7 +82,7 @@ export function RequestDetailModal({ orderId, onClose, templates }: RequestDetai
                                     { label: 'Дата', value: details.order.created_at?.slice(0, 10) },
                                     { label: 'Тип', value: details.order.branch.includes('_land') ? 'Садик' : 'Школа' },
                                     { label: 'Выполнение', value: `${details.delivery?.completion_rate ?? '—'}%` },
-                                    { label: 'Статус', value: details.order.status },
+                                    { label: 'Статус', value: STATUS_LABELS[details.order.status] || details.order.status },
                                 ].map(m => (
                                     <div key={m.label} className="bg-gray-50 rounded-2xl px-4 py-3">
                                         <p className="text-xs text-gray-400 font-medium mb-1">{m.label}</p>
