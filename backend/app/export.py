@@ -34,7 +34,7 @@ def fill_docx_template(template_path: str, context: dict) -> Optional[str]:
         return None
 
 
-def build_export_context(order_details: dict) -> dict:
+def build_export_context(order_details: dict, names: dict = None) -> dict:
     order = order_details.get('order', {})
     delivery = order_details.get('delivery', {})
     delivered = order_details.get('delivered_items', [])
@@ -82,7 +82,10 @@ def build_export_context(order_details: dict) -> dict:
         'total_ordered': total_ordered,
         'total_received': total_received,
         'completion_rate': delivery.get('completion_rate', ''),
-        'recipient_name': '',
-        'sender_name': '',
+        'snabjenec_name': (names or {}).get('snabjenec_name', ''),
+        'supplier_name':  (names or {}).get('supplier_name', ''),
+        'chef_name':      (names or {}).get('chef_name', ''),
+        'recipient_name': (names or {}).get('snabjenec_name', ''),
+        'sender_name':    (names or {}).get('supplier_name', ''),
         'signature_date': created_at[:10] if created_at else '',
     }
