@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Send, ChefHat, MessageSquare, Check, Trash2, Plus, RefreshCcw, Calendar, Truck } from 'lucide-react';
+import { ArrowLeft, Send, ChefHat, MessageSquare, Check, Trash2, Plus, RefreshCcw, Calendar, HelpCircle } from 'lucide-react';
 import type { Order, Branch } from '@/lib/api';
 import { StatusBadge } from '@/app/components/StatusBadge';
+import { HelpModal } from '@/app/components/HelpModal';
 import { useLanguage } from '@/app/context/LanguageContext';
 
 // Localized branch names handled by t() key 'branch' + id
@@ -21,6 +22,7 @@ export function ChefView({ order, onUpdateOrder, onBackToRoles, branch, onRefres
   const { t } = useLanguage();
   const [localProducts, setLocalProducts] = useState(order.products);
   const [customProductName, setCustomProductName] = useState('');
+  const [showHelp, setShowHelp] = useState(false);
 
   // Синхронизация localProducts при изменении order.products
   useEffect(() => {
@@ -91,18 +93,11 @@ export function ChefView({ order, onUpdateOrder, onBackToRoles, branch, onRefres
       <header className="flex-none text-white p-4 pb-4 rounded-b-2xl shadow-lg relative overflow-hidden" style={{ backgroundColor: '#8B0000' }}>
         <div className="flex items-center justify-between mb-2 relative z-10">
           <div className="flex items-center gap-2">
-            {/* Toggle Button for Chef */}
-            {onSetChefTab && (
-              <button
-                onClick={() => onSetChefTab(chefTab === 'order' ? 'delivery' : 'order')}
-                className="p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors mr-2"
-              >
-                {chefTab === 'order' ? <Truck className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-              </button>
-            )}
-
+            <button onClick={() => setShowHelp(true)} className="p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors">
+              <HelpCircle className="w-5 h-5" />
+            </button>
             <ChefHat className="w-4 h-4" />
-            <h1 className="text-lg font-bold">{chefTab === 'delivery' ? 'Приёмка' : t('chefTitle')}</h1>
+            <h1 className="text-lg font-bold">{t('chefTitle')}</h1>
           </div>
           {onRefresh ? (
             <button
@@ -283,5 +278,37 @@ export function ChefView({ order, onUpdateOrder, onBackToRoles, branch, onRefres
         </div>
       </div>
     </div>
+
+    {showHelp && (
+      <HelpModal
+        title="Шеф-повар"
+        color="#8B0000"
+        onClose={() => setShowHelp(false)}
+        sections={[
+          {
+            label: 'Что делать',
+            items: [
+              'Указать количество нужных продуктов из списка',
+              'При необходимости добавить свой продукт',
+              'Нажать «Отправить» — список уйдёт снабженцу',
+            ],
+          },
+          {
+            label: 'Обязательные условия',
+            items: [
+              'Хотя бы у одного продукта должно быть количество больше 0',
+              'Нельзя отправить полностью пустой список',
+            ],
+          },
+          {
+            label: 'После получения доставки',
+            items: [
+              'Проверить что привезли и оставить комментарий',
+              'Нажать «Завершить» для передачи финансисту',
+            ],
+          },
+        ]}
+      />
+    )}
   );
 }
