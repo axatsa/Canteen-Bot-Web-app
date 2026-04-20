@@ -149,21 +149,29 @@ def fill_docx_template(template_path: str, context: dict) -> Optional[str]:
                 # Regular product row — try to match order data
                 norm = _normalize_product_name(name_text)
                 matched = None
-                if norm in order_lookup:
+                
+                # 1. Try exact match first, but only if NOT already used
+                if norm in order_lookup and norm not in matched_keys:
                     matched = order_lookup[norm]
                     matched_keys.add(norm)
                     logger.info(f"[export] exact match: {repr(norm)}")
                 else:
-                    # Partial word match
+                    # 2. Try partial word match, skipping already matched items
                     for ok, ov in order_lookup.items():
+                        if ok in matched_keys:
+                            continue
+                            
                         ok_words   = set(ok.split())
                         tmpl_words = set(norm.split())
-                        common = ok_words & tmpl_words
-                        if len(common) >= 2 or (ok_words == tmpl_words):
+                        common     = ok_words & tmpl_words
+                        
+                        # Match if words are identical or have significant overlap
+                        if (ok_words == tmpl_words) or (len(common) >= 2 and len(common) == len(ok_words)):
                             matched = ov
                             matched_keys.add(ok)
                             logger.info(f"[export] partial match: {repr(norm)} -> {repr(ok)}")
                             break
+                    
                     if not matched:
                         logger.info(f"[export] NO match for: {repr(norm)}")
 
