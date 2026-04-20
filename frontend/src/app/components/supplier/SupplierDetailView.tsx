@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Send, MessageSquare, Truck, Check, RefreshCcw, AlignJustify, LayoutGrid, Download, Calendar } from 'lucide-react';
+import { ArrowLeft, Send, MessageSquare, Truck, Check, RefreshCcw, AlignJustify, LayoutGrid, Download, Calendar, HelpCircle } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import type { Order, Branch } from '@/lib/api';
 import { StatusBadge } from '@/app/components/StatusBadge';
+import { HelpModal } from '@/app/components/HelpModal';
 import { useLanguage } from '@/app/context/LanguageContext';
 
 // ── Date helpers ────────────────────────────────────────────────────────────
@@ -84,6 +85,7 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
     const { t } = useLanguage();
     const [localProducts, setLocalProducts] = useState(order.products);
     const [isCompact, setIsCompact] = useState(false);
+    const [showHelp, setShowHelp] = useState(false);
     const [estimatedDate, setEstimatedDate] = useState<string>(
         order.estimatedDeliveryDate ? order.estimatedDeliveryDate.toISOString().split('T')[0] : ''
     );
@@ -183,9 +185,14 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
         <div className="h-screen overflow-hidden bg-[#f5f5f5] flex flex-col">
             <header className="flex-none text-white p-4 pb-4 rounded-b-2xl shadow-lg relative overflow-hidden" style={{ backgroundColor: '#FF6B00' }}>
                 <div className="flex items-center justify-between mb-2 relative z-10">
-                    <button onClick={onBackToRoles} className="p-2 hover:bg-white/20 rounded-full transition-colors">
-                        <ArrowLeft className="w-5 h-5" />
-                    </button>
+                    <div className="flex items-center gap-1">
+                        <button onClick={onBackToRoles} className="p-2 hover:bg-white/20 rounded-full transition-colors">
+                            <ArrowLeft className="w-5 h-5" />
+                        </button>
+                        <button onClick={() => setShowHelp(true)} className="p-2 hover:bg-white/20 rounded-full transition-colors">
+                            <HelpCircle className="w-5 h-5" />
+                        </button>
+                    </div>
                     <div className="flex items-center gap-2">
                         <Truck className="w-4 h-4" />
                         <h1 className="text-lg font-bold">{t('supplierTitle')}</h1>
@@ -423,5 +430,37 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                 </div>
             </div>
         </div>
+
+        {showHelp && (
+            <HelpModal
+                title="Поставщик"
+                color="#FF6B00"
+                onClose={() => setShowHelp(false)}
+                sections={[
+                    {
+                        label: 'Что делать',
+                        items: [
+                            'Получить заказ и указать цену для каждого товара',
+                            'При необходимости добавить комментарий к позиции',
+                            'Нажать «Отправить» — список уйдёт снабженцу на приёмку',
+                        ],
+                    },
+                    {
+                        label: 'Обязательные условия',
+                        items: [
+                            'Цена должна быть указана для каждого товара',
+                            'Нельзя отправить список с нулевыми ценами',
+                        ],
+                    },
+                    {
+                        label: 'Нельзя',
+                        items: [
+                            'Отправить заказ без заполненных цен',
+                            'Изменить цены после отправки',
+                        ],
+                    },
+                ]}
+            />
+        )}
     );
 }

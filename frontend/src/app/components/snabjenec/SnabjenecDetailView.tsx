@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Send, CheckSquare, Save, Archive, Plus, Package } from 'lucide-react';
+import { ArrowLeft, Send, CheckSquare, Save, Archive, Plus, Package, HelpCircle } from 'lucide-react';
 import type { Order, Branch, Product, DeliveryItemTracking } from '@/lib/api';
 import { api } from '@/lib/api';
 import { StatusBadge } from '@/app/components/StatusBadge';
+import { HelpModal } from '@/app/components/HelpModal';
 import { useLanguage } from '@/app/context/LanguageContext';
 
 function isoToDmy(iso: string): string {
@@ -31,6 +32,7 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
     const { t } = useLanguage();
     const [localProducts, setLocalProducts] = useState<Product[]>(order.products);
     const [supplierDateInput, setSupplierDateInput] = useState('');
+    const [showHelp, setShowHelp] = useState(false);
     const [markingReceived, setMarkingReceived] = useState(false);
     const [savingDelivery, setSavingDelivery] = useState(false);
     const [archiving, setArchiving] = useState(false);
@@ -320,9 +322,14 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
         <div className="h-screen overflow-hidden bg-[#f5f5f5] flex flex-col">
             <header className="flex-none text-white p-4 rounded-b-2xl shadow-lg relative overflow-hidden" style={{ backgroundColor: '#2E7D32' }}>
                 <div className="flex items-center justify-between mb-2">
-                    <button onClick={onBackToRoles} className="p-2 hover:bg-white/20 rounded-full transition-colors">
-                        <ArrowLeft className="w-5 h-5" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button onClick={onBackToRoles} className="p-2 hover:bg-white/20 rounded-full transition-colors">
+                            <ArrowLeft className="w-5 h-5" />
+                        </button>
+                        <button onClick={() => setShowHelp(true)} className="p-2 hover:bg-white/20 rounded-full transition-colors">
+                            <HelpCircle className="w-5 h-5" />
+                        </button>
+                    </div>
                     <StatusBadge status={order.status} />
                 </div>
                 <h2 className="text-xl font-bold">{t(`branch${branch.charAt(0).toUpperCase() + branch.slice(1)}` as any)}</h2>
@@ -507,6 +514,38 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                 </div>
             )}
         </div>
+
+        {showHelp && (
+            <HelpModal
+                title="Снабженец"
+                color="#2E7D32"
+                onClose={() => setShowHelp(false)}
+                sections={[
+                    {
+                        label: 'Что делать',
+                        items: [
+                            'Получить список от шефа и отправить поставщику',
+                            'При получении товара отметить каждую позицию',
+                            'Нажать «Окончательно отправить» для передачи финансисту',
+                        ],
+                    },
+                    {
+                        label: 'Обязательные условия',
+                        items: [
+                            'Для товаров не на сегодня — обязательно указать дату доставки',
+                            'Нельзя завершить приёмку если есть ожидаемые товары с будущей датой',
+                        ],
+                    },
+                    {
+                        label: 'Нельзя',
+                        items: [
+                            'Завершить приёмку с незаполненными датами доставки',
+                            'Отправить поставщику без сохранения списка',
+                        ],
+                    },
+                ]}
+            />
+        )}
     );
 }
 

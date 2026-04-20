@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { BarChart2, Archive, FileText, Settings, RefreshCw } from 'lucide-react';
+import { BarChart2, Archive, FileText, Settings, RefreshCw, HelpCircle } from 'lucide-react';
+import { HelpModal } from '@/app/components/HelpModal';
 import { api } from '@/lib/api';
 import { SummaryCards } from './RequestsTab/SummaryCards';
 import { RequestsFilters } from './RequestsTab/RequestsFilters';
@@ -18,6 +19,7 @@ export function FinancierDesktop() {
     const [statistics, setStatistics] = useState<any>(null);
     const [templates, setTemplates] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+    const [showHelp, setShowHelp] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
     const [statusFilter, setStatusFilter] = useState('');
     const [branchFilter, setBranchFilter] = useState('');
@@ -103,6 +105,12 @@ export function FinancierDesktop() {
                     <p className="text-xs text-gray-400 mt-0.5">Управление доставками и отчётами</p>
                 </div>
                 <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => setShowHelp(true)}
+                        className="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                        <HelpCircle className="w-4 h-4" />
+                    </button>
                     <button
                         onClick={() => {
                             if (tab === 'requests') loadOrders();
@@ -259,6 +267,38 @@ export function FinancierDesktop() {
                     orderId={selectedOrderId}
                     onClose={() => setSelectedOrderId(null)}
                     templates={templates}
+                />
+            )}
+
+            {showHelp && (
+                <HelpModal
+                    title="Финансист — Dashboard"
+                    color="#1a365d"
+                    onClose={() => setShowHelp(false)}
+                    sections={[
+                        {
+                            label: 'Что делать',
+                            items: [
+                                'Вкладка «Заявки» — просматривать входящие и активные заявки',
+                                'Вкладка «Архив» — завершённые и архивированные заказы',
+                                'Вкладка «Статистика» — аналитика по доставкам и расходам',
+                            ],
+                        },
+                        {
+                            label: 'Фильтрация',
+                            items: [
+                                'Фильтровать заявки по филиалу и статусу',
+                                'Нажать на заявку для просмотра деталей и цен',
+                            ],
+                        },
+                        {
+                            label: 'Нельзя',
+                            items: [
+                                'Восстановить заявку из архива',
+                                'Изменять цены поставщика',
+                            ],
+                        },
+                    ]}
                 />
             )}
         </div>
