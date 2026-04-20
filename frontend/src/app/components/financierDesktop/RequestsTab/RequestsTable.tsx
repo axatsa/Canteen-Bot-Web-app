@@ -117,7 +117,12 @@ export function RequestsTable({ orders, onSelectOrder }: RequestsTableProps) {
                                     </span>
                                 </span>
                             </td>
-                            <td className="px-5 py-4 text-gray-600 text-sm">
+                            <td className="px-5 py-4 text-gray-600 text-sm flex items-center gap-2">
+                                <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
+                                    order.branch.includes('_land') ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600'
+                                }`}>
+                                    {order.branch.includes('_land') ? 'Садик' : 'Школа'}
+                                </span>
                                 {BRANCH_LABELS[order.branch] ?? order.branch}
                             </td>
                             <td className="px-5 py-4 text-right text-gray-500 tabular-nums">
