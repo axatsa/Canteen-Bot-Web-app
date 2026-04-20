@@ -7,3 +7,4 @@ github_actions_deploy.pub
 __pycache__
 .agent
 .claude
+.db
