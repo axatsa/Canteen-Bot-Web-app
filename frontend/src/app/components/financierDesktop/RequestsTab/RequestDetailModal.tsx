@@ -68,15 +68,16 @@ export function RequestDetailModal({ orderId, onClose, templates }: RequestDetai
                     ) : (
                         <>
                             {/* Meta */}
-                            <div className="grid grid-cols-3 gap-3">
+                            <div className="grid grid-cols-4 gap-3">
                                 {[
                                     { label: 'Дата', value: details.order.created_at?.slice(0, 10) },
+                                    { label: 'Тип', value: details.order.branch.includes('_land') ? 'Садик' : 'Школа' },
                                     { label: 'Выполнение', value: `${details.delivery?.completion_rate ?? '—'}%` },
                                     { label: 'Статус', value: details.order.status },
                                 ].map(m => (
                                     <div key={m.label} className="bg-gray-50 rounded-2xl px-4 py-3">
                                         <p className="text-xs text-gray-400 font-medium mb-1">{m.label}</p>
-                                        <p className="font-bold text-gray-900 text-sm">{m.value}</p>
+                                        <p className="font-bold text-gray-900 text-sm whitespace-nowrap">{m.value}</p>
                                     </div>
                                 ))}
                             </div>
