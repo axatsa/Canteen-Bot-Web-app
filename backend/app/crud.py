@@ -176,16 +176,27 @@ def archive_order(order_id: str, archived_by: str = "snabjenec") -> bool:
 
 def _compute_delivery_stats(delivery_tracking: dict, products: list) -> dict:
     ordered_qty_map = {str(p['id']): p.get('quantity', 0) for p in products}
+    price_map = {str(p['id']): p.get('price', 0) or p.get('lastPrice', 0) or 0 for p in products}
+    
     total_ordered = 0
     total_received = 0
+    total_ordered_sum = 0
+    total_received_sum = 0
+    
     delivered_items = []
     not_delivered_items = []
 
+    # First, track what's in delivery_tracking
     for pid, info in delivery_tracking.items():
         ordered = info.get('ordered_qty', ordered_qty_map.get(pid, 0))
         received = info.get('received_qty', 0)
+        price = price_map.get(pid, 0)
+        
         total_ordered += ordered
         total_received += received
+        total_ordered_sum += ordered * price
+        total_received_sum += received * price
+        
         product_name = next((p['name'] for p in products if str(p['id']) == pid), pid)
         unit = next((p['unit'] for p in products if str(p['id']) == pid), '')
         entry = {
@@ -194,6 +205,7 @@ def _compute_delivery_stats(delivery_tracking: dict, products: list) -> dict:
             "unit": unit,
             "ordered_qty": ordered,
             "received_qty": received,
+            "price": price,
             "status": info.get('status', 'pending'),
         }
         if received > 0:
@@ -201,10 +213,23 @@ def _compute_delivery_stats(delivery_tracking: dict, products: list) -> dict:
         else:
             not_delivered_items.append(entry)
 
+    # For any items NOT in delivery_tracking but in products (e.g. pending ones)
+    tracked_pids = set(delivery_tracking.keys())
+    for p in products:
+        pid = str(p['id'])
+        if pid not in tracked_pids:
+            qty = p.get('quantity', 0)
+            price = p.get('price', 0) or p.get('lastPrice', 0) or 0
+            total_ordered += qty
+            total_ordered_sum += qty * price
+            # total_received remains 0 for these
+
     completion_rate = round(total_received / total_ordered * 100) if total_ordered > 0 else 0
     return {
         "total_ordered": total_ordered,
         "total_received": total_received,
+        "total_ordered_sum": total_ordered_sum,
+        "total_received_sum": total_received_sum,
         "completion_rate": completion_rate,
         "delivered_items": delivered_items,
         "not_delivered_items": not_delivered_items,
@@ -249,6 +274,8 @@ def get_order_financier_details(order_id: str) -> Optional[dict]:
             "sent_to_supplier_at": order.get('sent_to_supplier_at'),
             "received_from_supplier_at": order.get('received_from_supplier_at'),
             "completion_rate": f"{stats['completion_rate']}%",
+            "total_ordered_sum": stats['total_ordered_sum'],
+            "total_received_sum": stats['total_received_sum'],
         },
         "ordered_products": [
             {
@@ -302,6 +329,8 @@ def get_financier_all_orders(branch: Optional[str] = None, status: Optional[str]
                 "total_items_ordered": stats['total_ordered'],
                 "total_items_received": stats['total_received'],
                 "completion_rate": stats['completion_rate'],
+                "total_ordered_sum": stats['total_ordered_sum'],
+                "total_received_sum": stats['total_received_sum'],
                 "sent_to_supplier_at": r.get('sent_to_supplier_at'),
                 "received_from_supplier_at": r.get('received_from_supplier_at'),
                 "extra_items_count": len(extra),
@@ -466,6 +495,8 @@ def get_financier_archive(branch: Optional[str] = None, limit: int = 20, offset:
                 "created_at": r['createdAt'],
                 "branch": r['branch'],
                 "completion_rate": stats['completion_rate'],
+                "total_ordered_sum": stats['total_ordered_sum'],
+                "total_received_sum": stats['total_received_sum'],
                 "sent_to_supplier_at": r.get('sent_to_supplier_at'),
                 "received_from_supplier_at": r.get('received_from_supplier_at'),
             })

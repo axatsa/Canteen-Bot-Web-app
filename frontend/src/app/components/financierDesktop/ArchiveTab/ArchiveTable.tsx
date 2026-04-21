@@ -16,7 +16,8 @@ export function ArchiveTable({ orders, onSelectOrder }: ArchiveTableProps) {
                         <th className="text-left p-3">Филиал</th>
                         <th className="text-right p-3">Отправлено пост.</th>
                         <th className="text-right p-3">Получено от пост.</th>
-                        <th className="text-right p-3 rounded-tr-xl">% Доставки</th>
+                        <th className="text-right p-3">% Доставки</th>
+                        <th className="text-right p-3 rounded-tr-xl">Сумма</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">

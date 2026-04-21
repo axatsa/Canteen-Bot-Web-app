@@ -86,6 +86,7 @@ export function RequestsTable({ orders, onSelectOrder }: RequestsTableProps) {
                         <th className="text-right px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none" onClick={() => handleSort('completion_rate')}>
                             Доставка <SortIcon k="completion_rate" />
                         </th>
+                        <th className="text-right px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Сумма</th>
                         <th className="px-5 py-3 w-8" />
                     </tr>
                 </thead>
@@ -143,6 +144,11 @@ export function RequestsTable({ orders, onSelectOrder }: RequestsTableProps) {
                                         {order.completion_rate}%
                                     </span>
                                 </div>
+                            </td>
+                            <td className="px-5 py-4 text-right tabular-nums">
+                                <span className="text-gray-900 font-bold">
+                                    {(order.total_received_sum || 0).toLocaleString()} <span className="text-[10px] text-gray-400">UZS</span>
+                                </span>
                             </td>
                             <td className="px-5 py-4 text-right">
                                 <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors inline" />

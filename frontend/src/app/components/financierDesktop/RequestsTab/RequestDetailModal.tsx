@@ -91,6 +91,22 @@ export function RequestDetailModal({ orderId, onClose, templates }: RequestDetai
                                 ))}
                             </div>
 
+                            {/* Financial Summary */}
+                            <div className="bg-gray-900 rounded-2xl px-6 py-5 flex items-center justify-between text-white shadow-lg">
+                                <div>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">Сумма заказа</p>
+                                    <p className="text-sm font-medium text-gray-300 opacity-60">
+                                        Заявлено: {details.delivery.total_ordered_sum.toLocaleString()} UZS
+                                    </p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">К оплате (факт)</p>
+                                    <p className="text-xl font-black text-white tracking-tight">
+                                        {details.delivery.total_received_sum.toLocaleString()} <span className="text-xs font-normal opacity-60">UZS</span>
+                                    </p>
+                                </div>
+                            </div>
+
                             {/* Unified color-coded product table */}
                             <ColorTable details={details} />
                         </>
@@ -197,20 +213,26 @@ function ColorTable({ details }: { details: any }) {
                     <tr className="bg-gray-50 border-b border-gray-100">
                         <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wide">Товар</th>
                         <th className="px-4 py-2.5 text-center text-xs font-semibold text-gray-400 uppercase tracking-wide">Ед.</th>
+                        <th className="px-4 py-2.5 text-center text-xs font-semibold text-gray-400 uppercase tracking-wide">Цена</th>
                         <th className="px-4 py-2.5 text-center text-xs font-semibold text-gray-400 uppercase tracking-wide">Заказ</th>
                         <th className="px-4 py-2.5 text-center text-xs font-semibold text-gray-400 uppercase tracking-wide">Получено</th>
+                        <th className="px-4 py-2.5 text-right text-xs font-semibold text-gray-400 uppercase tracking-wide pr-5">Итого</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                    {allRows.map((item, i) => (
+                    {allRows.map((item: any, i) => (
                         <tr key={i} className="bg-white hover:bg-gray-50 transition-colors">
                             <td className="px-4 py-3 font-medium text-gray-800">{item.product_name}</td>
                             <td className="px-4 py-3 text-center text-gray-400 text-xs">{item.unit}</td>
+                            <td className="px-4 py-3 text-center text-gray-500 tabular-nums">{(item.price || 0).toLocaleString()}</td>
                             <td className="px-4 py-3 text-center text-gray-500 tabular-nums">{item.ordered_qty}</td>
                             <td className="px-4 py-3 text-center">
                                 <span className={`inline-block px-2 py-0.5 rounded-lg text-xs font-bold tabular-nums ${getBadge(item)}`}>
                                     {item.received_qty}
                                 </span>
+                            </td>
+                            <td className="px-4 py-3 text-right text-gray-900 font-bold tabular-nums pr-5">
+                                {(item.received_qty * (item.price || 0)).toLocaleString()}
                             </td>
                         </tr>
                     ))}
