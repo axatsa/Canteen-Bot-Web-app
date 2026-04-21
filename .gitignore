@@ -8,5 +8,6 @@ __pycache__
 .agent
 .claude
 .db
+backend/database.db
 backend/exports/*.docx
 backend/exports/*.xlsx
