@@ -10,4 +10,4 @@ __pycache__
 .db
 backend/database.db
 backend/exports/*.docx
-backend/exports/*.xlsx
+backend/exports/*.xlsxbackend/templates/*.docx
