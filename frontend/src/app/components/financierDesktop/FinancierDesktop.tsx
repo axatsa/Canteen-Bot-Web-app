@@ -243,12 +243,40 @@ export function FinancierDesktop({ onBackToRoles }: { onBackToRoles?: () => void
                                     </div>
                                 </div>
 
-                                <div className="bg-white rounded-2xl border border-gray-100 p-6">
-                                    <h3 className="font-bold text-gray-900 mb-5">График доставок</h3>
-                                    <DeliveryChart data={[]} />
-                                    <p className="text-xs text-gray-300 text-center mt-3">
-                                        График отображается при наличии данных
-                                    </p>
+                                <div className="grid grid-cols-2 gap-5">
+                                    <div className="bg-white rounded-2xl border border-gray-100 p-6">
+                                        <h3 className="font-bold text-gray-900 mb-5">График выполнения (% по дням)</h3>
+                                        <DeliveryChart data={statistics.delivery_timeline} />
+                                    </div>
+                                    <div className="bg-white rounded-2xl border border-gray-100 p-6">
+                                        <h3 className="font-bold text-gray-900 mb-5">Эффективность снабженцев</h3>
+                                        {statistics.by_snabjenec?.length > 0 ? (
+                                            <div className="space-y-4">
+                                                {statistics.by_snabjenec.map((s: any) => (
+                                                    <div key={s.name} className="flex flex-col gap-1.5">
+                                                        <div className="flex justify-between items-end">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-sm font-bold text-gray-900">{s.name}</span>
+                                                                <span className="text-[10px] text-gray-400 uppercase font-medium">{s.orders_count} заказов</span>
+                                                            </div>
+                                                            <span className="text-sm font-black text-gray-900">{s.completion}%</span>
+                                                        </div>
+                                                        <div className="w-full bg-gray-50 rounded-full h-1.5 overflow-hidden">
+                                                            <div
+                                                                className={`h-full rounded-full transition-all ${
+                                                                    s.completion > 90 ? 'bg-green-500' : 
+                                                                    s.completion > 70 ? 'bg-yellow-500' : 'bg-red-500'
+                                                                }`}
+                                                                style={{ width: `${s.completion}%` }}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="h-48 flex items-center justify-center text-gray-400 text-sm">Нет данных по снабженцам</div>
+                                        )}
+                                    </div>
                                 </div>
                             </>
                         ) : (

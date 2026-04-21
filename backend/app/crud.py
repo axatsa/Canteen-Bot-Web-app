@@ -373,7 +373,7 @@ def get_financier_statistics(branch: Optional[str] = None) -> dict:
             conditions.append("branch = ?")
             params.append(branch)
         where = f"WHERE {' AND '.join(conditions)}"
-        rows = conn.execute(f"SELECT * FROM orders {where}", params).fetchall()
+        rows = conn.execute(f"SELECT * FROM orders {where} ORDER BY createdAt ASC", params).fetchall()
     finally:
         conn.close()
 
@@ -382,6 +382,9 @@ def get_financier_statistics(branch: Optional[str] = None) -> dict:
     partially_delivered = 0
     not_delivered = 0
     total_completion = 0
+    
+    timeline_map = {} # date -> {total_completion, count}
+    snabjenec_map = {} # name -> {total_completion, count}
 
     for row in rows:
         r = dict(row)
@@ -390,14 +393,40 @@ def get_financier_statistics(branch: Optional[str] = None) -> dict:
         stats = _compute_delivery_stats(tracking, products)
         rate = stats['completion_rate']
         total_completion += rate
+        
         if rate == 100:
             fully_delivered += 1
         elif rate > 0:
             partially_delivered += 1
         else:
             not_delivered += 1
+            
+        # Timeline
+        date = r['createdAt'][:10] # YYYY-MM-DD
+        if date not in timeline_map:
+            timeline_map[date] = {"total": 0, "count": 0}
+        timeline_map[date]["total"] += rate
+        timeline_map[date]["count"] += 1
+        
+        # Snabjenec
+        s_name = r.get('snabjenec_name') or "Не указан"
+        if s_name not in snabjenec_map:
+            snabjenec_map[s_name] = {"total": 0, "count": 0}
+        snabjenec_map[s_name]["total"] += rate
+        snabjenec_map[s_name]["count"] += 1
 
     avg_rate = round(total_completion / total_orders, 1) if total_orders > 0 else 0
+    
+    delivery_timeline = [
+        {"date": d, "completion": round(v["total"] / v["count"], 1)}
+        for d, v in sorted(timeline_map.items())
+    ]
+    
+    by_snabjenec = [
+        {"name": n, "completion": round(v["total"] / v["count"], 1), "orders_count": v["count"]}
+        for n, v in snabjenec_map.items()
+    ]
+
     return {
         "summary": {
             "total_orders": total_orders,
@@ -405,7 +434,9 @@ def get_financier_statistics(branch: Optional[str] = None) -> dict:
             "partially_delivered": partially_delivered,
             "not_delivered": not_delivered,
             "average_completion_rate": avg_rate,
-        }
+        },
+        "delivery_timeline": delivery_timeline,
+        "by_snabjenec": by_snabjenec
     }
 
 
