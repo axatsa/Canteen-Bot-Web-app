@@ -7,7 +7,14 @@ github_actions_deploy.pub
 __pycache__
 .agent
 .claude
-.db
+
+# Database
+*.db
 backend/database.db
-backend/exports/*.docx
-backend/exports/*.xlsxbackend/templates/*.docx
+
+# Exports
+backend/exports/
+
+# Templates
+backend/templates/*.docx
+!backend/templates/.gitkeep

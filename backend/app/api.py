@@ -1,9 +1,9 @@
 import os
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from typing import List, Optional
-from . import schemas, crud
+from . import schemas, crud, notifications
 from .export import TEMPLATES_DIR, EXPORTS_DIR, ensure_dirs, fill_docx_template, build_export_context
 
 app = FastAPI(title="Optimizer API")
@@ -26,10 +26,15 @@ async def get_orders():
     return crud.get_all_orders()
 
 @app.post("/orders/upsert")
-async def upsert_order(order: schemas.Order):
+async def upsert_order(order: schemas.Order, background_tasks: BackgroundTasks):
+    existing = crud.get_order_by_id(order.id)
     success = crud.upsert_order(order.dict())
     if not success:
         raise HTTPException(status_code=500, detail="Failed to save order")
+    
+    if not existing and order.status == 'sent_to_chef':
+        background_tasks.add_task(notifications.notify_new_order, order.dict())
+        
     return {"status": "success"}
 
 @app.post("/users/register")
@@ -80,13 +85,16 @@ async def update_delivery(order_id: str, body: schemas.UpdateDeliveryRequest):
 
 
 @app.post("/orders/{order_id}/archive")
-async def archive_order(order_id: str, body: schemas.ArchiveRequest):
+async def archive_order(order_id: str, body: schemas.ArchiveRequest, background_tasks: BackgroundTasks):
     order = crud.get_order_by_id(order_id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     success = crud.archive_order(order_id, body.archived_by)
     if not success:
         raise HTTPException(status_code=500, detail="Failed to archive order")
+    
+    background_tasks.add_task(notifications.notify_order_archived, order_id)
+    
     return {"status": "success", "order_id": order_id, "status_new": "archived"}
 
 

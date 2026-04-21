@@ -7,8 +7,8 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
-TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), '..', 'templates')
-EXPORTS_DIR = os.path.join(os.path.dirname(__file__), '..', 'exports')
+TEMPLATES_DIR = os.getenv('TEMPLATES_DIR', os.path.join(os.path.dirname(__file__), '..', 'templates'))
+EXPORTS_DIR = os.getenv('EXPORTS_DIR', os.path.join(os.path.dirname(__file__), '..', 'exports'))
 
 
 def ensure_dirs():

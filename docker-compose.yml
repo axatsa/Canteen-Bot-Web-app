@@ -6,7 +6,12 @@ services:
     command: python main.py api
     volumes:
       - ./backend:/app
+      - canteen_db:/app/db
+      - canteen_templates:/app/templates_storage
     restart: unless-stopped
+    environment:
+      - DB_PATH=/app/db/database.db
+      - TEMPLATES_DIR=/app/templates_storage
     env_file: .env
 
   bot:
@@ -16,7 +21,12 @@ services:
       - api
     volumes:
       - ./backend:/app
+      - canteen_db:/app/db
+      - canteen_templates:/app/templates_storage
     restart: unless-stopped
+    environment:
+      - DB_PATH=/app/db/database.db
+      - TEMPLATES_DIR=/app/templates_storage
     env_file: .env
 
   frontend:
@@ -35,6 +45,10 @@ services:
       - "traefik.http.routers.web-app.entrypoints=websecure"
       - "traefik.http.routers.web-app.tls.certresolver=le"
       - "traefik.http.services.web-app.loadbalancer.server.port=80"
+
+volumes:
+  canteen_db:
+  canteen_templates:
 
 networks:
   default:

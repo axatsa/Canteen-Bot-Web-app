@@ -44,6 +44,13 @@ def save_user(telegram_id: int, full_name: str, role: str, branch: str, language
         return False
     finally:
         conn.close()
+def get_users_by_role(role: str) -> List[dict]:
+    conn = get_db_connection()
+    try:
+        rows = conn.execute('SELECT * FROM users WHERE role = ?', (role,)).fetchall()
+        return [dict(r) for r in rows]
+    finally:
+        conn.close()
 
 def get_all_products() -> List[dict]:
     conn = get_db_connection()
