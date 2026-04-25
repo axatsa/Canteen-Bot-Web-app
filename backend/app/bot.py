@@ -24,6 +24,8 @@ ROLE_PASSWORDS = {
     'financier': 'F123',
     'supplier': 'C123',
     'snabjenec': 'S123',
+    'supplier_meat': 'C123',
+    'supplier_products': 'C123',
 }
 
 LAND_BRANCHES = [
@@ -78,7 +80,9 @@ TEXTS = {
         'role_chef': '👨‍🍳 Шеф-повар',
         'role_snabjenec': '📦 Снабженец',
         'role_financier': '💼 Финансист',
-        'role_supplier': '🚚 Поставщик',
+        'role_supplier': '🚚 Поставщик (Общий)',
+        'role_supplier_meat': '🥩 Поставщик мяса',
+        'role_supplier_products': '🛒 Поставщик продуктов',
     },
     'uz': {
         'welcome': "👋 Optimizer'ga xush kelibsiz!\n\nTilni tanlang:",
@@ -109,7 +113,9 @@ TEXTS = {
         'role_chef': '👨‍🍳 Oshpaz',
         'role_snabjenec': "📦 Ta'minotchi",
         'role_financier': '💼 Moliyachi',
-        'role_supplier': '🚚 Yetkazuvchi',
+        'role_supplier': '🚚 Yetkazuvchi (Umumiy)',
+        'role_supplier_meat': '🥩 Go‘sht yetkazib beruvchi',
+        'role_supplier_products': '🛒 Mahsulot yetkazib beruvchi',
     }
 }
 
@@ -156,7 +162,8 @@ def _role_keyboard(lang: str, back_cb: str) -> InlineKeyboardMarkup:
         [InlineKeyboardButton(get_text(lang, 'role_chef'), callback_data='role_chef')],
         [InlineKeyboardButton(get_text(lang, 'role_snabjenec'), callback_data='role_snabjenec')],
         [InlineKeyboardButton(get_text(lang, 'role_financier'), callback_data='role_financier')],
-        [InlineKeyboardButton(get_text(lang, 'role_supplier'), callback_data='role_supplier')],
+        [InlineKeyboardButton(get_text(lang, 'role_supplier_meat'), callback_data='role_supplier_meat')],
+        [InlineKeyboardButton(get_text(lang, 'role_supplier_products'), callback_data='role_supplier_products')],
         [InlineKeyboardButton(get_text(lang, 'back'), callback_data=back_cb)],
     ])
 
@@ -281,7 +288,7 @@ async def password_entered(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     await msg.delete()
 
     # Supplier / snabjenec / financier — no branch needed
-    if role in ('financier', 'supplier', 'snabjenec'):
+    if role in ('financier', 'supplier', 'snabjenec', 'supplier_meat', 'supplier_products'):
         context.user_data['branch'] = 'all'
         return await finalize_registration(update, context)
 

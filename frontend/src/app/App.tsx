@@ -138,7 +138,7 @@ export default function App() {
       ...updatedOrder,
       ...(selectedRole === 'chef' && userName ? { chefName: userName } : {}),
       ...(selectedRole === 'snabjenec' && userName ? { snabjenecName: userName } : {}),
-      ...(selectedRole === 'supplier' && userName ? { supplierName: userName } : {}),
+      ...(selectedRole?.startsWith('supplier') && userName ? { supplierName: userName } : {}),
     };
     try {
       await api.upsertOrder(orderWithUser);
@@ -189,7 +189,7 @@ export default function App() {
   }
 
   // Для поставщика тоже сразу показываем список заявок (без выбора филиала)
-  if (selectedRole === 'supplier') {
+  if (selectedRole?.startsWith('supplier')) {
     const selectedOrder = selectedOrderId ? orders.find(o => o.id === selectedOrderId) : null;
 
     if (selectedOrder) {
@@ -201,6 +201,7 @@ export default function App() {
           branch={selectedOrder.branch}
           onRefresh={loadOrders}
           isFromBot={isFromBot}
+          role={selectedRole}
         />
       );
     }
@@ -212,6 +213,7 @@ export default function App() {
         onBackToRoles={handleBackToStart}
         onRefresh={loadOrders}
         isFromBot={isFromBot}
+        role={selectedRole}
       />
     );
   }

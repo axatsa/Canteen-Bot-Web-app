@@ -28,6 +28,8 @@ class Order(BaseModel):
     chefName: Optional[str] = None
     snabjenecName: Optional[str] = None
     supplierName: Optional[str] = None
+    sentToMeatSupplier: Optional[bool] = False
+    sentToProductSupplier: Optional[bool] = False
 
 class UserRegister(BaseModel):
     telegram_id: int

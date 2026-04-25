@@ -109,6 +109,8 @@ def get_all_orders() -> List[dict]:
             "chefName": r.get('chef_name'),
             "snabjenecName": r.get('snabjenec_name'),
             "supplierName": r.get('supplier_name'),
+            "sentToMeatSupplier": bool(r.get('sent_to_meat_supplier', 0)),
+            "sentToProductSupplier": bool(r.get('sent_to_product_supplier', 0)),
         })
     return orders
 
@@ -276,6 +278,7 @@ def get_order_financier_details(order_id: str) -> Optional[dict]:
             "created_at": order['createdAt'],
             "status": order['status'],
             "branch": order['branch'],
+            "products": products,
         },
         "delivery": {
             "sent_to_supplier_at": order.get('sent_to_supplier_at'),
@@ -565,8 +568,9 @@ def upsert_order(order_data: dict) -> bool:
         
         cursor.execute('''
         INSERT INTO orders (id, status, products, createdAt, deliveredAt, estimatedDeliveryDate, branch,
-                            chef_name, snabjenec_name, supplier_name)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            chef_name, snabjenec_name, supplier_name,
+                            sent_to_meat_supplier, sent_to_product_supplier)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET
             status=excluded.status,
             products=excluded.products,
@@ -576,7 +580,9 @@ def upsert_order(order_data: dict) -> bool:
             branch=excluded.branch,
             chef_name=COALESCE(excluded.chef_name, orders.chef_name),
             snabjenec_name=COALESCE(excluded.snabjenec_name, orders.snabjenec_name),
-            supplier_name=COALESCE(excluded.supplier_name, orders.supplier_name)
+            supplier_name=COALESCE(excluded.supplier_name, orders.supplier_name),
+            sent_to_meat_supplier=CASE WHEN excluded.sent_to_meat_supplier = 1 THEN 1 ELSE orders.sent_to_meat_supplier END,
+            sent_to_product_supplier=CASE WHEN excluded.sent_to_product_supplier = 1 THEN 1 ELSE orders.sent_to_product_supplier END
         ''', (
             order_data['id'],
             order_data['status'],
@@ -588,6 +594,8 @@ def upsert_order(order_data: dict) -> bool:
             order_data.get('chefName'),
             order_data.get('snabjenecName'),
             order_data.get('supplierName'),
+            1 if order_data.get('sentToMeatSupplier') else 0,
+            1 if order_data.get('sentToProductSupplier') else 0,
         ))
         
         # Update last_price

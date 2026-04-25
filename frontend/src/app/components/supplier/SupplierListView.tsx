@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ArrowLeft, Truck, RefreshCcw, HelpCircle, ChevronRight } from 'lucide-react';
-import type { Order } from '@/lib/api';
+import type { Order, Role } from '@/lib/api';
 import { HelpModal } from '@/app/components/HelpModal';
 import { useLanguage } from '@/app/context/LanguageContext';
 
@@ -25,12 +25,24 @@ interface SupplierListViewProps {
     onBackToRoles: () => void;
     onRefresh?: () => void;
     isFromBot?: boolean;
+    role: Role;
 }
 
-export function SupplierListView({ orders, onSelectOrder, onBackToRoles, onRefresh, isFromBot }: SupplierListViewProps) {
+export function SupplierListView({ orders, onSelectOrder, onBackToRoles, onRefresh, isFromBot, role }: SupplierListViewProps) {
     const { t } = useLanguage();
     const [showHelp, setShowHelp] = useState(false);
-    const activeOrders = orders.filter(o => o.status === 'sent_to_supplier');
+    const activeOrders = orders.filter(o => {
+        if (o.status !== 'sent_to_supplier' && o.status !== 'waiting_snabjenec_receive' && o.status !== 'supplier_collecting' && o.status !== 'supplier_delivering') return false;
+        
+        if (role === 'supplier_meat') return o.sentToMeatSupplier === true;
+        if (role === 'supplier_products') return o.sentToProductSupplier === true;
+        
+        // Filter out orders that don't have any products for this supplier
+        return o.products.some(p => {
+            if (p.quantity <= 0) return false;
+            return true;
+        });
+    });
 
     return (
         <>

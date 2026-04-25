@@ -34,11 +34,12 @@ function Stepper({ value, onChange, disabled }: { value: number; onChange: (v: n
             onChange(0);
             return;
           }
-          const val = parseInt(e.target.value, 10);
+          const val = parseFloat(e.target.value);
           onChange(isNaN(val) ? 0 : Math.max(0, val));
         }}
         disabled={disabled}
-        className="w-14 text-center font-black text-xl text-gray-900 tabular-nums leading-none bg-transparent border-b-2 border-transparent focus:border-[#8B0000] focus:outline-none placeholder-gray-300 rounded-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        step="0.1"
+        className="w-16 text-center font-black text-xl text-gray-900 tabular-nums leading-none bg-transparent border-b-2 border-transparent focus:border-[#8B0000] focus:outline-none placeholder-gray-300 rounded-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
       />
       <button
         type="button"

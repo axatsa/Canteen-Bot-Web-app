@@ -1,4 +1,4 @@
-import { Product } from '@/app/App';
+import { Product } from '@/lib/api';
 
 export const MASTER_PRODUCT_LIST: Product[] = [
     // 🥛 Молочные продукты

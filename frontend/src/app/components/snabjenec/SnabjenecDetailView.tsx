@@ -68,9 +68,24 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
 
     // ── Review mode handlers ──────────────────────────────────────────────────
 
-    const handleSendToSupplier = () => {
-        onUpdateOrder({ ...order, products: localProducts, status: 'sent_to_supplier' });
-        alert(t('alertListSent'));
+    const handleSendToMeatSupplier = () => {
+        onUpdateOrder({ 
+            ...order, 
+            products: localProducts, 
+            status: 'sent_to_supplier',
+            sentToMeatSupplier: true 
+        });
+        alert('Список мяса отправлен мяснику! 🥩');
+    };
+
+    const handleSendToProductSupplier = () => {
+        onUpdateOrder({ 
+            ...order, 
+            products: localProducts, 
+            status: 'sent_to_supplier',
+            sentToProductSupplier: true 
+        });
+        alert('Список продуктов отправлен поставщику! 🛒');
     };
 
     const handleSaveProgress = () => {
@@ -448,13 +463,24 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
             <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-gray-200 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex flex-col gap-2 z-20 rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
 
                 {isReviewMode && (
-                    <button
-                        onClick={handleSendToSupplier}
-                        className="w-full bg-[#2E7D32] text-white font-bold py-3 px-6 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2"
-                    >
-                        <Send className="w-5 h-5" />
-                        {t('sendToSupplier')}
-                    </button>
+                    <div className="flex flex-col gap-2 w-full">
+                        <button
+                            onClick={handleSendToMeatSupplier}
+                            disabled={!localProducts.some(p => p.category === '🥩 Мясо' && p.quantity > 0)}
+                            className="w-full bg-[#8B0000] text-white font-bold py-3 px-6 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                            <Send className="w-5 h-5" />
+                            Отправить мяснику 🥩
+                        </button>
+                        <button
+                            onClick={handleSendToProductSupplier}
+                            disabled={!localProducts.some(p => p.category !== '🥩 Мясо' && p.quantity > 0)}
+                            className="w-full bg-[#2E7D32] text-white font-bold py-3 px-6 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                            <Send className="w-5 h-5" />
+                            Отправить продукты 🛒
+                        </button>
+                    </div>
                 )}
 
                 {isDeliveryTrackingMode && (

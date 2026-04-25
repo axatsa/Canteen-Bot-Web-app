@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Send, MessageSquare, Truck, Check, RefreshCcw, AlignJustify, LayoutGrid, Download, Calendar, HelpCircle } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import type { Order, Branch } from '@/lib/api';
+import type { Order, Branch, Role } from '@/lib/api';
 import { StatusBadge } from '@/app/components/StatusBadge';
 import { HelpModal } from '@/app/components/HelpModal';
 import { useLanguage } from '@/app/context/LanguageContext';
@@ -87,9 +87,10 @@ interface SupplierDetailViewProps {
     onBackToRoles: () => void;
     branch: Branch;
     onRefresh?: () => void;
+    role: Role;
 }
 
-export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch }: SupplierDetailViewProps) {
+export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch, role }: SupplierDetailViewProps) {
     const { t } = useLanguage();
     const [localProducts, setLocalProducts] = useState(order.products);
     const [isCompact, setIsCompact] = useState(true);
@@ -183,7 +184,13 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
         saveAs(blob, `Заказ_${branchNames[branch]}_${new Date().toLocaleDateString('ru-RU')}.xlsx`);
     };
 
-    const filteredProducts = localProducts.filter(p => p.quantity > 0);
+    const filteredProducts = localProducts
+        .filter(p => p.quantity > 0)
+        .filter(p => {
+            if (role === 'supplier_meat') return p.category === '🥩 Мясо';
+            if (role === 'supplier_products') return p.category !== '🥩 Мясо';
+            return true; // fallback for generic 'supplier'
+        });
     const categories = Array.from(new Set(filteredProducts.map(p => p.category)));
     const totalAmount = filteredProducts.reduce((sum, p) => sum + ((p.price || 0) * p.quantity), 0);
     const totalWithPrice = filteredProducts.filter(p => (p.price || 0) > 0).length;

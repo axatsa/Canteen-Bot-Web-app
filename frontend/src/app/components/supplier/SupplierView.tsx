@@ -1,4 +1,4 @@
-import type { Order, Branch } from '@/lib/api';
+import type { Order, Branch, Role } from '@/lib/api';
 import { SupplierListView } from './SupplierListView';
 import { SupplierDetailView } from './SupplierDetailView';
 
@@ -9,6 +9,7 @@ type SupplierViewProps =
     onBackToRoles: () => void;
     onRefresh?: () => void;
     isFromBot?: boolean;
+    role: Role;
   }
   | {
     order: Order;
@@ -17,6 +18,7 @@ type SupplierViewProps =
     branch: Branch;
     onRefresh?: () => void;
     isFromBot?: boolean;
+    role: Role;
   };
 
 export function SupplierView(props: SupplierViewProps) {

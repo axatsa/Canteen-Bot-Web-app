@@ -33,7 +33,7 @@ export type Status =
     | 'supplier_delivering'
     | 'completed';
 
-export type Role = 'chef' | 'financier' | 'supplier' | 'snabjenec';
+export type Role = 'chef' | 'financier' | 'supplier' | 'snabjenec' | 'supplier_meat' | 'supplier_products';
 
 export type Branch =
     | 'beltepa_land' | 'uchtepa_land' | 'rakat_land' | 'mukumiy_land' | 'yunusabad_land' | 'novoi_land'
@@ -61,6 +61,8 @@ export type Order = {
     chefName?: string;
     snabjenecName?: string;
     supplierName?: string;
+    sentToMeatSupplier?: boolean;
+    sentToProductSupplier?: boolean;
 };
 
 export const api = {
@@ -88,6 +90,8 @@ export const api = {
             chefName: o.chefName ?? undefined,
             snabjenecName: o.snabjenecName ?? undefined,
             supplierName: o.supplierName ?? undefined,
+            sentToMeatSupplier: o.sentToMeatSupplier ?? false,
+            sentToProductSupplier: o.sentToProductSupplier ?? false,
         }));
     },
 

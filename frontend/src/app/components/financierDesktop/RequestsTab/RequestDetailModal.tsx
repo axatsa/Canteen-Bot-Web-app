@@ -20,15 +20,40 @@ const STATUS_LABELS: Record<string, string> = {
 export function RequestDetailModal({ orderId, onClose, templates }: RequestDetailModalProps) {
     const [details, setDetails] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [exporting, setExporting] = useState(false);
     const [selectedTemplate, setSelectedTemplate] = useState('');
+    const [localProducts, setLocalProducts] = useState<any[]>([]);
+    const [saving, setSaving] = useState(false);
+    const [exporting, setExporting] = useState(false);
 
     useEffect(() => {
         api.getFinancierOrderDetails(orderId)
-            .then(setDetails)
+            .then(data => {
+                setDetails(data);
+                setLocalProducts(data.order.products || []);
+            })
             .catch(console.error)
             .finally(() => setLoading(false));
     }, [orderId]);
+
+    const handleSaveUnits = async () => {
+        if (!details) return;
+        setSaving(true);
+        try {
+            // Reconstruct the order object to match schemas.Order
+            const updatedOrder = {
+                ...details.order,
+                products: localProducts,
+                createdAt: new Date(details.order.created_at)
+            };
+            await api.upsertOrder(updatedOrder);
+            alert('✅ Единицы измерения сохранены');
+        } catch (error) {
+            console.error(error);
+            alert('Ошибка сохранения');
+        } finally {
+            setSaving(false);
+        }
+    };
 
     const handleExport = async () => {
         if (!selectedTemplate) return;
@@ -108,13 +133,27 @@ export function RequestDetailModal({ orderId, onClose, templates }: RequestDetai
                             </div>
 
                             {/* Unified color-coded product table */}
-                            <ColorTable details={details} />
+                            <ColorTable 
+                                details={details} 
+                                localProducts={localProducts} 
+                                onUpdateUnit={(pid: string, newUnit: string) => {
+                                    setLocalProducts(prev => prev.map(p => p.id === pid ? { ...p, unit: newUnit } : p));
+                                }}
+                            />
                         </>
                     )}
                 </div>
 
                 {/* Export footer */}
                 <div className="px-6 py-4 border-t border-gray-100 flex items-center gap-3">
+                    <button
+                        onClick={handleSaveUnits}
+                        disabled={saving || loading}
+                        className="bg-emerald-600 text-white font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm disabled:opacity-40 hover:bg-emerald-700 transition-colors whitespace-nowrap"
+                    >
+                        {saving ? 'Сохранение...' : 'Сохранить ед. изм.'}
+                    </button>
+                    <div className="flex-1" />
                     <select
                         value={selectedTemplate}
                         onChange={(e) => setSelectedTemplate(e.target.value)}
@@ -139,7 +178,7 @@ export function RequestDetailModal({ orderId, onClose, templates }: RequestDetai
     );
 }
 
-function ColorTable({ details }: { details: any }) {
+function ColorTable({ details, localProducts, onUpdateUnit }: { details: any; localProducts: any[]; onUpdateUnit: (id: string, unit: string) => void }) {
     const hasTracking =
         (details.delivered_items?.length ?? 0) > 0 ||
         (details.not_delivered_items?.length ?? 0) > 0;
@@ -163,17 +202,22 @@ function ColorTable({ details }: { details: any }) {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
-                        {items.map((item: any, i: number) => (
+                        {localProducts.map((item: any, i: number) => (
                             <tr key={i} className="bg-white">
-                                <td className="px-4 py-3 font-medium text-gray-500">{item.product_name}</td>
-                                <td className="px-4 py-3 text-center text-gray-400 text-xs">{item.unit}</td>
+                                <td className="px-4 py-3 font-medium text-gray-500">{item.name}</td>
+                                <td className="px-4 py-3 text-center">
+                                    <input 
+                                        type="text" 
+                                        value={item.unit}
+                                        onChange={(e) => onUpdateUnit(item.id, e.target.value)}
+                                        className="w-12 text-center bg-gray-50 rounded-lg py-1 border-none focus:ring-1 focus:ring-emerald-500 text-xs"
+                                    />
+                                </td>
                                 <td className="px-4 py-3 text-center">
                                     <span className={`inline-block px-2 py-0.5 rounded-lg text-xs font-bold tabular-nums ${
-                                        item.ordered_qty === 0 ? 'bg-gray-100 text-gray-400' :
-                                        item.received ? 'bg-green-100 text-green-700' :
-                                        'bg-red-100 text-red-600'
+                                        item.quantity === 0 ? 'bg-gray-100 text-gray-400' : 'bg-green-100 text-green-700'
                                     }`}>
-                                        {item.ordered_qty}
+                                        {item.quantity}
                                     </span>
                                 </td>
                             </tr>
@@ -220,22 +264,34 @@ function ColorTable({ details }: { details: any }) {
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                    {allRows.map((item: any, i) => (
-                        <tr key={i} className="bg-white hover:bg-gray-50 transition-colors">
-                            <td className="px-4 py-3 font-medium text-gray-800">{item.product_name}</td>
-                            <td className="px-4 py-3 text-center text-gray-400 text-xs">{item.unit}</td>
-                            <td className="px-4 py-3 text-center text-gray-500 tabular-nums">{(item.price || 0).toLocaleString()}</td>
-                            <td className="px-4 py-3 text-center text-gray-500 tabular-nums">{item.ordered_qty}</td>
-                            <td className="px-4 py-3 text-center">
-                                <span className={`inline-block px-2 py-0.5 rounded-lg text-xs font-bold tabular-nums ${getBadge(item)}`}>
-                                    {item.received_qty}
-                                </span>
-                            </td>
-                            <td className="px-4 py-3 text-right text-gray-900 font-bold tabular-nums pr-5">
-                                {(item.received_qty * (item.price || 0)).toLocaleString()}
-                            </td>
-                        </tr>
-                    ))}
+                    {allRows.map((item: any, i) => {
+                        const localP = localProducts.find(p => p.name === item.product_name);
+                        return (
+                            <tr key={i} className="bg-white hover:bg-gray-50 transition-colors">
+                                <td className="px-4 py-3 font-medium text-gray-800">{item.product_name}</td>
+                                <td className="px-4 py-3 text-center">
+                                    <input 
+                                        type="text" 
+                                        value={localP?.unit || item.unit}
+                                        onChange={(e) => {
+                                            if (localP) onUpdateUnit(localP.id, e.target.value);
+                                        }}
+                                        className="w-12 text-center bg-gray-50 rounded-lg py-1 border-none focus:ring-1 focus:ring-emerald-500 text-xs"
+                                    />
+                                </td>
+                                <td className="px-4 py-3 text-center text-gray-500 tabular-nums">{(item.price || 0).toLocaleString()}</td>
+                                <td className="px-4 py-3 text-center text-gray-500 tabular-nums">{item.ordered_qty}</td>
+                                <td className="px-4 py-3 text-center">
+                                    <span className={`inline-block px-2 py-0.5 rounded-lg text-xs font-bold tabular-nums ${getBadge(item)}`}>
+                                        {item.received_qty}
+                                    </span>
+                                </td>
+                                <td className="px-4 py-3 text-right text-gray-900 font-bold tabular-nums pr-5">
+                                    {(item.received_qty * (item.price || 0)).toLocaleString()}
+                                </td>
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </table>
         </div>
