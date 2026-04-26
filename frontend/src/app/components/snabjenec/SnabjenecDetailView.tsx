@@ -226,18 +226,30 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                 <div>
                     <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t('quantity')} ({product.unit})</label>
                     <input
-                        type="number"
-                        value={product.quantity || ''}
-                        onChange={(e) => handleUpdateProduct(product.id, 'quantity', Math.max(0, parseFloat(e.target.value) || 0))}
+                        type="text"
+                        inputMode="decimal"
+                        value={(product.quantity || 0).toString().replace('.', ',')}
+                        onChange={(e) => {
+                            const raw = e.target.value.replace(',', '.');
+                            if (/^\d*\.?\d*$/.test(raw)) {
+                                handleUpdateProduct(product.id, 'quantity', parseFloat(raw) || 0);
+                            }
+                        }}
                         className="w-full bg-gray-50 rounded-xl px-3 py-2 font-bold"
                     />
                 </div>
                 <div>
                     <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t('price')} ({t('sum')})</label>
                     <input
-                        type="number"
-                        value={product.price || ''}
-                        onChange={(e) => handleUpdateProduct(product.id, 'price', Math.max(0, parseFloat(e.target.value) || 0))}
+                        type="text"
+                        inputMode="decimal"
+                        value={(product.price || 0).toString().replace('.', ',')}
+                        onChange={(e) => {
+                            const raw = e.target.value.replace(',', '.');
+                            if (/^\d*\.?\d*$/.test(raw)) {
+                                handleUpdateProduct(product.id, 'price', parseFloat(raw) || 0);
+                            }
+                        }}
                         placeholder="0"
                         className="w-full bg-gray-50 rounded-xl px-3 py-2 font-bold"
                     />

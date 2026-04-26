@@ -26,20 +26,24 @@ function Stepper({ value, onChange, disabled }: { value: number; onChange: (v: n
         <Minus className="w-4 h-4" />
       </button>
       <input
-        type="number"
-        value={value === 0 ? '' : value}
+        type="text"
+        inputMode="decimal"
+        value={value === 0 ? '' : value.toString().replace('.', ',')}
         placeholder="0"
         onChange={(e) => {
-          if (e.target.value === '') {
+          const raw = e.target.value.replace(',', '.');
+          if (raw === '') {
             onChange(0);
             return;
           }
-          const val = parseFloat(e.target.value);
-          onChange(isNaN(val) ? 0 : Math.max(0, val));
+          // Allow only numbers and one dot
+          if (/^\d*\.?\d*$/.test(raw)) {
+            const val = parseFloat(raw);
+            onChange(isNaN(val) ? 0 : Math.max(0, val));
+          }
         }}
         disabled={disabled}
-        step="0.1"
-        className="w-16 text-center font-black text-xl text-gray-900 tabular-nums leading-none bg-transparent border-b-2 border-transparent focus:border-[#8B0000] focus:outline-none placeholder-gray-300 rounded-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        className="w-16 text-center font-black text-xl text-gray-900 tabular-nums leading-none bg-transparent border-b-2 border-transparent focus:border-[#8B0000] focus:outline-none placeholder-gray-300 rounded-none"
       />
       <button
         type="button"
