@@ -51,7 +51,7 @@ export function SupplierListView({ orders, onSelectOrder, onBackToRoles, onRefre
                 {/* Header */}
                 <header
                     className="flex-none text-white px-4 pt-4 pb-5 rounded-b-3xl shadow-lg"
-                    style={{ backgroundColor: '#FF6B00' }}
+                    style={{ backgroundColor: role === 'supplier_meat' ? '#8B0000' : '#FF6B00' }}
                 >
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
@@ -84,7 +84,9 @@ export function SupplierListView({ orders, onSelectOrder, onBackToRoles, onRefre
                         <div>
                             <div className="flex items-center gap-1.5 mb-1">
                                 <Truck className="w-4 h-4 opacity-70" />
-                                <p className="text-white/70 text-xs font-semibold uppercase tracking-wider">{t('supplierTitle')}</p>
+                                <p className="text-white/70 text-xs font-semibold uppercase tracking-wider">
+                                    {role === 'supplier_meat' ? 'Мясник 🥩' : role === 'supplier_products' ? 'Поставщик продуктов 🛒' : t('supplierTitle')}
+                                </p>
                             </div>
                             <h2 className="text-2xl font-black tracking-tight">{t('allOrders')}</h2>
                         </div>
@@ -116,8 +118,8 @@ export function SupplierListView({ orders, onSelectOrder, onBackToRoles, onRefre
                                         onClick={() => onSelectOrder(order.id)}
                                         className="w-full bg-white rounded-2xl border border-gray-100 px-4 py-4 flex items-center gap-3 text-left active:scale-[0.99] transition-all shadow-sm"
                                     >
-                                        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#fff3e0' }}>
-                                            <Truck className="w-5 h-5" style={{ color: '#FF6B00' }} />
+                                        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: role === 'supplier_meat' ? '#ffebee' : '#fff3e0' }}>
+                                            <Truck className="w-5 h-5" style={{ color: role === 'supplier_meat' ? '#8B0000' : '#FF6B00' }} />
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <h3 className="font-bold text-gray-900 text-sm mb-0.5">

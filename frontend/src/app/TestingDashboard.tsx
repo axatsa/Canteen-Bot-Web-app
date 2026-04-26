@@ -25,7 +25,6 @@ export default function TestingDashboard() {
         { id: 2, fio: 'Снабженец', role: 'snabjenec', branch: 'beltepa_land', isActive: false, url: '', isRegistering: false, telegramId: 1002 },
         { id: 3, fio: 'Мясник', role: 'supplier_meat', branch: 'beltepa_land', isActive: false, url: '', isRegistering: false, telegramId: 1003 },
         { id: 4, fio: 'Поставщик', role: 'supplier_products', branch: 'beltepa_land', isActive: false, url: '', isRegistering: false, telegramId: 1004 },
-        { id: 5, fio: 'Финансист', role: 'financier', branch: 'beltepa_land', isActive: false, url: '', isRegistering: false, telegramId: 1005 },
     ]);
 
     const handleUpdatePhone = (id: number, field: keyof PhoneState, value: any) => {

@@ -201,7 +201,7 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
         <div className="h-screen overflow-hidden bg-[#f5f5f5] flex flex-col">
             <header
                 className="flex-none text-white px-4 pt-4 pb-5 rounded-b-3xl shadow-lg"
-                style={{ backgroundColor: '#FF6B00' }}
+                style={{ backgroundColor: role === 'supplier_meat' ? '#8B0000' : '#FF6B00' }}
             >
                 <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
@@ -238,7 +238,9 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                     <div>
                         <div className="flex items-center gap-1.5 mb-1">
                             <Truck className="w-4 h-4 opacity-70" />
-                            <p className="text-white/70 text-xs font-semibold uppercase tracking-wider">{t('supplierTitle')}</p>
+                            <p className="text-white/70 text-xs font-semibold uppercase tracking-wider">
+                                {role === 'supplier_meat' ? 'Мясник 🥩' : role === 'supplier_products' ? 'Поставщик продуктов 🛒' : t('supplierTitle')}
+                            </p>
                         </div>
                         <p className="text-white/60 text-[10px] uppercase font-semibold tracking-wider mb-1">
                             {t('branch')}: {t(`branch${branch.charAt(0).toUpperCase() + branch.slice(1)}` as any)}
@@ -277,7 +279,7 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                                                             onClick={() => handleUpdateProduct(product.id, 'checked', !product.checked)}
                                                             className={`w-7 h-7 rounded-lg border-2 transition-all flex items-center justify-center flex-shrink-0 ${
                                                                 product.checked
-                                                                    ? 'bg-orange-500 border-orange-500 text-white'
+                                                                    ? role === 'supplier_meat' ? 'bg-[#8B0000] border-[#8B0000] text-white' : 'bg-orange-500 border-orange-500 text-white'
                                                                     : 'bg-white border-gray-200 text-transparent'
                                                             }`}
                                                         >
@@ -288,7 +290,7 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                                                                 {product.name}
                                                             </h4>
                                                             <div className="flex items-center gap-1.5 text-xs mt-0.5">
-                                                                <span className="text-orange-500 font-bold">{product.quantity} {product.unit}</span>
+                                                                <span className={role === 'supplier_meat' ? 'text-[#8B0000] font-bold' : 'text-orange-500 font-bold'}>{product.quantity} {product.unit}</span>
                                                                 {(product.price || 0) > 0 && (
                                                                     <>
                                                                         <span className="text-gray-200">·</span>
@@ -310,6 +312,7 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                                                             value={product.price || ''}
                                                             onChange={(e) => handleUpdateProduct(product.id, 'price', parseFloat(e.target.value) || 0)}
                                                             className="flex-1 min-w-0 bg-gray-50 rounded-xl px-3 py-2.5 text-sm font-bold text-right focus:ring-1 focus:ring-orange-500 outline-none border-none"
+                                                            style={{ caretColor: role === 'supplier_meat' ? '#8B0000' : '#FF6B00' }}
                                                         />
                                                         <div className="relative flex-1 min-w-0">
                                                             <input
@@ -449,7 +452,7 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                         <button
                             onClick={handleSend}
                             disabled={!allPricesFilled}
-                            className="bg-[#FF6B00] text-white font-bold py-3 px-6 rounded-2xl shadow-lg shadow-orange-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:active:scale-100 disabled:bg-gray-300"
+                            className={`${role === 'supplier_meat' ? 'bg-[#8B0000]' : 'bg-[#FF6B00]'} text-white font-bold py-3 px-6 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:active:scale-100 disabled:bg-gray-300`}
                         >
                             <Send className="w-4 h-4" />
                             {t('send')}
