@@ -68,13 +68,13 @@ export type Order = {
 export const api = {
     API_URL,
     getProducts: async (): Promise<Product[]> => {
-        const response = await fetch(`${API_URL}/products`);
+        const response = await fetch(`${API_URL}/products?t=${Date.now()}`);
         if (!response.ok) throw new Error('Failed to fetch products');
         return response.json();
     },
 
     getOrders: async (): Promise<Order[]> => {
-        const response = await fetch(`${API_URL}/orders`);
+        const response = await fetch(`${API_URL}/orders?t=${Date.now()}`);
         if (!response.ok) throw new Error('Failed to fetch orders');
         const data = await response.json();
         return data.map((o: any) => ({

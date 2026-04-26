@@ -262,35 +262,39 @@ export default function App() {
   let currentOrder: Order | undefined;
 
   if (selectedRole === 'chef') {
-    currentOrder = orders.find(o => o.branch === selectedBranch && o.status === 'sent_to_chef');
+    const draft = orders.find(o => o.branch === selectedBranch && o.status === 'sent_to_chef');
 
-    if (!currentOrder) {
-      if (isLoadingProducts) {
-        return (
-          <div className="h-screen flex items-center justify-center bg-[#f5f5f5]">
-            <div className="text-center">
-              <div className="w-16 h-16 border-4 border-[#8B0000] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-600 font-medium">Загрузка продуктов...</p>
-            </div>
+    if (isLoadingProducts) {
+      return (
+        <div className="h-screen flex items-center justify-center bg-[#f5f5f5]">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-[#8B0000] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600 font-medium">Загрузка продуктов...</p>
           </div>
-        );
-      }
-
-      const baseProducts = masterProducts.map((p) => ({
-        ...p,
-        quantity: 0,
-        price: undefined,
-        comment: undefined,
-      }));
-
-      currentOrder = {
-        id: Date.now().toString(),
-        status: 'sent_to_chef',
-        createdAt: getTashkentDate(),
-        branch: selectedBranch!,
-        products: baseProducts,
-      };
+        </div>
+      );
     }
+
+    // Always base on master list to ensure new products appear
+    const baseProducts = masterProducts.map((p) => {
+      // Check if this product is already in the draft
+      const existing = draft?.products.find(dp => dp.id === p.id);
+      return {
+        ...p,
+        quantity: existing?.quantity || 0,
+        price: existing?.price,
+        comment: existing?.comment,
+        chefComment: existing?.chefComment,
+      };
+    });
+
+    currentOrder = {
+      id: draft?.id || Date.now().toString(),
+      status: 'sent_to_chef',
+      createdAt: draft?.createdAt || getTashkentDate(),
+      branch: selectedBranch!,
+      products: baseProducts,
+    };
   }
 
   const handleBack = () => {

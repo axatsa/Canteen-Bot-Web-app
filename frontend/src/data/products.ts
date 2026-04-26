@@ -15,13 +15,24 @@ export const MASTER_PRODUCT_LIST: Product[] = [
     { id: '11', name: 'Сливочное масло (Sariyog‘)', category: '🥛 Молочные продукты', quantity: 0, unit: 'кг' },
     { id: '12', name: 'Маргарин «Шедрое лето» (Margarin)', category: '🥛 Молочные продукты', quantity: 0, unit: 'кг' },
 
-    // 🥚 Яйца и мясо
-    { id: '13', name: 'Яйца куриные (Tovuq tuxumi)', category: '🥚 Яйца и мясо', quantity: 0, unit: 'шт' },
-    { id: '14', name: 'Яйца перепелиные (Bedana tuxumi)', category: '🥚 Яйца и мясо', quantity: 0, unit: 'шт' },
-    { id: '15', name: 'Индейка (Kurka go‘shti)', category: '🥚 Яйца и мясо', quantity: 0, unit: 'кг' },
-    { id: '16', name: 'Колбаса варёная (Qaynatilgan kolbasa)', category: '🥚 Яйца и мясо', quantity: 0, unit: 'кг' },
-    { id: '17', name: 'Колбаса копчёная (Dudlangan kolbasa)', category: '🥚 Яйца и мясо', quantity: 0, unit: 'кг' },
-    { id: '18', name: 'Сосиски (Sosiska)', category: '🥚 Яйца и мясо', quantity: 0, unit: 'кг' },
+    // 🥚 Яйца
+    { id: '13', name: 'Яйца куриные (Tovuq tuxumi)', category: '🥚 Яйца', quantity: 0, unit: 'шт' },
+    { id: '14', name: 'Яйца перепелиные (Bedana tuxumi)', category: '🥚 Яйца', quantity: 0, unit: 'шт' },
+
+    // 🥩 Мясо
+    { id: '15', name: 'Индейка (Kurka go‘shti)', category: '🥩 Мясо', quantity: 0, unit: 'кг' },
+    { id: '16', name: 'Колбаса варёная (Qaynatilgan kolbasa)', category: '🥩 Мясо', quantity: 0, unit: 'кг' },
+    { id: '17', name: 'Колбаса копчёная (Dudlangan kolbasa)', category: '🥩 Мясо', quantity: 0, unit: 'кг' },
+    { id: '18', name: 'Сосиски (Sosiska)', category: '🥩 Мясо', quantity: 0, unit: 'кг' },
+    { id: '82', name: 'Мясо (Говядина)', category: '🥩 Мясо', quantity: 0, unit: 'кг' },
+    { id: '83', name: 'Мясо (Баранина)', category: '🥩 Мясо', quantity: 0, unit: 'кг' },
+    { id: '84', name: 'Фарш', category: '🥩 Мясо', quantity: 0, unit: 'кг' },
+    { id: '85', name: 'Куриное мясо (Крылышки)', category: '🥩 Мясо', quantity: 0, unit: 'кг' },
+    { id: '86', name: 'Куриное мясо (Бедро)', category: '🥩 Мясо', quantity: 0, unit: 'кг' },
+    { id: '87', name: 'Куриное мясо (Филе)', category: '🥩 Мясо', quantity: 0, unit: 'кг' },
+    { id: '88', name: 'Куриное мясо (Ножки)', category: '🥩 Мясо', quantity: 0, unit: 'кг' },
+    { id: '89', name: 'Куриное мясо (Целая курочка)', category: '🥩 Мясо', quantity: 0, unit: 'кг' },
+    { id: '90', name: 'Кости/Илик', category: '🥩 Мясо', quantity: 0, unit: 'кг' },
 
     // 🍞 Хлеб и мучное
     { id: '19', name: 'Мука (Un)', category: '🍞 Хлеб и мучное', quantity: 0, unit: 'кг' },
@@ -87,10 +98,10 @@ export const MASTER_PRODUCT_LIST: Product[] = [
     { id: '69', name: 'Болгарский перец (Bulgar qalampiri)', category: '🥕 Овощи и зелень', quantity: 0, unit: 'кг' },
     { id: '70', name: 'Болгарский перец «Светофор» (Rangli qalampir)', category: '🥕 Овощи и зелень', quantity: 0, unit: 'кг' },
     { id: '71', name: 'Лук (Piyoz)', category: '🥕 Овощи и зелень', quantity: 0, unit: 'кг' },
-    { id: '72', name: 'Сельдерей (Selderey)', category: '🥕 Овощи и зелень', quantity: 0, unit: 'кг' },
+    { id: '72', name: 'Сельдерей (Selderey)', category: '🥕 Овощи и зелень', quantity: 0, unit: 'пучки' },
     { id: '73', name: 'Корейская морковь (Koreyscha sabzi)', category: '🥕 Овощи и зелень', quantity: 0, unit: 'кг' },
-    { id: '74', name: 'Укроп (Shivit)', category: '🥕 Овощи и зелень', quantity: 0, unit: 'кг' },
-    { id: '75', name: 'Кинза (Kashnich)', category: '🥕 Овощи и зелень', quantity: 0, unit: 'кг' },
+    { id: '74', name: 'Укроп (Shivit)', category: '🥕 Овощи и зелень', quantity: 0, unit: 'пучки' },
+    { id: '75', name: 'Кинза (Kashnich)', category: '🥕 Овощи и зелень', quantity: 0, unit: 'пучки' },
     { id: '76', name: 'Свекла красная (Qizil lavlagi)', category: '🥕 Овощи и зелень', quantity: 0, unit: 'кг' },
     { id: '77', name: 'Редька белая (Oq turup)', category: '🥕 Овощи и зелень', quantity: 0, unit: 'кг' },
 
@@ -98,5 +109,5 @@ export const MASTER_PRODUCT_LIST: Product[] = [
     { id: '78', name: 'Бананы (Banan)', category: '🍎 Фрукты', quantity: 0, unit: 'кг' },
     { id: '79', name: 'Яблоки (Olma)', category: '🍎 Фрукты', quantity: 0, unit: 'кг' },
     { id: '80', name: 'Груша (Nok)', category: '🍎 Фрукты', quantity: 0, unit: 'кг' },
-    { id: '81', name: 'Лимоны (Limon)', category: '🍎 Фрукты', quantity: 0, unit: 'кг' } 
+    { id: '81', name: 'Лимоны (Limon)', category: '🍎 Фрукты', quantity: 0, unit: 'кг' }
 ];
