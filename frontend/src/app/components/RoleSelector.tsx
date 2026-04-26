@@ -79,16 +79,31 @@ export function RoleSelector({ onSelectRole, onBack }: RoleSelectorProps) {
             </button>
 
             <button
-              onClick={() => onSelectRole('supplier')}
+              onClick={() => onSelectRole('supplier_meat')}
               className="w-full bg-gray-50 rounded-3xl p-6 shadow-sm active:scale-95 transition-all border border-gray-100 hover:bg-gray-100/50"
             >
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(to bottom right, #FF6B00, #FF8C00)' }}>
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(to bottom right, #8B0000, #5C0000)' }}>
                   <Truck className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1 text-left">
-                  <h2 className="text-xl font-bold text-gray-900">{t('supplier')}</h2>
-                  <p className="text-sm text-gray-500">{t('supplierDesc')}</p>
+                  <h2 className="text-xl font-bold text-gray-900">Мясник 🥩</h2>
+                  <p className="text-sm text-gray-500">Поставка мяса и мясной продукции</p>
+                </div>
+              </div>
+            </button>
+
+            <button
+              onClick={() => onSelectRole('supplier_products')}
+              className="w-full bg-gray-50 rounded-3xl p-6 shadow-sm active:scale-95 transition-all border border-gray-100 hover:bg-gray-100/50"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(to bottom right, #FF9800, #F57C00)' }}>
+                  <Truck className="w-8 h-8 text-white" />
+                </div>
+                <div className="flex-1 text-left">
+                  <h2 className="text-xl font-bold text-gray-900">Поставщик продуктов 🛒</h2>
+                  <p className="text-sm text-gray-500">Поставка овощей, фруктов и прочих продуктов</p>
                 </div>
               </div>
             </button>

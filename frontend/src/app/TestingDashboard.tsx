@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Smartphone, User, Briefcase, MapPin, Play, Loader2, RefreshCw } from 'lucide-react';
 import { api } from '@/lib/api';
 
-type Role = 'chef' | 'financier' | 'supplier' | 'snabjenec';
-type Branch = 'chilanzar' | 'uchtepa' | 'shayzantaur' | 'olmazar';
+type Role = 'chef' | 'financier' | 'supplier' | 'snabjenec' | 'supplier_meat' | 'supplier_products';
+type Branch = 'beltepa_land' | 'uchtepa_land' | 'rakat_land' | 'mukumiy_land' | 'yunusabad_land' | 'novoi_land';
 
 interface PhoneState {
     id: number;
@@ -16,15 +16,16 @@ interface PhoneState {
     telegramId: number;
 }
 
-const ROLES: Role[] = ['chef', 'financier', 'supplier', 'snabjenec'];
-const BRANCHES: Branch[] = ['chilanzar', 'uchtepa', 'shayzantaur', 'olmazar'];
+const ROLES: Role[] = ['chef', 'snabjenec', 'supplier_meat', 'supplier_products', 'financier', 'supplier'];
+const BRANCHES: Branch[] = ['beltepa_land', 'uchtepa_land', 'rakat_land', 'mukumiy_land', 'yunusabad_land', 'novoi_land'];
 
 export default function TestingDashboard() {
     const [phones, setPhones] = useState<PhoneState[]>([
-        { id: 1, fio: 'Шеф Повар', role: 'chef', branch: 'chilanzar', isActive: false, url: '', isRegistering: false, telegramId: 1001 },
-        { id: 2, fio: 'Снабженец', role: 'snabjenec', branch: 'chilanzar', isActive: false, url: '', isRegistering: false, telegramId: 1002 },
-        { id: 3, fio: 'Поставщик', role: 'supplier', branch: 'chilanzar', isActive: false, url: '', isRegistering: false, telegramId: 1003 },
-        { id: 4, fio: 'Финансист', role: 'financier', branch: 'chilanzar', isActive: false, url: '', isRegistering: false, telegramId: 1004 },
+        { id: 1, fio: 'Шеф Повар', role: 'chef', branch: 'beltepa_land', isActive: false, url: '', isRegistering: false, telegramId: 1001 },
+        { id: 2, fio: 'Снабженец', role: 'snabjenec', branch: 'beltepa_land', isActive: false, url: '', isRegistering: false, telegramId: 1002 },
+        { id: 3, fio: 'Мясник', role: 'supplier_meat', branch: 'beltepa_land', isActive: false, url: '', isRegistering: false, telegramId: 1003 },
+        { id: 4, fio: 'Поставщик', role: 'supplier_products', branch: 'beltepa_land', isActive: false, url: '', isRegistering: false, telegramId: 1004 },
+        { id: 5, fio: 'Финансист', role: 'financier', branch: 'beltepa_land', isActive: false, url: '', isRegistering: false, telegramId: 1005 },
     ]);
 
     const handleUpdatePhone = (id: number, field: keyof PhoneState, value: any) => {
@@ -84,7 +85,7 @@ export default function TestingDashboard() {
                 </div>
             </header>
 
-            <main className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+            <main className="max-w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
                 {phones.map((phone) => (
                     <div key={phone.id} className="flex flex-col gap-4">
                         {/* Phone Container */}

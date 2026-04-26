@@ -124,9 +124,10 @@ export default function App() {
       return [...prev, updatedOrder];
     });
 
-    // Close detail view if open
-    // Close detail view if open
-    setSelectedOrderId(null);
+    // Keep detail view open for snabjenec (they need to send to multiple suppliers)
+    if (selectedRole !== 'snabjenec') {
+      setSelectedOrderId(null);
+    }
 
     // Only reset branch if role is NOT chef (chef should stay on the same branch view)
     if (selectedRole !== 'chef') {

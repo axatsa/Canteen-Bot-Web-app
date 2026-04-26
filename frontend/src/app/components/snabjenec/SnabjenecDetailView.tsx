@@ -69,21 +69,19 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
     // ── Review mode handlers ──────────────────────────────────────────────────
 
     const handleSendToMeatSupplier = () => {
-        onUpdateOrder({ 
-            ...order, 
-            products: localProducts, 
-            status: 'sent_to_supplier',
-            sentToMeatSupplier: true 
+        onUpdateOrder({
+            ...order,
+            products: localProducts,
+            sentToMeatSupplier: true
         });
         alert('Список мяса отправлен мяснику! 🥩');
     };
 
     const handleSendToProductSupplier = () => {
-        onUpdateOrder({ 
-            ...order, 
-            products: localProducts, 
-            status: 'sent_to_supplier',
-            sentToProductSupplier: true 
+        onUpdateOrder({
+            ...order,
+            products: localProducts,
+            sentToProductSupplier: true
         });
         alert('Список продуктов отправлен поставщику! 🛒');
     };
@@ -466,20 +464,44 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                     <div className="flex flex-col gap-2 w-full">
                         <button
                             onClick={handleSendToMeatSupplier}
-                            disabled={!localProducts.some(p => p.category === '🥩 Мясо' && p.quantity > 0)}
-                            className="w-full bg-[#8B0000] text-white font-bold py-3 px-6 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                            disabled={!localProducts.some(p => p.category === '🥩 Мясо' && p.quantity > 0) || order.sentToMeatSupplier}
+                            className={`w-full font-bold py-3 px-6 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 ${
+                                order.sentToMeatSupplier
+                                    ? 'bg-green-600 text-white opacity-75'
+                                    : 'bg-[#8B0000] text-white disabled:opacity-50'
+                            }`}
                         >
-                            <Send className="w-5 h-5" />
-                            Отправить мяснику 🥩
+                            {order.sentToMeatSupplier ? '✓ Отправлено' : <Send className="w-5 h-5" />}
+                            Мяснику 🥩
                         </button>
                         <button
                             onClick={handleSendToProductSupplier}
-                            disabled={!localProducts.some(p => p.category !== '🥩 Мясо' && p.quantity > 0)}
-                            className="w-full bg-[#2E7D32] text-white font-bold py-3 px-6 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                            disabled={!localProducts.some(p => p.category !== '🥩 Мясо' && p.quantity > 0) || order.sentToProductSupplier}
+                            className={`w-full font-bold py-3 px-6 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 ${
+                                order.sentToProductSupplier
+                                    ? 'bg-green-600 text-white opacity-75'
+                                    : 'bg-[#2E7D32] text-white disabled:opacity-50'
+                            }`}
                         >
-                            <Send className="w-5 h-5" />
-                            Отправить продукты 🛒
+                            {order.sentToProductSupplier ? '✓ Отправлено' : <Send className="w-5 h-5" />}
+                            Поставщику 🛒
                         </button>
+                        {(order.sentToMeatSupplier || order.sentToProductSupplier) && (
+                            <button
+                                onClick={() => {
+                                    onUpdateOrder({
+                                        ...order,
+                                        products: localProducts,
+                                        status: 'sent_to_supplier'
+                                    });
+                                    alert('Список(ки) отправлены! ✅');
+                                }}
+                                className="w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2"
+                            >
+                                <CheckSquare className="w-5 h-5" />
+                                Завершить отправку
+                            </button>
+                        )}
                     </div>
                 )}
 
