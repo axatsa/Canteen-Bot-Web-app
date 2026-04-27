@@ -19,7 +19,7 @@ function Stepper({ value, onChange, disabled }: { value: number; onChange: (v: n
     <div className="flex items-center gap-2">
       <button
         type="button"
-        onClick={() => onChange(Math.max(0, value - 1))}
+        onClick={() => onChange(Math.max(0, Number((value - 0.1).toFixed(1))))}
         disabled={disabled || value <= 0}
         className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 text-gray-600 active:bg-gray-200 disabled:opacity-30 transition-colors"
       >
@@ -47,7 +47,7 @@ function Stepper({ value, onChange, disabled }: { value: number; onChange: (v: n
       />
       <button
         type="button"
-        onClick={() => onChange(value + 1)}
+        onClick={() => onChange(Number((value + 0.1).toFixed(1)))}
         disabled={disabled}
         className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#8B0000] text-white active:opacity-80 disabled:opacity-30 transition-colors"
       >
