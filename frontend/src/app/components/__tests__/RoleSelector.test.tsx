@@ -10,7 +10,8 @@ vi.mock('@/app/context/LanguageContext', () => ({
         'chef': '👨‍🍳 Шеф-повар',
         'snabjenec': '📦 Снабженец',
         'financier': '💼 Финансист',
-        'supplier': '🚚 Поставщик',
+        'meat_supplier': 'Мясник 🥩',
+        'product_supplier': 'Поставщик продуктов 🛒',
         'appTitle': 'Optimizer',
         'selectRole': 'Выберите роль'
       };
@@ -33,7 +34,8 @@ describe('RoleSelector', () => {
     expect(screen.getByText('👨‍🍳 Шеф-повар')).toBeInTheDocument();
     expect(screen.getByText('📦 Снабженец')).toBeInTheDocument();
     expect(screen.getByText('💼 Финансист')).toBeInTheDocument();
-    expect(screen.getByText('🚚 Поставщик')).toBeInTheDocument();
+    expect(screen.getByText('Мясник 🥩')).toBeInTheDocument();
+    expect(screen.getByText('Поставщик продуктов 🛒')).toBeInTheDocument();
   });
 
   it('calls onSelectRole with "chef" when Chef button is clicked', () => {
