@@ -18,3 +18,10 @@ backend/exports/
 # Templates
 backend/templates/*.docx
 !backend/templates/.gitkeep
+
+
+.DS_Store
+
+# Code editor
+.vscode
+.idea
