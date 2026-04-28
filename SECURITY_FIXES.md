@@ -87,7 +87,49 @@
    - Snabjenec can review and modify orders
    - Financier can view and export orders
 
+### 4. ✅ Missing Mandatory Field Validation
+**Severity:** IMPORTANT
+
+**Problem:** Orders could be created without chef_name, snabjenec_name, or supplier_name depending on the status.
+
+**Solution:**
+- Added `validate_order_fields()` function to check required fields based on order status
+- Validation logic enforces that required names are set before order can transition to certain statuses
+- Provides clear error messages when mandatory fields are missing
+
+### 5. ✅ No Status Transition Validation
+**Severity:** IMPORTANT
+
+**Problem:** Orders could be changed to invalid statuses, breaking the order workflow.
+
+**Solution:**
+- Defined `VALID_STATUS_TRANSITIONS` map specifying allowed state transitions
+- Added `is_valid_status_transition()` function to validate status changes
+- Updated `can_user_edit_order()` to validate status transitions
+- Prevents invalid order state changes (e.g., can't go from archived back to sent_to_chef)
+
+### 6. ✅ Missing Audit Trail for Order Archival
+**Severity:** MEDIUM
+
+**Problem:** When orders were archived, there was no record of who archived them or when.
+
+**Solution:**
+- Added `archived_by` and `archived_at` columns to orders table
+- Updated `archive_order()` function to record the user who archived the order and timestamp
+- Enables audit trail for compliance and debugging
+
 ## Status
 ✅ All critical security issues have been addressed
 ✅ Backend and frontend compile without errors
 ✅ Ready for testing on staging environment
+
+## Summary of Changes
+
+Total commits: 4
+- security: implement role-based access control and permission validation
+- feat: add mandatory field validation for orders  
+- feat: add status transition validation
+- feat: persist archived_by and archived_at in order audit trail
+
+Lines of code added: ~150
+Files modified: 6 (backend: 3, frontend: 3)
