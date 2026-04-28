@@ -41,7 +41,7 @@ async def upsert_order(
     existing = crud.get_order_by_id(order.id)
 
     if existing:
-        can_edit, error_msg = crud.can_user_edit_order(order.id, role, user_name, branch)
+        can_edit, error_msg = crud.can_user_edit_order(order.id, role, user_name, branch, order.status)
         if not can_edit:
             raise HTTPException(status_code=403, detail=error_msg)
 

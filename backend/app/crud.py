@@ -619,7 +619,7 @@ def _determine_order_type(products: list) -> tuple[bool, bool]:
   return has_meat, has_products
 
 
-def can_user_edit_order(order_id: str, role: str, user_name: str, branch: str) -> tuple[bool, str]:
+def can_user_edit_order(order_id: str, role: str, user_name: str, branch: str, new_status: Optional[str] = None) -> tuple[bool, str]:
     order = get_order_by_id(order_id)
     if not order:
         return False, "Order not found"
@@ -629,12 +629,16 @@ def can_user_edit_order(order_id: str, role: str, user_name: str, branch: str) -
             return False, "You can only edit your own orders"
         if order.get('status') != 'sent_to_chef':
             return False, "You can only edit orders in sent_to_chef status"
+        if new_status and not is_valid_status_transition(order.get('status'), new_status):
+            return False, f"Cannot transition from {order.get('status')} to {new_status}"
         return True, ""
     elif role == 'snabjenec':
         if order.get('branch') != branch:
             return False, "You can only edit orders from your branch"
         if order.get('status') != 'review_snabjenec':
             return False, "You can only edit orders in review_snabjenec status"
+        if new_status and not is_valid_status_transition(order.get('status'), new_status):
+            return False, f"Cannot transition from {order.get('status')} to {new_status}"
         return True, ""
     elif role == 'supplier':
         return False, "Suppliers cannot edit orders"
@@ -643,9 +647,26 @@ def can_user_edit_order(order_id: str, role: str, user_name: str, branch: str) -
             return False, "You can only view orders from your branch"
         if order.get('status') != 'sent_to_financier':
             return False, "You can only view orders in sent_to_financier status"
+        if new_status and not is_valid_status_transition(order.get('status'), new_status):
+            return False, f"Cannot transition from {order.get('status')} to {new_status}"
         return True, ""
 
     return False, "Invalid role"
+
+VALID_STATUS_TRANSITIONS = {
+    'sent_to_chef': {'review_snabjenec'},
+    'review_snabjenec': {'sent_to_supplier', 'sent_to_financier'},
+    'sent_to_supplier': {'waiting_snabjenec_receive'},
+    'waiting_snabjenec_receive': {'sent_to_financier'},
+    'sent_to_financier': {'archived'},
+    'archived': set(),
+}
+
+def is_valid_status_transition(current_status: str, new_status: str) -> bool:
+    if current_status == new_status:
+        return True
+    allowed_transitions = VALID_STATUS_TRANSITIONS.get(current_status, set())
+    return new_status in allowed_transitions
 
 def validate_order_fields(order_data: dict) -> tuple[bool, str]:
     status = order_data.get('status')
