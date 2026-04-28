@@ -22,19 +22,36 @@ async def get_products():
     return crud.get_all_products()
 
 @app.get("/orders", response_model=List[schemas.Order])
-async def get_orders():
-    return crud.get_all_orders()
+async def get_orders(role: Optional[str] = None, branch: Optional[str] = None, user_name: Optional[str] = None):
+    if not role or not branch:
+        raise HTTPException(status_code=400, detail="role and branch parameters are required")
+    return crud.get_orders_by_role(role, branch, user_name)
 
 @app.post("/orders/upsert")
-async def upsert_order(order: schemas.Order, background_tasks: BackgroundTasks):
+async def upsert_order(
+    order: schemas.Order,
+    background_tasks: BackgroundTasks,
+    role: Optional[str] = None,
+    user_name: Optional[str] = None,
+    branch: Optional[str] = None,
+):
+    if not role or not user_name or not branch:
+        raise HTTPException(status_code=400, detail="role, user_name, and branch are required")
+
     existing = crud.get_order_by_id(order.id)
+
+    if existing:
+        can_edit, error_msg = crud.can_user_edit_order(order.id, role, user_name, branch)
+        if not can_edit:
+            raise HTTPException(status_code=403, detail=error_msg)
+
     success = crud.upsert_order(order.dict())
     if not success:
         raise HTTPException(status_code=500, detail="Failed to save order")
-    
+
     if not existing and order.status == 'sent_to_chef':
         background_tasks.add_task(notifications.notify_new_order, order.dict())
-        
+
     return {"status": "success"}
 
 @app.post("/users/register")

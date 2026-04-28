@@ -12,7 +12,14 @@ import { TemplateManager } from './SettingsTab/TemplateManager';
 
 type Tab = 'requests' | 'archive' | 'statistics' | 'settings';
 
-export function FinancierDesktop({ onBackToRoles }: { onBackToRoles?: () => void }) {
+interface FinancierDesktopProps {
+    onBackToRoles?: () => void;
+    role?: string;
+    branch?: string;
+    userName?: string;
+}
+
+export function FinancierDesktop({ onBackToRoles, role, branch, userName }: FinancierDesktopProps) {
     const [tab, setTab] = useState<Tab>('requests');
     const [orders, setOrders] = useState<any[]>([]);
     const [archiveOrders, setArchiveOrders] = useState<any[]>([]);
@@ -297,6 +304,9 @@ export function FinancierDesktop({ onBackToRoles }: { onBackToRoles?: () => void
                     orderId={selectedOrderId}
                     onClose={() => setSelectedOrderId(null)}
                     templates={templates}
+                    role={role}
+                    branch={branch}
+                    userName={userName}
                 />
             )}
 

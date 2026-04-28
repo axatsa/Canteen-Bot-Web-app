@@ -6,6 +6,9 @@ interface RequestDetailModalProps {
     orderId: string;
     onClose: () => void;
     templates: any[];
+    role?: string;
+    branch?: string;
+    userName?: string;
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -17,7 +20,7 @@ const STATUS_LABELS: Record<string, string> = {
     archived:                  'Архив',
 };
 
-export function RequestDetailModal({ orderId, onClose, templates }: RequestDetailModalProps) {
+export function RequestDetailModal({ orderId, onClose, templates, role, branch, userName }: RequestDetailModalProps) {
     const [details, setDetails] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [selectedTemplate, setSelectedTemplate] = useState('');
@@ -45,7 +48,7 @@ export function RequestDetailModal({ orderId, onClose, templates }: RequestDetai
                 products: localProducts,
                 createdAt: new Date(details.order.created_at)
             };
-            await api.upsertOrder(updatedOrder);
+            await api.upsertOrder(updatedOrder, role, userName, branch);
             alert('✅ Единицы измерения сохранены');
         } catch (error) {
             console.error(error);

@@ -70,8 +70,13 @@ export const api = {
         return response.json();
     },
 
-    getOrders: async (): Promise<Order[]> => {
-        const response = await fetch(`${API_URL}/orders?t=${Date.now()}`);
+    getOrders: async (role?: string, branch?: string, userName?: string): Promise<Order[]> => {
+        const params = new URLSearchParams({ t: Date.now().toString() });
+        if (role) params.append('role', role);
+        if (branch) params.append('branch', branch);
+        if (userName) params.append('user_name', userName);
+
+        const response = await fetch(`${API_URL}/orders?${params.toString()}`);
         if (!response.ok) throw new Error('Failed to fetch orders');
         const data = await response.json();
         return data.map((o: any) => ({
@@ -92,19 +97,28 @@ export const api = {
         }));
     },
 
-    upsertOrder: async (order: Order): Promise<void> => {
+    upsertOrder: async (order: Order, role?: string, userName?: string, branch?: string): Promise<void> => {
         const payload = {
             ...order,
             createdAt: order.createdAt.toISOString(),
             deliveredAt: order.deliveredAt ? order.deliveredAt.toISOString() : undefined,
             estimatedDeliveryDate: order.estimatedDeliveryDate ? order.estimatedDeliveryDate.toISOString() : undefined,
         };
-        const response = await fetch(`${API_URL}/orders/upsert`, {
+
+        const params = new URLSearchParams();
+        if (role) params.append('role', role);
+        if (userName) params.append('user_name', userName);
+        if (branch) params.append('branch', branch);
+
+        const response = await fetch(`${API_URL}/orders/upsert?${params.toString()}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
         });
-        if (!response.ok) throw new Error('Failed to upsert order');
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.detail || 'Failed to upsert order');
+        }
     },
 
     registerUser: async (user: { telegram_id: number; full_name: string; role: string; branch: string; language?: string }): Promise<void> => {

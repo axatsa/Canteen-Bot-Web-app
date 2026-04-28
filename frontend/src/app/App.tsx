@@ -76,7 +76,7 @@ export default function App() {
   const loadInitialData = async () => {
     try {
       const [ordersData, productsData] = await Promise.all([
-        api.getOrders(),
+        api.getOrders(selectedRole || undefined, selectedBranch || undefined, userName || undefined),
         api.getProducts()
       ]);
 
@@ -92,7 +92,7 @@ export default function App() {
 
   const loadOrders = async () => {
     try {
-      const data = await api.getOrders();
+      const data = await api.getOrders(selectedRole || undefined, selectedBranch || undefined, userName || undefined);
       setOrders(data);
     } catch (error) {
       console.error('Error loading orders:', error);
@@ -142,7 +142,8 @@ export default function App() {
       ...(selectedRole?.startsWith('supplier') && userName ? { supplierName: userName } : {}),
     };
     try {
-      await api.upsertOrder(orderWithUser);
+      const roleForBackend = selectedRole?.startsWith('supplier') ? 'supplier' : selectedRole;
+      await api.upsertOrder(orderWithUser, roleForBackend, userName || undefined, selectedBranch || undefined);
       console.log('✅ Order saved successfully!');
     } catch (error: any) {
       console.error('❌ Error saving order:', error);
@@ -186,7 +187,14 @@ export default function App() {
   }
 
   if (selectedRole === 'financier') {
-    return <FinancierDesktop onBackToRoles={handleBackToStart} />;
+    return (
+      <FinancierDesktop
+        onBackToRoles={handleBackToStart}
+        role={selectedRole}
+        branch={selectedBranch || undefined}
+        userName={userName || undefined}
+      />
+    );
   }
 
   // Для поставщика тоже сразу показываем список заявок (без выбора филиала)

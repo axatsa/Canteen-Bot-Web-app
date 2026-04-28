@@ -114,6 +114,58 @@ def get_all_orders() -> List[dict]:
         })
     return orders
 
+def get_orders_by_role(role: str, branch: str, user_name: Optional[str] = None) -> List[dict]:
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    if role == 'chef':
+        cursor.execute("SELECT * FROM orders WHERE chef_name = ? OR status = 'sent_to_chef'", (user_name,))
+    elif role == 'snabjenec':
+        cursor.execute("SELECT * FROM orders WHERE branch = ? AND status IN ('review_snabjenec', 'waiting_snabjenec_receive')", (branch,))
+    elif role == 'supplier':
+        cursor.execute("SELECT * FROM orders WHERE supplier_name = ? AND status IN ('sent_to_supplier', 'waiting_snabjenec_receive')", (user_name,))
+    elif role == 'financier':
+        cursor.execute("SELECT * FROM orders WHERE branch = ? AND status IN ('sent_to_financier', 'archived')", (branch,))
+    else:
+        cursor.execute("SELECT * FROM orders WHERE branch = ?", (branch,))
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, last_price FROM master_products")
+    last_prices = {row[0]: row[1] for row in cursor.fetchall()}
+    conn.close()
+
+    orders = []
+    for row in rows:
+        r = dict(row)
+        order_products = json.loads(r['products'])
+        for p in order_products:
+            if 'id' in p and p['id'] in last_prices:
+                p['lastPrice'] = last_prices[p['id']]
+        orders.append({
+            "id": r['id'],
+            "status": r['status'],
+            "products": order_products,
+            "createdAt": r['createdAt'],
+            "deliveredAt": r.get('deliveredAt'),
+            "estimatedDeliveryDate": r.get('estimatedDeliveryDate'),
+            "branch": r['branch'],
+            "sentToSupplierAt": r.get('sent_to_supplier_at'),
+            "receivedFromSupplierAt": r.get('received_from_supplier_at'),
+            "deliveryTracking": json.loads(r['delivery_tracking'] or '{}'),
+            "supplierResponded": bool(r.get('supplier_responded', 0)),
+            "extraItemsDelivered": json.loads(r['extra_items_delivered'] or '{}'),
+            "chefName": r.get('chef_name'),
+            "snabjenecName": r.get('snabjenec_name'),
+            "supplierName": r.get('supplier_name'),
+            "sentToMeatSupplier": bool(r.get('sent_to_meat_supplier', 0)),
+            "sentToProductSupplier": bool(r.get('sent_to_product_supplier', 0)),
+        })
+    return orders
+
 def get_order_by_id(order_id: str) -> Optional[dict]:
     conn = get_db_connection()
     try:
@@ -566,6 +618,34 @@ def _determine_order_type(products: list) -> tuple[bool, bool]:
   has_products = any(p.get('category') != '🥩 Мясо' for p in products)
   return has_meat, has_products
 
+
+def can_user_edit_order(order_id: str, role: str, user_name: str, branch: str) -> tuple[bool, str]:
+    order = get_order_by_id(order_id)
+    if not order:
+        return False, "Order not found"
+
+    if role == 'chef':
+        if order.get('chef_name') != user_name:
+            return False, "You can only edit your own orders"
+        if order.get('status') != 'sent_to_chef':
+            return False, "You can only edit orders in sent_to_chef status"
+        return True, ""
+    elif role == 'snabjenec':
+        if order.get('branch') != branch:
+            return False, "You can only edit orders from your branch"
+        if order.get('status') != 'review_snabjenec':
+            return False, "You can only edit orders in review_snabjenec status"
+        return True, ""
+    elif role == 'supplier':
+        return False, "Suppliers cannot edit orders"
+    elif role == 'financier':
+        if order.get('branch') != branch:
+            return False, "You can only view orders from your branch"
+        if order.get('status') != 'sent_to_financier':
+            return False, "You can only view orders in sent_to_financier status"
+        return True, ""
+
+    return False, "Invalid role"
 
 def upsert_order(order_data: dict) -> bool:
     conn = get_db_connection()
