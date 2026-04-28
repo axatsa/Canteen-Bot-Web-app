@@ -647,7 +647,42 @@ def can_user_edit_order(order_id: str, role: str, user_name: str, branch: str) -
 
     return False, "Invalid role"
 
-def upsert_order(order_data: dict) -> bool:
+def validate_order_fields(order_data: dict) -> tuple[bool, str]:
+    status = order_data.get('status')
+
+    if status == 'sent_to_chef':
+        if not order_data.get('chefName'):
+            return False, "Chef name is required when sending to chef"
+    elif status == 'review_snabjenec':
+        if not order_data.get('snabjenecName'):
+            return False, "Snabjenec name is required in review status"
+    elif status == 'sent_to_supplier':
+        if not order_data.get('chefName'):
+            return False, "Chef name is required"
+        if not order_data.get('snabjenecName'):
+            return False, "Snabjenec name is required"
+        if not order_data.get('supplierName'):
+            return False, "Supplier name is required when sending to supplier"
+    elif status == 'waiting_snabjenec_receive':
+        if not order_data.get('chefName'):
+            return False, "Chef name is required"
+        if not order_data.get('snabjenecName'):
+            return False, "Snabjenec name is required"
+    elif status == 'sent_to_financier':
+        if not order_data.get('chefName'):
+            return False, "Chef name is required"
+        if not order_data.get('snabjenecName'):
+            return False, "Snabjenec name is required"
+        if not order_data.get('supplierName'):
+            return False, "Supplier name is required"
+
+    return True, ""
+
+def upsert_order(order_data: dict) -> tuple[bool, str]:
+    is_valid, error_msg = validate_order_fields(order_data)
+    if not is_valid:
+        return False, error_msg
+
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
@@ -692,16 +727,16 @@ def upsert_order(order_data: dict) -> bool:
             1 if order_data.get('sentToMeatSupplier') else 0,
             1 if order_data.get('sentToProductSupplier') else 0,
         ))
-        
+
         # Update last_price
         for p in order_data['products']:
             if p.get('price') and p['price'] > 0:
                 cursor.execute("UPDATE master_products SET last_price = ? WHERE id = ?", (p['price'], p['id']))
-        
+
         conn.commit()
-        return True
+        return True, ""
     except Exception as e:
         logger.error(f"Error upserting order: {e}")
-        return False
+        return False, str(e)
     finally:
         conn.close()

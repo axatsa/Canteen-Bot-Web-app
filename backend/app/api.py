@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from typing import List, Optional
 from . import schemas, crud, notifications
-from .export import TEMPLATES_DIR, EXPORTS_DIR, ensure_dirs, fill_docx_template, build_export_context
+from .export import TEMPLATES_DIR, ensure_dirs, fill_docx_template, build_export_context
 
 app = FastAPI(title="Optimizer API")
 
@@ -45,9 +45,9 @@ async def upsert_order(
         if not can_edit:
             raise HTTPException(status_code=403, detail=error_msg)
 
-    success = crud.upsert_order(order.dict())
+    success, error_msg = crud.upsert_order(order.dict())
     if not success:
-        raise HTTPException(status_code=500, detail="Failed to save order")
+        raise HTTPException(status_code=400, detail=error_msg or "Failed to save order")
 
     if not existing and order.status == 'sent_to_chef':
         background_tasks.add_task(notifications.notify_new_order, order.dict())
