@@ -28,10 +28,7 @@ export type Status =
     | 'sent_to_supplier'
     | 'waiting_snabjenec_receive'
     | 'sent_to_financier'
-    | 'archived'
-    | 'supplier_collecting'
-    | 'supplier_delivering'
-    | 'completed';
+    | 'archived';
 
 export type Role = 'chef' | 'financier' | 'supplier' | 'snabjenec' | 'supplier_meat' | 'supplier_products';
 

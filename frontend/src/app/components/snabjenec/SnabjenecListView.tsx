@@ -105,14 +105,34 @@ export function SnabjenecListView({ orders, onSelectOrder, onBackToRoles, onRefr
                             {activeOrders.map(order => {
                                 const pill = STATUS_PILL[order.status];
                                 const productCount = order.products.filter(p => p.quantity > 0).length;
+                                const hasMeat = order.products.some(p => p.category === '🥩 Мясо');
+                                const hasProducts = order.products.some(p => p.category !== '🥩 Мясо');
+
+                                let icon = '📦';
+                                let bgColor = '#e8f5e9';
+                                let iconColor = '#2E7D32';
+                                if (hasMeat && !hasProducts) {
+                                  icon = '🥩';
+                                  bgColor = '#ffebee';
+                                  iconColor = '#c62828';
+                                } else if (!hasMeat && hasProducts) {
+                                  icon = '🥬';
+                                  bgColor = '#e8f5e9';
+                                  iconColor = '#2E7D32';
+                                } else if (hasMeat && hasProducts) {
+                                  icon = '🛒';
+                                  bgColor = '#fff3e0';
+                                  iconColor = '#e65100';
+                                }
+
                                 return (
                                     <button
                                         key={order.id}
                                         onClick={() => onSelectOrder(order.id)}
                                         className="w-full bg-white rounded-2xl border border-gray-100 px-4 py-4 flex items-center gap-3 text-left active:scale-[0.99] transition-all shadow-sm"
                                     >
-                                        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#e8f5e9' }}>
-                                            <Package className="w-5 h-5" style={{ color: '#2E7D32' }} />
+                                        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 text-lg" style={{ backgroundColor: bgColor }}>
+                                            {icon}
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 mb-0.5">

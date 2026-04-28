@@ -62,6 +62,7 @@ export function ChefView({ order, onUpdateOrder, onBackToRoles: _onBackToRoles, 
   const [localProducts, setLocalProducts] = useState(order.products);
   const [customProductName, setCustomProductName] = useState('');
   const [showHelp, setShowHelp] = useState(false);
+  const [activeTab, setActiveTab] = useState<'meat' | 'products'>('products');
 
   useEffect(() => {
     setLocalProducts(order.products);
@@ -86,20 +87,35 @@ export function ChefView({ order, onUpdateOrder, onBackToRoles: _onBackToRoles, 
     setCustomProductName('');
   };
 
+  const getMeatProducts = () => localProducts.filter(p => p.category === '🥩 Мясо');
+  const getNonMeatProducts = () => localProducts.filter(p => p.category !== '🥩 Мясо');
+
   const handleSend = () => {
-    const hasProducts = localProducts.some(p => p.quantity > 0);
+    const productsToSend = activeTab === 'meat' ? getMeatProducts() : getNonMeatProducts();
+    const hasProducts = productsToSend.some(p => p.quantity > 0);
     if (!hasProducts) {
       alert(t('alertNoProducts'));
       return;
     }
-    onUpdateOrder({ ...order, products: localProducts, status: 'review_snabjenec' });
+    const productsWithQuantity = productsToSend.filter(p => p.quantity > 0);
+    onUpdateOrder({
+      ...order,
+      products: productsWithQuantity,
+      status: 'review_snabjenec'
+    });
     alert(t('alertSentToChef'));
   };
 
   const isReadOnly = order.status !== 'sent_to_chef';
 
-  const categories = Array.from(new Set(localProducts.map(p => p.category)));
-  const selectedCount = localProducts.filter(p => p.quantity > 0).length;
+  const productsToDisplay = activeTab === 'meat' ? getMeatProducts() : getNonMeatProducts();
+  const categories = Array.from(new Set(productsToDisplay.map(p => p.category)));
+  const selectedCount = productsToDisplay.filter(p => p.quantity > 0).length;
+
+  const totalPrice = productsToDisplay.reduce((sum, p) => {
+    const price = p.price || p.lastPrice || 0;
+    return sum + (price * (p.quantity || 0));
+  }, 0);
 
   return (
     <>
@@ -157,6 +173,30 @@ export function ChefView({ order, onUpdateOrder, onBackToRoles: _onBackToRoles, 
             <StatusBadge status={order.status} />
           </div>
         </header>
+
+        {/* Tabs */}
+        <div className="flex-none bg-white border-b border-gray-100 px-4 pt-3 pb-3 flex gap-2">
+          <button
+            onClick={() => setActiveTab('products')}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl font-semibold text-sm transition-all ${
+              activeTab === 'products'
+                ? 'bg-[#8B0000] text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            🥬 Продукты
+          </button>
+          <button
+            onClick={() => setActiveTab('meat')}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl font-semibold text-sm transition-all ${
+              activeTab === 'meat'
+                ? 'bg-[#8B0000] text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            🥩 Мясо
+          </button>
+        </div>
 
         {/* Product list */}
         <main className="flex-1 overflow-y-auto px-4 pt-4 pb-[140px]">
@@ -236,25 +276,32 @@ export function ChefView({ order, onUpdateOrder, onBackToRoles: _onBackToRoles, 
         </main>
 
         {/* Bottom action bar */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-100 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex items-center justify-between gap-4 z-20">
-          <div>
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t('positions')}</p>
-            <p className="text-3xl font-black text-gray-900 leading-none tabular-nums">{selectedCount}</p>
-          </div>
-
-          {!isReadOnly ? (
-            <button
-              onClick={handleSend}
-              className="bg-[#8B0000] text-white font-bold py-3.5 px-7 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center gap-2 text-sm"
-            >
-              <Send className="w-4 h-4" />
-              {t('send')}
-            </button>
-          ) : (
-            <div className="px-4 py-2.5 bg-gray-100 rounded-xl">
-              <p className="text-gray-400 text-xs font-bold">{t('readOnly')}</p>
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-100 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] z-20">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t('positions')}</p>
+              <p className="text-3xl font-black text-gray-900 leading-none tabular-nums">{selectedCount}</p>
+              {totalPrice > 0 && (
+                <p className="text-xs font-semibold text-gray-600 mt-1">
+                  {(totalPrice / 1000000).toLocaleString('ru-RU')} млн
+                </p>
+              )}
             </div>
-          )}
+
+            {!isReadOnly ? (
+              <button
+                onClick={handleSend}
+                className="bg-[#8B0000] text-white font-bold py-3.5 px-7 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center gap-2 text-sm"
+              >
+                <Send className="w-4 h-4" />
+                {t('send')}
+              </button>
+            ) : (
+              <div className="px-4 py-2.5 bg-gray-100 rounded-xl">
+                <p className="text-gray-400 text-xs font-bold">{t('readOnly')}</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

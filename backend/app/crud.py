@@ -560,12 +560,27 @@ def delete_template(template_id: str) -> bool:
         conn.close()
 
 
+def _determine_order_type(products: list) -> tuple[bool, bool]:
+  """Determine if order contains meat and/or products. Returns (has_meat, has_products)"""
+  has_meat = any(p.get('category') == '🥩 Мясо' for p in products)
+  has_products = any(p.get('category') != '🥩 Мясо' for p in products)
+  return has_meat, has_products
+
+
 def upsert_order(order_data: dict) -> bool:
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
         products_json = json.dumps(order_data['products'])
-        
+
+        # Auto-determine order type if status is review_snabjenec
+        if order_data.get('status') == 'review_snabjenec':
+            has_meat, has_products = _determine_order_type(order_data['products'])
+            if not order_data.get('sentToMeatSupplier'):
+                order_data['sentToMeatSupplier'] = has_meat
+            if not order_data.get('sentToProductSupplier'):
+                order_data['sentToProductSupplier'] = has_products
+
         cursor.execute('''
         INSERT INTO orders (id, status, products, createdAt, deliveredAt, estimatedDeliveryDate, branch,
                             chef_name, snabjenec_name, supplier_name,
