@@ -222,9 +222,11 @@ def update_delivery_tracking(order_id: str, delivery_tracking: dict, extra_items
 def archive_order(order_id: str, archived_by: str = "snabjenec") -> bool:
     conn = get_db_connection()
     try:
+        from datetime import datetime
+        archived_at = datetime.now().isoformat()
         conn.execute(
-            "UPDATE orders SET status = 'archived' WHERE id = ?",
-            (order_id,)
+            "UPDATE orders SET status = 'archived', archived_by = ?, archived_at = ? WHERE id = ?",
+            (archived_by, archived_at, order_id)
         )
         conn.commit()
         return True
