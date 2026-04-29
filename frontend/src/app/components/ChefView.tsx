@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Send, ChefHat, Plus, RefreshCcw, Calendar, HelpCircle, Minus } from 'lucide-react';
 import type { Order, Branch } from '@/lib/api';
 import { StatusBadge } from '@/app/components/StatusBadge';
 import { HelpModal } from '@/app/components/HelpModal';
-import { DecimalInput } from '@/app/components/DecimalInput';
 import { useLanguage } from '@/app/context/LanguageContext';
 
 type ChefViewProps = {
@@ -16,45 +15,84 @@ type ChefViewProps = {
 };
 
 function Stepper({ value, onChange, disabled }: { value: number; onChange: (v: number) => void; disabled?: boolean }) {
+  const toDisplay = (n: number) => n === 0 ? '' : String(n).replace('.', ',');
+  const [display, setDisplay] = useState(() => toDisplay(value));
+  const focused = useRef(false);
+  const prevExternal = useRef(value);
+
+  useEffect(() => {
+    if (!focused.current && value !== prevExternal.current) {
+      prevExternal.current = value;
+      setDisplay(toDisplay(value));
+    }
+  }, [value]);
+
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    focused.current = true;
+    e.target.select();
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let raw = e.target.value.replace(/[^0-9.,]/g, '');
+    if ((raw.match(/[.,]/g) || []).length > 1) return;
+    setDisplay(raw);
+    const normalized = raw.replace(',', '.');
+    const num = parseFloat(normalized);
+    if (!isNaN(num) && !normalized.endsWith('.')) {
+      const clamped = Math.max(0, num);
+      prevExternal.current = clamped;
+      onChange(clamped);
+    } else if (raw === '') {
+      prevExternal.current = 0;
+      onChange(0);
+    }
+  };
+
+  const handleBlur = () => {
+    focused.current = false;
+    const normalized = display.replace(',', '.');
+    const num = parseFloat(normalized);
+    if (isNaN(num) || display === '') {
+      prevExternal.current = 0;
+      onChange(0);
+      setDisplay('');
+    } else {
+      const clamped = Math.max(0, num);
+      prevExternal.current = clamped;
+      onChange(clamped);
+      setDisplay(toDisplay(clamped));
+    }
+  };
+
   return (
     <div className="flex items-center gap-2">
       <button
         type="button"
         onClick={() => {
-          const newVal = value - 0.1;
-          onChange(Math.max(0, Math.round(newVal * 10) / 10));
+          const newVal = Math.max(0, Math.round((value - 0.1) * 10) / 10);
+          onChange(newVal);
         }}
         disabled={disabled || value <= 0}
         className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 text-gray-600 active:bg-gray-200 disabled:opacity-30 transition-colors"
       >
         <Minus className="w-4 h-4" />
       </button>
-      <div className="relative w-16">
-        <input
-          type="number"
-          step="1"
-          min="0"
-          value={Math.floor(value)}
-          onChange={(e) => {
-            const intPart = parseInt(e.target.value) || 0;
-            const fracPart = value - Math.floor(value);
-            onChange(intPart + fracPart);
-          }}
-          disabled={disabled}
-          className="w-16 text-center font-black text-xl text-gray-900 tabular-nums leading-none bg-transparent border-b-2 border-transparent focus:border-[#8B0000] focus:outline-none placeholder-gray-300 rounded-none"
-          placeholder="0"
-        />
-        {value % 1 !== 0 && (
-          <span className="absolute right-0 bottom-0 text-[10px] text-[#8B0000] font-bold">
-            ,{Math.round((value % 1) * 10)}
-          </span>
-        )}
-      </div>
+      <input
+        type="text"
+        inputMode="decimal"
+        value={display}
+        onChange={handleChange}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        disabled={disabled}
+        placeholder="0"
+        className="w-16 text-center font-black text-xl text-gray-900 tabular-nums leading-none bg-transparent border-b-2 border-transparent focus:border-[#8B0000] focus:outline-none placeholder-gray-300 rounded-none"
+      />
       <button
         type="button"
         onClick={() => {
-          const newVal = value + 0.1;
-          onChange(Math.round(newVal * 10) / 10);
+          const newVal = Math.round((value + 0.1) * 10) / 10;
+          onChange(newVal);
         }}
         disabled={disabled}
         className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#8B0000] text-white active:opacity-80 disabled:opacity-30 transition-colors"

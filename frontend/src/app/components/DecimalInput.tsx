@@ -1,3 +1,5 @@
+import { useState, useEffect, useRef } from 'react';
+
 interface DecimalInputProps {
     value: number;
     onChange: (value: number) => void;
@@ -17,46 +19,79 @@ export function DecimalInput({
     min = 0,
     max,
 }: DecimalInputProps) {
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const input = e.target.value;
+    const toDisplay = (n: number) => n === 0 ? '' : String(n).replace('.', ',');
 
-        if (input === '') {
-            onChange(0);
-            return;
+    const [display, setDisplay] = useState(() => toDisplay(value));
+    const focused = useRef(false);
+    const prevExternal = useRef(value);
+
+    // Sync when external value changes (e.g. +/- button) but not while typing
+    useEffect(() => {
+        if (!focused.current && value !== prevExternal.current) {
+            prevExternal.current = value;
+            setDisplay(toDisplay(value));
         }
+    }, [value]);
 
-        // Только целые числа
-        const num = parseInt(input, 10);
-
-        if (isNaN(num)) {
-            return;
-        }
-
-        let finalValue = num;
-
-        if (typeof min === 'number') {
-            finalValue = Math.max(min, finalValue);
-        }
-
-        if (typeof max === 'number') {
-            finalValue = Math.min(max, finalValue);
-        }
-
-        onChange(finalValue);
+    const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+        focused.current = true;
+        e.target.select();
     };
 
-    const displayValue = value === 0 ? '' : Math.floor(value).toString();
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let raw = e.target.value.replace(/[^0-9.,]/g, '');
+
+        // Allow only one decimal separator
+        const separators = (raw.match(/[.,]/g) || []).length;
+        if (separators > 1) return;
+
+        setDisplay(raw);
+
+        const normalized = raw.replace(',', '.');
+        const num = parseFloat(normalized);
+
+        // Don't emit while user is still typing the decimal part (e.g. "3.")
+        if (!isNaN(num) && !normalized.endsWith('.')) {
+            let clamped = num;
+            if (typeof min === 'number') clamped = Math.max(min, clamped);
+            if (typeof max === 'number') clamped = Math.min(max, clamped);
+            prevExternal.current = clamped;
+            onChange(clamped);
+        } else if (raw === '') {
+            prevExternal.current = 0;
+            onChange(0);
+        }
+    };
+
+    const handleBlur = () => {
+        focused.current = false;
+        const normalized = display.replace(',', '.');
+        const num = parseFloat(normalized);
+        if (isNaN(num) || display === '') {
+            prevExternal.current = 0;
+            onChange(0);
+            setDisplay('');
+        } else {
+            let clamped = num;
+            if (typeof min === 'number') clamped = Math.max(min, clamped);
+            if (typeof max === 'number') clamped = Math.min(max, clamped);
+            prevExternal.current = clamped;
+            onChange(clamped);
+            setDisplay(toDisplay(clamped));
+        }
+    };
 
     return (
         <input
-            type="number"
-            value={displayValue}
+            type="text"
+            inputMode="decimal"
+            value={display}
             onChange={handleChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             placeholder={placeholder}
             disabled={disabled}
             className={className}
-            min={typeof min === 'number' ? min : undefined}
-            max={typeof max === 'number' ? max : undefined}
         />
     );
 }
