@@ -13,6 +13,17 @@ services:
       - DB_PATH=/app/db/database.db
       - TEMPLATES_DIR=/app/templates_storage
     env_file: .env
+    networks:
+      - default
+      - traefik-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.web-app-api.rule=Host(`canteen.thompson.uz`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.web-app-api.entrypoints=websecure"
+      - "traefik.http.routers.web-app-api.tls.certresolver=le"
+      - "traefik.http.services.web-app-api.loadbalancer.server.port=8000"
+      - "traefik.http.middlewares.api-stripprefix.stripprefix.prefixes=/api"
+      - "traefik.http.routers.web-app-api.middlewares=api-stripprefix@docker"
 
   bot:
     build: ./backend

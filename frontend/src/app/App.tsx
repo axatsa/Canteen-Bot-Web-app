@@ -139,9 +139,9 @@ export default function App() {
     // 2. Send to local API — attach user's name to the correct role field
     const orderWithUser: Order = {
       ...updatedOrder,
-      ...(selectedRole === 'chef' && userName ? { chefName: userName } : {}),
-      ...(selectedRole === 'snabjenec' && userName ? { snabjenecName: userName } : {}),
-      ...(selectedRole?.startsWith('supplier') && userName ? { supplierName: userName } : {}),
+      ...(selectedRole === 'chef' ? { chefName: userName || 'Chef' } : {}),
+      ...(selectedRole === 'snabjenec' ? { snabjenecName: userName || 'Snabjenec' } : {}),
+      ...(selectedRole?.startsWith('supplier') ? { supplierName: userName || 'Supplier' } : {}),
     };
     try {
       const roleForBackend = selectedRole?.startsWith('supplier') ? 'supplier' : selectedRole;

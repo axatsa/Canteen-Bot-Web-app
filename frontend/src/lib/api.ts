@@ -1,9 +1,9 @@
 
-// Use Docker service name 'api' for container-to-container communication
-// For local development outside Docker, use 'localhost:8000'
-export const API_URL = typeof window !== 'undefined' && window.location.hostname !== 'localhost'
-    ? '/api'  // Nginx proxy to backend
-    : 'http://localhost:8000';     // Local development
+// Use traefik proxy for all environments
+// Traefik routes /api to the backend service
+export const API_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    ? 'http://localhost:8000'     // Local development
+    : '/api';                     // Traefik proxy (same domain)
 
 
 export type Product = {
@@ -108,7 +108,9 @@ export const api = {
         const params = new URLSearchParams();
         if (role) params.append('role', role);
         if (userName) params.append('user_name', userName);
-        if (branch) params.append('branch', branch);
+        // Use order.branch as fallback if branch parameter is not provided
+        const branchToUse = branch || order.branch;
+        if (branchToUse) params.append('branch', branchToUse);
 
         const response = await fetch(`${API_URL}/orders/upsert?${params.toString()}`, {
             method: 'POST',
