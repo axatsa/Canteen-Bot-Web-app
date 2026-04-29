@@ -5,6 +5,7 @@ import { saveAs } from 'file-saver';
 import type { Order, Branch, Role } from '@/lib/api';
 import { StatusBadge } from '@/app/components/StatusBadge';
 import { HelpModal } from '@/app/components/HelpModal';
+import { DecimalInput } from '@/app/components/DecimalInput';
 import { useLanguage } from '@/app/context/LanguageContext';
 
 // ── Date helpers ────────────────────────────────────────────────────────────
@@ -305,19 +306,12 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                                                     </div>
                                                     {/* Bottom: price + comment + date */}
                                                     <div className="flex items-center gap-2">
-                                                        <input
-                                                            type="text"
-                                                            inputMode="decimal"
+                                                        <DecimalInput
+                                                            value={product.price || 0}
+                                                            onChange={(val) => handleUpdateProduct(product.id, 'price', val)}
                                                             placeholder="Цена"
-                                                            value={(product.price || 0).toString().replace('.', ',')}
-                                                            onChange={(e) => {
-                                                                const raw = e.target.value.replace(',', '.');
-                                                                if (/^\d*[.,]?\d*$/.test(e.target.value) && /^\d*\.?\d*$/.test(raw)) {
-                                                                    handleUpdateProduct(product.id, 'price', parseFloat(raw) || 0);
-                                                                }
-                                                            }}
+                                                            min={0}
                                                             className="flex-1 min-w-0 bg-gray-50 rounded-xl px-3 py-2.5 text-sm font-bold text-right focus:ring-1 focus:ring-orange-500 outline-none border-none"
-                                                            style={{ caretColor: role === 'supplier_meat' ? '#8B0000' : '#FF6B00' }}
                                                         />
                                                         <div className="relative flex-1 min-w-0">
                                                             <input
@@ -367,17 +361,11 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
 
                                                     <div className="space-y-3">
                                                         <div className="relative">
-                                                            <input
-                                                                type="text"
-                                                                inputMode="decimal"
+                                                            <DecimalInput
+                                                                value={product.price || 0}
+                                                                onChange={(val) => handleUpdateProduct(product.id, 'price', val)}
                                                                 placeholder={t('pricePerUnit')}
-                                                                value={(product.price || 0).toString().replace('.', ',')}
-                                                                onChange={(e) => {
-                                                                    const raw = e.target.value.replace(',', '.');
-                                                                    if (/^\d*[.,]?\d*$/.test(e.target.value) && /^\d*\.?\d*$/.test(raw)) {
-                                                                        handleUpdateProduct(product.id, 'price', parseFloat(raw) || 0);
-                                                                    }
-                                                                }}
+                                                                min={0}
                                                                 className="w-full bg-gray-50 border-none rounded-2xl px-5 py-3 font-bold text-gray-900 focus:ring-2 focus:ring-orange-500 transition-all placeholder:text-gray-300"
                                                             />
                                                             <span className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 font-bold">{t('sum')} / {product.unit}</span>

@@ -4,6 +4,7 @@ import type { Order, Branch, Product, DeliveryItemTracking } from '@/lib/api';
 import { api } from '@/lib/api';
 import { StatusBadge } from '@/app/components/StatusBadge';
 import { HelpModal } from '@/app/components/HelpModal';
+import { DecimalInput } from '@/app/components/DecimalInput';
 import { useLanguage } from '@/app/context/LanguageContext';
 
 function isoToDmy(iso: string): string {
@@ -238,33 +239,22 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
             <div className="grid grid-cols-2 gap-2">
                 <div>
                     <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t('quantity')} ({product.unit})</label>
-                    <input
-                        type="text"
-                        inputMode="decimal"
-                        value={(product.quantity || 0).toString().replace('.', ',')}
-                        onChange={(e) => {
-                            const raw = e.target.value.replace(',', '.');
-                            if (/^\d*[.,]?\d*$/.test(e.target.value) && /^\d*\.?\d*$/.test(raw)) {
-                                handleUpdateProduct(product.id, 'quantity', parseFloat(raw) || 0);
-                            }
-                        }}
+                    <DecimalInput
+                        value={product.quantity || 0}
+                        onChange={(val) => handleUpdateProduct(product.id, 'quantity', val)}
+                        placeholder="0"
+                        min={0}
                         className="w-full bg-gray-50 rounded-xl px-3 py-2 font-bold"
                     />
                 </div>
                 <div>
                     <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">{t('price')} ({t('sum')})</label>
-                    <input
-                        type="text"
-                        inputMode="decimal"
-                        value={(product.price || 0).toString().replace('.', ',')}
-                        onChange={(e) => {
-                            const raw = e.target.value.replace(',', '.');
-                            if (/^\d*[.,]?\d*$/.test(e.target.value) && /^\d*\.?\d*$/.test(raw)) {
-                                handleUpdateProduct(product.id, 'price', parseFloat(raw) || 0);
-                            }
-                        }}
+                    <DecimalInput
+                        value={product.price || 0}
+                        onChange={(val) => handleUpdateProduct(product.id, 'price', val)}
                         placeholder="0"
                         disabled={!isReviewMode}
+                        min={0}
                         className={`w-full rounded-xl px-3 py-2 font-bold ${isReviewMode ? 'bg-gray-50' : 'bg-gray-100 text-gray-500 cursor-not-allowed'}`}
                     />
                 </div>
@@ -336,21 +326,11 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                     </div>
                     <div>
                         <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Получено ({product.unit})</label>
-                        <input
-                            type="text"
-                            inputMode="decimal"
-                            value={tracking.received_qty === 0 ? '' : tracking.received_qty.toString().replace('.', ',')}
-                            onChange={(e) => {
-                                const raw = e.target.value.replace(',', '.');
-                                if (raw === '') {
-                                    handleReceivedQtyChange(product.id, tracking.ordered_qty, 0);
-                                    return;
-                                }
-                                if (/^\d*[.,]?\d*$/.test(e.target.value) && /^\d*\.?\d*$/.test(raw)) {
-                                    const val = parseFloat(raw);
-                                    handleReceivedQtyChange(product.id, tracking.ordered_qty, isNaN(val) ? 0 : Math.max(0, val));
-                                }
-                            }}
+                        <DecimalInput
+                            value={tracking.received_qty || 0}
+                            onChange={(val) => handleReceivedQtyChange(product.id, tracking.ordered_qty, val)}
+                            placeholder="0"
+                            min={0}
                             className="w-full bg-blue-50 rounded-xl px-3 py-2 font-bold border-none focus:ring-1 focus:ring-blue-400"
                         />
                     </div>
@@ -681,21 +661,11 @@ function ExtraItemRow({ product, onAdd }: { product: Product; onAdd: (id: string
                 <p className="font-bold text-sm text-gray-900">{product.name}</p>
                 <p className="text-xs text-gray-400">{product.unit}</p>
             </div>
-            <input
-                type="text"
-                inputMode="decimal"
-                value={qty === 0 ? '' : qty.toString().replace('.', ',')}
-                onChange={(e) => {
-                    const raw = e.target.value.replace(',', '.');
-                    if (raw === '') {
-                        setQty(1);
-                        return;
-                    }
-                    if (/^\d*[.,]?\d*$/.test(e.target.value) && /^\d*\.?\d*$/.test(raw)) {
-                        const val = parseFloat(raw);
-                        setQty(isNaN(val) ? 1 : Math.max(0.1, val));
-                    }
-                }}
+            <DecimalInput
+                value={qty}
+                onChange={setQty}
+                placeholder="1"
+                min={0.1}
                 className="w-16 bg-white border border-gray-200 rounded-xl px-2 py-1 text-center font-bold text-sm"
             />
             <button

@@ -3,6 +3,7 @@ import { Send, ChefHat, Plus, RefreshCcw, Calendar, HelpCircle, Minus } from 'lu
 import type { Order, Branch } from '@/lib/api';
 import { StatusBadge } from '@/app/components/StatusBadge';
 import { HelpModal } from '@/app/components/HelpModal';
+import { DecimalInput } from '@/app/components/DecimalInput';
 import { useLanguage } from '@/app/context/LanguageContext';
 
 type ChefViewProps = {
@@ -15,50 +16,27 @@ type ChefViewProps = {
 };
 
 function Stepper({ value, onChange, disabled }: { value: number; onChange: (v: number) => void; disabled?: boolean }) {
-  const handleDecrement = () => {
-    const newVal = Math.max(0, parseFloat((value - 0.1).toFixed(10)));
-    onChange(newVal);
-  };
-
-  const handleIncrement = () => {
-    const newVal = parseFloat((value + 0.1).toFixed(10));
-    onChange(newVal);
-  };
-
   return (
     <div className="flex items-center gap-2">
       <button
         type="button"
-        onClick={handleDecrement}
+        onClick={() => onChange(Math.max(0, value - 0.1))}
         disabled={disabled || value <= 0}
         className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 text-gray-600 active:bg-gray-200 disabled:opacity-30 transition-colors"
       >
         <Minus className="w-4 h-4" />
       </button>
-      <input
-        type="text"
-        inputMode="decimal"
-        value={value === 0 ? '' : value.toString().replace('.', ',')}
+      <DecimalInput
+        value={value}
+        onChange={onChange}
         placeholder="0"
-        onChange={(e) => {
-          const raw = e.target.value.replace(',', '.');
-          if (raw === '') {
-            onChange(0);
-            return;
-          }
-          // Allow only numbers and one dot/comma
-          if (/^\d*[.,]?\d*$/.test(raw)) {
-            const normalized = raw.replace(',', '.');
-            const val = parseFloat(normalized);
-            onChange(isNaN(val) ? 0 : Math.max(0, val));
-          }
-        }}
         disabled={disabled}
+        min={0}
         className="w-16 text-center font-black text-xl text-gray-900 tabular-nums leading-none bg-transparent border-b-2 border-transparent focus:border-[#8B0000] focus:outline-none placeholder-gray-300 rounded-none"
       />
       <button
         type="button"
-        onClick={handleIncrement}
+        onClick={() => onChange(value + 0.1)}
         disabled={disabled}
         className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#8B0000] text-white active:opacity-80 disabled:opacity-30 transition-colors"
       >
