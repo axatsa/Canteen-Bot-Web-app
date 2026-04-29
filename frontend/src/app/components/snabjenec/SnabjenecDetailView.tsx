@@ -244,7 +244,7 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                         value={(product.quantity || 0).toString().replace('.', ',')}
                         onChange={(e) => {
                             const raw = e.target.value.replace(',', '.');
-                            if (/^\d*\.?\d*$/.test(raw)) {
+                            if (/^\d*[.,]?\d*$/.test(e.target.value) && /^\d*\.?\d*$/.test(raw)) {
                                 handleUpdateProduct(product.id, 'quantity', parseFloat(raw) || 0);
                             }
                         }}
@@ -259,7 +259,7 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                         value={(product.price || 0).toString().replace('.', ',')}
                         onChange={(e) => {
                             const raw = e.target.value.replace(',', '.');
-                            if (/^\d*\.?\d*$/.test(raw)) {
+                            if (/^\d*[.,]?\d*$/.test(e.target.value) && /^\d*\.?\d*$/.test(raw)) {
                                 handleUpdateProduct(product.id, 'price', parseFloat(raw) || 0);
                             }
                         }}
@@ -346,7 +346,7 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                                     handleReceivedQtyChange(product.id, tracking.ordered_qty, 0);
                                     return;
                                 }
-                                if (/^\d*\.?\d*$/.test(raw)) {
+                                if (/^\d*[.,]?\d*$/.test(e.target.value) && /^\d*\.?\d*$/.test(raw)) {
                                     const val = parseFloat(raw);
                                     handleReceivedQtyChange(product.id, tracking.ordered_qty, isNaN(val) ? 0 : Math.max(0, val));
                                 }
@@ -691,7 +691,7 @@ function ExtraItemRow({ product, onAdd }: { product: Product; onAdd: (id: string
                         setQty(1);
                         return;
                     }
-                    if (/^\d*\.?\d*$/.test(raw)) {
+                    if (/^\d*[.,]?\d*$/.test(e.target.value) && /^\d*\.?\d*$/.test(raw)) {
                         const val = parseFloat(raw);
                         setQty(isNaN(val) ? 1 : Math.max(0.1, val));
                     }

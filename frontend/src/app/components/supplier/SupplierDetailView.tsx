@@ -312,7 +312,7 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                                                             value={(product.price || 0).toString().replace('.', ',')}
                                                             onChange={(e) => {
                                                                 const raw = e.target.value.replace(',', '.');
-                                                                if (/^\d*\.?\d*$/.test(raw)) {
+                                                                if (/^\d*[.,]?\d*$/.test(e.target.value) && /^\d*\.?\d*$/.test(raw)) {
                                                                     handleUpdateProduct(product.id, 'price', parseFloat(raw) || 0);
                                                                 }
                                                             }}
@@ -374,7 +374,7 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                                                                 value={(product.price || 0).toString().replace('.', ',')}
                                                                 onChange={(e) => {
                                                                     const raw = e.target.value.replace(',', '.');
-                                                                    if (/^\d*\.?\d*$/.test(raw)) {
+                                                                    if (/^\d*[.,]?\d*$/.test(e.target.value) && /^\d*\.?\d*$/.test(raw)) {
                                                                         handleUpdateProduct(product.id, 'price', parseFloat(raw) || 0);
                                                                     }
                                                                 }}
