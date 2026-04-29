@@ -18,34 +18,17 @@ export function DecimalInput({
     max,
 }: DecimalInputProps) {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let input = e.target.value;
+        const input = e.target.value;
 
-        if (input === '' || input === '-') {
+        if (input === '') {
             onChange(0);
             return;
         }
 
-        // Заменяем запятую на точку
-        input = input.replace(/,/g, '.');
-
-        // Удаляем все символы кроме цифр и точки
-        input = input.replace(/[^\d.]/g, '');
-
-        // Удаляем дополнительные точки (оставляем только первую)
-        const parts = input.split('.');
-        if (parts.length > 2) {
-            input = parts[0] + '.' + parts.slice(1).join('');
-        }
-
-        if (input === '' || input === '.') {
-            onChange(0);
-            return;
-        }
-
-        const num = parseFloat(input);
+        // Только целые числа
+        const num = parseInt(input, 10);
 
         if (isNaN(num)) {
-            onChange(0);
             return;
         }
 
@@ -62,17 +45,18 @@ export function DecimalInput({
         onChange(finalValue);
     };
 
-    const displayValue = value === 0 ? '' : value.toString().replace('.', ',');
+    const displayValue = value === 0 ? '' : Math.floor(value).toString();
 
     return (
         <input
-            type="text"
-            inputMode="decimal"
+            type="number"
             value={displayValue}
             onChange={handleChange}
             placeholder={placeholder}
             disabled={disabled}
             className={className}
+            min={typeof min === 'number' ? min : undefined}
+            max={typeof max === 'number' ? max : undefined}
         />
     );
 }

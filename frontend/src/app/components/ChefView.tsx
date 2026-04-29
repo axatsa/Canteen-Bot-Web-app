@@ -20,23 +20,42 @@ function Stepper({ value, onChange, disabled }: { value: number; onChange: (v: n
     <div className="flex items-center gap-2">
       <button
         type="button"
-        onClick={() => onChange(Math.max(0, value - 0.1))}
+        onClick={() => {
+          const newVal = value - 0.1;
+          onChange(Math.max(0, Math.round(newVal * 10) / 10));
+        }}
         disabled={disabled || value <= 0}
         className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 text-gray-600 active:bg-gray-200 disabled:opacity-30 transition-colors"
       >
         <Minus className="w-4 h-4" />
       </button>
-      <DecimalInput
-        value={value}
-        onChange={onChange}
-        placeholder="0"
-        disabled={disabled}
-        min={0}
-        className="w-16 text-center font-black text-xl text-gray-900 tabular-nums leading-none bg-transparent border-b-2 border-transparent focus:border-[#8B0000] focus:outline-none placeholder-gray-300 rounded-none"
-      />
+      <div className="relative w-16">
+        <input
+          type="number"
+          step="1"
+          min="0"
+          value={Math.floor(value)}
+          onChange={(e) => {
+            const intPart = parseInt(e.target.value) || 0;
+            const fracPart = value - Math.floor(value);
+            onChange(intPart + fracPart);
+          }}
+          disabled={disabled}
+          className="w-16 text-center font-black text-xl text-gray-900 tabular-nums leading-none bg-transparent border-b-2 border-transparent focus:border-[#8B0000] focus:outline-none placeholder-gray-300 rounded-none"
+          placeholder="0"
+        />
+        {value % 1 !== 0 && (
+          <span className="absolute right-0 bottom-0 text-[10px] text-[#8B0000] font-bold">
+            ,{Math.round((value % 1) * 10)}
+          </span>
+        )}
+      </div>
       <button
         type="button"
-        onClick={() => onChange(value + 0.1)}
+        onClick={() => {
+          const newVal = value + 0.1;
+          onChange(Math.round(newVal * 10) / 10);
+        }}
         disabled={disabled}
         className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#8B0000] text-white active:opacity-80 disabled:opacity-30 transition-colors"
       >
