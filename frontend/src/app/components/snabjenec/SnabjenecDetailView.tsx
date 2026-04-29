@@ -337,11 +337,20 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                     <div>
                         <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Получено ({product.unit})</label>
                         <input
-                            type="number"
-                            value={tracking.received_qty || ''}
-                            min={0}
-                            max={tracking.ordered_qty * 2}
-                            onChange={(e) => handleReceivedQtyChange(product.id, tracking.ordered_qty, parseFloat(e.target.value) || 0)}
+                            type="text"
+                            inputMode="decimal"
+                            value={tracking.received_qty === 0 ? '' : tracking.received_qty.toString().replace('.', ',')}
+                            onChange={(e) => {
+                                const raw = e.target.value.replace(',', '.');
+                                if (raw === '') {
+                                    handleReceivedQtyChange(product.id, tracking.ordered_qty, 0);
+                                    return;
+                                }
+                                if (/^\d*\.?\d*$/.test(raw)) {
+                                    const val = parseFloat(raw);
+                                    handleReceivedQtyChange(product.id, tracking.ordered_qty, isNaN(val) ? 0 : Math.max(0, val));
+                                }
+                            }}
                             className="w-full bg-blue-50 rounded-xl px-3 py-2 font-bold border-none focus:ring-1 focus:ring-blue-400"
                         />
                     </div>
@@ -673,10 +682,20 @@ function ExtraItemRow({ product, onAdd }: { product: Product; onAdd: (id: string
                 <p className="text-xs text-gray-400">{product.unit}</p>
             </div>
             <input
-                type="number"
-                value={qty}
-                min={1}
-                onChange={(e) => setQty(Math.max(1, parseFloat(e.target.value) || 1))}
+                type="text"
+                inputMode="decimal"
+                value={qty === 0 ? '' : qty.toString().replace('.', ',')}
+                onChange={(e) => {
+                    const raw = e.target.value.replace(',', '.');
+                    if (raw === '') {
+                        setQty(1);
+                        return;
+                    }
+                    if (/^\d*\.?\d*$/.test(raw)) {
+                        const val = parseFloat(raw);
+                        setQty(isNaN(val) ? 1 : Math.max(0.1, val));
+                    }
+                }}
                 className="w-16 bg-white border border-gray-200 rounded-xl px-2 py-1 text-center font-bold text-sm"
             />
             <button

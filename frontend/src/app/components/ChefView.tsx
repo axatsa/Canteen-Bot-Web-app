@@ -15,11 +15,21 @@ type ChefViewProps = {
 };
 
 function Stepper({ value, onChange, disabled }: { value: number; onChange: (v: number) => void; disabled?: boolean }) {
+  const handleDecrement = () => {
+    const newVal = Math.max(0, parseFloat((value - 0.1).toFixed(10)));
+    onChange(newVal);
+  };
+
+  const handleIncrement = () => {
+    const newVal = parseFloat((value + 0.1).toFixed(10));
+    onChange(newVal);
+  };
+
   return (
     <div className="flex items-center gap-2">
       <button
         type="button"
-        onClick={() => onChange(Math.max(0, Number((value - 0.1).toFixed(1))))}
+        onClick={handleDecrement}
         disabled={disabled || value <= 0}
         className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 text-gray-600 active:bg-gray-200 disabled:opacity-30 transition-colors"
       >
@@ -36,9 +46,10 @@ function Stepper({ value, onChange, disabled }: { value: number; onChange: (v: n
             onChange(0);
             return;
           }
-          // Allow only numbers and one dot
-          if (/^\d*\.?\d*$/.test(raw)) {
-            const val = parseFloat(raw);
+          // Allow only numbers and one dot/comma
+          if (/^\d*[.,]?\d*$/.test(raw)) {
+            const normalized = raw.replace(',', '.');
+            const val = parseFloat(normalized);
             onChange(isNaN(val) ? 0 : Math.max(0, val));
           }
         }}
@@ -47,7 +58,7 @@ function Stepper({ value, onChange, disabled }: { value: number; onChange: (v: n
       />
       <button
         type="button"
-        onClick={() => onChange(Number((value + 0.1).toFixed(1)))}
+        onClick={handleIncrement}
         disabled={disabled}
         className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#8B0000] text-white active:opacity-80 disabled:opacity-30 transition-colors"
       >
