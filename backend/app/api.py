@@ -23,8 +23,8 @@ async def get_products():
 
 @app.get("/orders", response_model=List[schemas.Order])
 async def get_orders(role: Optional[str] = None, branch: Optional[str] = None, user_name: Optional[str] = None):
-    if not role or not branch:
-        raise HTTPException(status_code=400, detail="role and branch parameters are required")
+    if not role:
+        raise HTTPException(status_code=400, detail="role parameter is required")
     return crud.get_orders_by_role(role, branch, user_name)
 
 @app.post("/orders/upsert")

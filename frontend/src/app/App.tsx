@@ -100,6 +100,8 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (!selectedRole) return;
+
     loadInitialData();
 
     // Polling disabled to prevent data reset while editing
@@ -110,7 +112,7 @@ export default function App() {
     // return () => {
     //   clearInterval(interval);
     // };
-  }, []);
+  }, [selectedRole, selectedBranch, userName]);
 
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
