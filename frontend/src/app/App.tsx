@@ -145,7 +145,14 @@ export default function App() {
     };
     try {
       const roleForBackend = selectedRole?.startsWith('supplier') ? 'supplier' : selectedRole;
-      await api.upsertOrder(orderWithUser, roleForBackend, userName || undefined, selectedBranch || undefined);
+      const effectiveName = userName
+        || orderWithUser.chefName
+        || orderWithUser.snabjenecName
+        || orderWithUser.supplierName
+        || roleForBackend
+        || 'user';
+      const effectiveBranch = selectedBranch || orderWithUser.branch || undefined;
+      await api.upsertOrder(orderWithUser, roleForBackend, effectiveName, effectiveBranch);
       console.log('✅ Order saved successfully!');
     } catch (error: any) {
       console.error('❌ Error saving order:', error);
