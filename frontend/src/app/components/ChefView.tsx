@@ -248,7 +248,7 @@ export function ChefView({ order, onUpdateOrder, onBackToRoles: _onBackToRoles, 
         <main className="flex-1 overflow-y-auto px-4 pt-4 pb-[140px]">
           <div className="space-y-6">
             {categories.map(category => {
-              const categoryProducts = localProducts.filter(p => p.category === category);
+              const categoryProducts = productsToDisplay.filter(p => p.category === category);
               if (categoryProducts.length === 0) return null;
 
               return (
