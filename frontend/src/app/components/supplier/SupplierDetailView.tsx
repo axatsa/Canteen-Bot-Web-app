@@ -8,6 +8,9 @@ import { HelpModal } from '@/app/components/HelpModal';
 import { DecimalInput } from '@/app/components/DecimalInput';
 import { useLanguage } from '@/app/context/LanguageContext';
 
+const UNKNOWN_DELIVERY_VALUES = new Set(['Неизвестно', "Noma'lum"]);
+const isUnknownDelivery = (d?: string) => !d || UNKNOWN_DELIVERY_VALUES.has(d);
+
 // ── Date helpers ────────────────────────────────────────────────────────────
 /** "2026-04-17" → "17.04.2026" */
 function isoToDmy(iso: string): string {
@@ -92,7 +95,7 @@ interface SupplierDetailViewProps {
 }
 
 export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch, role }: SupplierDetailViewProps) {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [localProducts, setLocalProducts] = useState(order.products);
     const [isCompact, setIsCompact] = useState(true);
     const [showHelp, setShowHelp] = useState(false);
@@ -247,7 +250,7 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                             {t('branch')}: {t(`branch${branch.charAt(0).toUpperCase() + branch.slice(1)}` as any)}
                         </p>
                         <h2 className="text-2xl font-black tracking-tight leading-none">
-                            {order.createdAt.toLocaleDateString(t('back') === 'Orqaga' ? 'uz-UZ' : 'ru-RU', {
+                            {order.createdAt.toLocaleDateString(language === 'uz' ? 'uz-UZ' : 'ru-RU', {
                                 day: 'numeric',
                                 month: 'short',
                             })}
@@ -323,7 +326,7 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                                                             <MessageSquare className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-300 pointer-events-none" />
                                                         </div>
                                                         <DateInput
-                                                            value={product.deliveryDate && product.deliveryDate !== 'Неизвестно' && product.deliveryDate !== "Noma'lum" ? product.deliveryDate : ''}
+                                                            value={!isUnknownDelivery(product.deliveryDate) ? product.deliveryDate! : ''}
                                                             onChange={(iso) => handleUpdateProduct(product.id, 'deliveryDate', iso)}
                                                             className="flex-1 min-w-0 bg-gray-50 rounded-xl px-3 py-2.5 text-sm font-bold text-gray-700 focus:ring-1 focus:ring-orange-500 outline-none border-none"
                                                         />
@@ -384,7 +387,7 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
 
                                                         <div className="relative">
                                                             <DateInput
-                                                                value={(product.deliveryDate && product.deliveryDate !== t('unknown' as any)) ? product.deliveryDate : ''}
+                                                                value={!isUnknownDelivery(product.deliveryDate) ? product.deliveryDate! : ''}
                                                                 onChange={(iso) => handleUpdateProduct(product.id, 'deliveryDate', iso)}
                                                                 className={`w-full bg-gray-50 border-none rounded-2xl px-5 py-3 font-medium text-gray-700 focus:ring-2 focus:ring-orange-500 transition-all ${!product.checked && !product.deliveryDate ? 'ring-2 ring-red-200' : ''}`}
                                                             />
@@ -395,7 +398,7 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                                                             <div className="flex gap-2">
                                                                 <button
                                                                     onClick={() => handleUpdateProduct(product.id, 'deliveryDate', t('unknown' as any))}
-                                                                    className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all ${product.deliveryDate === t('unknown' as any) ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-500'}`}
+                                                                    className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all ${isUnknownDelivery(product.deliveryDate) && product.deliveryDate ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-500'}`}
                                                                 >
                                                                     {t('unknown' as any)}
                                                                 </button>
@@ -405,7 +408,7 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                                                                         tomorrow.setDate(tomorrow.getDate() + 1);
                                                                         handleUpdateProduct(product.id, 'deliveryDate', tomorrow.toISOString().split('T')[0]);
                                                                     }}
-                                                                    className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all ${product.deliveryDate && product.deliveryDate !== t('unknown' as any) ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-500'}`}
+                                                                    className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all ${!isUnknownDelivery(product.deliveryDate) && product.deliveryDate ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-500'}`}
                                                                 >
                                                                     Завтра
                                                                 </button>

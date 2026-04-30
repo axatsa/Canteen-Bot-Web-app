@@ -303,6 +303,7 @@ export function FinancierDesktop({ onBackToRoles, role, branch, userName }: Fina
                 <RequestDetailModal
                     orderId={selectedOrderId}
                     onClose={() => setSelectedOrderId(null)}
+                    onArchive={() => { setSelectedOrderId(null); loadOrders(); loadArchive(); }}
                     templates={templates}
                     role={role}
                     branch={branch}

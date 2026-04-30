@@ -104,7 +104,7 @@ function Stepper({ value, onChange, disabled }: { value: number; onChange: (v: n
 }
 
 export function ChefView({ order, onUpdateOrder, onBackToRoles: _onBackToRoles, branch, onRefresh, isFromBot: _isFromBot }: ChefViewProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [localProducts, setLocalProducts] = useState(order.products);
   const [customProductName, setCustomProductName] = useState('');
   const [showHelp, setShowHelp] = useState(false);
@@ -201,7 +201,7 @@ export function ChefView({ order, onUpdateOrder, onBackToRoles: _onBackToRoles, 
                 {t('branch')}: {t(`branch${branch.charAt(0).toUpperCase() + branch.slice(1)}` as any)}
               </p>
               <h2 className="text-2xl font-black tracking-tight leading-none">
-                {order.createdAt.toLocaleDateString(t('back') === 'Orqaga' ? 'uz-UZ' : 'ru-RU', {
+                {order.createdAt.toLocaleDateString(language === 'uz' ? 'uz-UZ' : 'ru-RU', {
                   day: 'numeric',
                   month: 'short',
                 })}
@@ -210,7 +210,7 @@ export function ChefView({ order, onUpdateOrder, onBackToRoles: _onBackToRoles, 
                 <p className="text-white/80 text-xs font-semibold mt-2 flex items-center gap-1">
                   <Calendar className="w-3 h-3" />
                   {t('estimatedDelivery')}: {order.estimatedDeliveryDate.toLocaleDateString(
-                    t('back') === 'Orqaga' ? 'uz-UZ' : 'ru-RU',
+                    language === 'uz' ? 'uz-UZ' : 'ru-RU',
                     { day: 'numeric', month: 'long' }
                   )}
                 </p>

@@ -29,7 +29,7 @@ interface SupplierListViewProps {
 }
 
 export function SupplierListView({ orders, onSelectOrder, onBackToRoles, onRefresh, isFromBot, role }: SupplierListViewProps) {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [showHelp, setShowHelp] = useState(false);
     const activeOrders = orders.filter(o => {
         if (o.status !== 'sent_to_supplier' && o.status !== 'waiting_snabjenec_receive' && o.status !== 'supplier_collecting' && o.status !== 'supplier_delivering') return false;
@@ -126,7 +126,7 @@ export function SupplierListView({ orders, onSelectOrder, onBackToRoles, onRefre
                                                 {BRANCH_LABELS[order.branch] ?? order.branch}
                                             </h3>
                                             <p className="text-xs text-gray-400">
-                                                {order.createdAt.toLocaleDateString(t('back') === 'Orqaga' ? 'uz-UZ' : 'ru-RU', {
+                                                {order.createdAt.toLocaleDateString(language === 'uz' ? 'uz-UZ' : 'ru-RU', {
                                                     day: 'numeric',
                                                     month: 'long',
                                                     year: 'numeric',

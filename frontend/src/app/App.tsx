@@ -144,7 +144,7 @@ export default function App() {
       ...(selectedRole?.startsWith('supplier') ? { supplierName: userName || 'Supplier' } : {}),
     };
     try {
-      const roleForBackend = selectedRole?.startsWith('supplier') ? 'supplier' : selectedRole;
+      const roleForBackend = selectedRole?.startsWith('supplier') ? 'supplier' : selectedRole ?? undefined;
       const effectiveName = userName
         || orderWithUser.chefName
         || orderWithUser.snabjenecName

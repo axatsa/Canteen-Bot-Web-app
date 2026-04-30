@@ -22,7 +22,7 @@ export function ArchiveTable({ orders, onSelectOrder }: ArchiveTableProps) {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                     {orders.length === 0 && (
-                        <tr><td colSpan={6} className="text-center py-10 text-gray-400">Архив пуст</td></tr>
+                        <tr><td colSpan={7} className="text-center py-10 text-gray-400">Архив пуст</td></tr>
                     )}
                     {orders.map(order => (
                         <tr key={order.id} className="hover:bg-gray-50 cursor-pointer group" onClick={() => onSelectOrder(order.id)}>
@@ -39,6 +39,9 @@ export function ArchiveTable({ orders, onSelectOrder }: ArchiveTableProps) {
                                     <span className="text-xs font-bold w-9 text-right">{order.completion_rate}%</span>
                                     <Eye className="w-4 h-4 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>
+                            </td>
+                            <td className="p-3 text-right font-bold text-gray-900 tabular-nums">
+                                {(order.total_received_sum || 0).toLocaleString()} <span className="text-[10px] text-gray-400 font-normal">UZS</span>
                             </td>
                         </tr>
                     ))}

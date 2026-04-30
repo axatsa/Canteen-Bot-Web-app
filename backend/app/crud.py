@@ -122,8 +122,26 @@ def get_orders_by_role(role: str, branch: str, user_name: Optional[str] = None) 
         cursor.execute("SELECT * FROM orders WHERE chef_name = ? OR status = 'sent_to_chef'", (user_name,))
     elif role == 'snabjenec':
         cursor.execute("SELECT * FROM orders WHERE branch = ? AND status IN ('review_snabjenec', 'waiting_snabjenec_receive')", (branch,))
+    elif role == 'supplier_meat':
+        # Show unresponded meat orders + own responded orders
+        cursor.execute("""
+            SELECT * FROM orders
+            WHERE (status = 'sent_to_supplier' AND sent_to_meat_supplier = 1)
+               OR (status = 'waiting_snabjenec_receive' AND supplier_name = ?)
+        """, (user_name,))
+    elif role == 'supplier_products':
+        # Show unresponded product orders + own responded orders
+        cursor.execute("""
+            SELECT * FROM orders
+            WHERE (status = 'sent_to_supplier' AND sent_to_product_supplier = 1)
+               OR (status = 'waiting_snabjenec_receive' AND supplier_name = ?)
+        """, (user_name,))
     elif role == 'supplier':
-        cursor.execute("SELECT * FROM orders WHERE supplier_name = ? AND status IN ('sent_to_supplier', 'waiting_snabjenec_receive')", (user_name,))
+        cursor.execute("""
+            SELECT * FROM orders
+            WHERE (status = 'sent_to_supplier')
+               OR (status = 'waiting_snabjenec_receive' AND supplier_name = ?)
+        """, (user_name,))
     elif role == 'financier':
         cursor.execute("SELECT * FROM orders WHERE branch = ? AND status IN ('sent_to_financier', 'archived')", (branch,))
     else:
@@ -333,11 +351,14 @@ def get_order_financier_details(order_id: str) -> Optional[dict]:
             "status": order['status'],
             "branch": order['branch'],
             "products": products,
+            "chefName": order.get('chef_name'),
+            "snabjenecName": order.get('snabjenec_name'),
+            "supplierName": order.get('supplier_name'),
         },
         "delivery": {
             "sent_to_supplier_at": order.get('sent_to_supplier_at'),
             "received_from_supplier_at": order.get('received_from_supplier_at'),
-            "completion_rate": f"{stats['completion_rate']}%",
+            "completion_rate": stats['completion_rate'],
             "total_ordered_sum": stats['total_ordered_sum'],
             "total_received_sum": stats['total_received_sum'],
         },
@@ -637,13 +658,17 @@ def can_user_edit_order(order_id: str, role: str, user_name: str, branch: str, n
     elif role == 'snabjenec':
         if order.get('branch') != branch:
             return False, "You can only edit orders from your branch"
-        if order.get('status') != 'review_snabjenec':
-            return False, "You can only edit orders in review_snabjenec status"
+        if order.get('status') not in ('review_snabjenec', 'waiting_snabjenec_receive'):
+            return False, "You can only edit orders in review or receive status"
         if new_status and not is_valid_status_transition(order.get('status'), new_status):
             return False, f"Cannot transition from {order.get('status')} to {new_status}"
         return True, ""
     elif role == 'supplier':
-        return False, "Suppliers cannot edit orders"
+        if order.get('status') not in ('sent_to_supplier',):
+            return False, "Suppliers can only respond to orders in sent_to_supplier status"
+        if new_status and not is_valid_status_transition(order.get('status'), new_status):
+            return False, f"Cannot transition from {order.get('status')} to {new_status}"
+        return True, ""
     elif role == 'financier':
         if order.get('branch') != branch:
             return False, "You can only view orders from your branch"
@@ -680,24 +705,23 @@ def validate_order_fields(order_data: dict) -> tuple[bool, str]:
         if not order_data.get('snabjenecName'):
             return False, "Snabjenec name is required in review status"
     elif status == 'sent_to_supplier':
+        # supplierName is not required here — supplier hasn't responded yet
         if not order_data.get('chefName'):
             return False, "Chef name is required"
         if not order_data.get('snabjenecName'):
             return False, "Snabjenec name is required"
-        if not order_data.get('supplierName'):
-            return False, "Supplier name is required when sending to supplier"
     elif status == 'waiting_snabjenec_receive':
         if not order_data.get('chefName'):
             return False, "Chef name is required"
         if not order_data.get('snabjenecName'):
             return False, "Snabjenec name is required"
+        # supplierName set by supplier; preserved via COALESCE in DB
     elif status == 'sent_to_financier':
         if not order_data.get('chefName'):
             return False, "Chef name is required"
         if not order_data.get('snabjenecName'):
             return False, "Snabjenec name is required"
-        if not order_data.get('supplierName'):
-            return False, "Supplier name is required"
+        # supplierName may be absent in legacy (no-supplier) path — preserved via COALESCE
 
     return True, ""
 

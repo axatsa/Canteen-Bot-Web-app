@@ -5,18 +5,24 @@ const STATUS_LABELS: Record<string, string> = {
     sent_to_chef:              'У шефа',
     review_snabjenec:          'У снабженца',
     sent_to_supplier:          'У поставщика',
+    supplier_collecting:       'Сборка',
+    supplier_delivering:       'В пути',
     waiting_snabjenec_receive: 'На приёмке',
     sent_to_financier:         'Ожидает меня',
     archived:                  'Архив',
+    completed:                 'Завершён',
 };
 
 const STATUS_DOT: Record<string, string> = {
     sent_to_chef:              'bg-slate-400',
     review_snabjenec:          'bg-yellow-400',
     sent_to_supplier:          'bg-blue-400',
+    supplier_collecting:       'bg-orange-400',
+    supplier_delivering:       'bg-purple-400',
     waiting_snabjenec_receive: 'bg-amber-400',
     sent_to_financier:         'bg-violet-500',
     archived:                  'bg-gray-300',
+    completed:                 'bg-green-500',
 };
 
 const BRANCH_LABELS: Record<string, string> = {
@@ -93,7 +99,7 @@ export function RequestsTable({ orders, onSelectOrder }: RequestsTableProps) {
                 <tbody>
                     {sorted.length === 0 && (
                         <tr>
-                            <td colSpan={7} className="text-center py-16 text-gray-300 text-sm font-medium">
+                            <td colSpan={8} className="text-center py-16 text-gray-300 text-sm font-medium">
                                 Нет заявок
                             </td>
                         </tr>

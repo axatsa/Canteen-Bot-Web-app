@@ -26,9 +26,12 @@ export type Status =
     | 'sent_to_chef'
     | 'review_snabjenec'
     | 'sent_to_supplier'
+    | 'supplier_collecting'
+    | 'supplier_delivering'
     | 'waiting_snabjenec_receive'
     | 'sent_to_financier'
-    | 'archived';
+    | 'archived'
+    | 'completed';
 
 export type Role = 'chef' | 'financier' | 'supplier' | 'snabjenec' | 'supplier_meat' | 'supplier_products';
 
@@ -156,11 +159,11 @@ export const api = {
         if (!response.ok) throw new Error('Failed to update delivery');
     },
 
-    archiveOrder: async (orderId: string): Promise<void> => {
+    archiveOrder: async (orderId: string, archivedBy = 'snabjenec'): Promise<void> => {
         const response = await fetch(`${API_URL}/orders/${orderId}/archive`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ archived_by: 'snabjenec' }),
+            body: JSON.stringify({ archived_by: archivedBy }),
         });
         if (!response.ok) throw new Error('Failed to archive order');
     },

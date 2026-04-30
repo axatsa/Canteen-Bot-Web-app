@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { X, Download, Package } from 'lucide-react';
+import { X, Download, Package, ArchiveIcon } from 'lucide-react';
 import { api } from '@/lib/api';
 
 interface RequestDetailModalProps {
     orderId: string;
     onClose: () => void;
+    onArchive?: () => void;
     templates: any[];
     role?: string;
     branch?: string;
@@ -20,12 +21,13 @@ const STATUS_LABELS: Record<string, string> = {
     archived:                  'Архив',
 };
 
-export function RequestDetailModal({ orderId, onClose, templates, role, branch, userName }: RequestDetailModalProps) {
+export function RequestDetailModal({ orderId, onClose, onArchive, templates, role, branch, userName }: RequestDetailModalProps) {
     const [details, setDetails] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [selectedTemplate, setSelectedTemplate] = useState('');
     const [localProducts, setLocalProducts] = useState<any[]>([]);
     const [saving, setSaving] = useState(false);
+    const [archiving, setArchiving] = useState(false);
     const [exporting, setExporting] = useState(false);
 
     useEffect(() => {
@@ -42,19 +44,38 @@ export function RequestDetailModal({ orderId, onClose, templates, role, branch, 
         if (!details) return;
         setSaving(true);
         try {
-            // Reconstruct the order object to match schemas.Order
             const updatedOrder = {
                 ...details.order,
                 products: localProducts,
-                createdAt: new Date(details.order.created_at)
+                createdAt: new Date(details.order.created_at),
+                // names must be included so validate_order_fields passes
+                chefName: details.order.chefName,
+                snabjenecName: details.order.snabjenecName,
+                supplierName: details.order.supplierName,
             };
-            await api.upsertOrder(updatedOrder, role, userName, branch);
+            // Use order's own branch as fallback so the request always has branch
+            const effectiveBranch = branch || details.order.branch;
+            await api.upsertOrder(updatedOrder, role, userName, effectiveBranch);
             alert('✅ Единицы измерения сохранены');
         } catch (error) {
             console.error(error);
             alert('Ошибка сохранения');
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleArchive = async () => {
+        if (!window.confirm('Архивировать заявку? Это действие нельзя отменить.')) return;
+        setArchiving(true);
+        try {
+            await api.archiveOrder(orderId, userName || 'financier');
+            onArchive?.();
+            onClose();
+        } catch {
+            alert('Ошибка архивирования');
+        } finally {
+            setArchiving(false);
         }
     };
 
@@ -109,7 +130,7 @@ export function RequestDetailModal({ orderId, onClose, templates, role, branch, 
                                 {[
                                     { label: 'Дата', value: details.order.created_at?.slice(0, 10) },
                                     { label: 'Тип', value: details.order.branch.includes('_land') ? 'Садик' : 'Школа' },
-                                    { label: 'Выполнение', value: `${details.delivery?.completion_rate ?? '—'}%` },
+                                    { label: 'Выполнение', value: details.delivery?.completion_rate != null ? `${details.delivery.completion_rate}%` : '—' },
                                     { label: 'Статус', value: STATUS_LABELS[details.order.status] || details.order.status },
                                 ].map(m => (
                                     <div key={m.label} className="bg-gray-50 rounded-2xl px-4 py-3">
@@ -149,13 +170,25 @@ export function RequestDetailModal({ orderId, onClose, templates, role, branch, 
 
                 {/* Export footer */}
                 <div className="px-6 py-4 border-t border-gray-100 flex items-center gap-3">
-                    <button
-                        onClick={handleSaveUnits}
-                        disabled={saving || loading}
-                        className="bg-emerald-600 text-white font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm disabled:opacity-40 hover:bg-emerald-700 transition-colors whitespace-nowrap"
-                    >
-                        {saving ? 'Сохранение...' : 'Сохранить ед. изм.'}
-                    </button>
+                    {details?.order.status === 'sent_to_financier' && (
+                        <>
+                            <button
+                                onClick={handleSaveUnits}
+                                disabled={saving || loading}
+                                className="bg-emerald-600 text-white font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm disabled:opacity-40 hover:bg-emerald-700 transition-colors whitespace-nowrap"
+                            >
+                                {saving ? 'Сохранение...' : 'Сохранить ед. изм.'}
+                            </button>
+                            <button
+                                onClick={handleArchive}
+                                disabled={archiving || loading}
+                                className="bg-gray-700 text-white font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm disabled:opacity-40 hover:bg-gray-600 transition-colors whitespace-nowrap"
+                            >
+                                <ArchiveIcon className="w-4 h-4" />
+                                {archiving ? 'Архивирование...' : 'Архивировать'}
+                            </button>
+                        </>
+                    )}
                     <div className="flex-1" />
                     <select
                         value={selectedTemplate}
