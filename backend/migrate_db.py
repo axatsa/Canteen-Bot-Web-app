@@ -15,8 +15,7 @@ def migrate():
     cursor.execute("UPDATE master_products SET unit = 'пучки' WHERE id IN ('72', '74', '75')")
     
     print("Updating eggs and existing meat categories...")
-    cursor.execute("UPDATE master_products SET category = '🥚 Яйца' WHERE id IN ('13', '14')")
-    cursor.execute("UPDATE master_products SET category = '🥩 Мясо' WHERE id IN ('15', '16', '17', '18')")
+    cursor.execute("UPDATE master_products SET category = '🥚 Яйца и мясо' WHERE id IN ('13', '14', '15', '16', '17', '18')")
 
     print("Adding new meat products...")
     new_products = [
