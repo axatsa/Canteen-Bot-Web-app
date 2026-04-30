@@ -1,90 +1,632 @@
-[{"id":"1","name":"Молоко (Sut)","category":"🥛 Молочные продукты","unit":"л","last_price":null},
-{"id":"2","name":"Кефир (Kefir)","category":"🥛 Молочные продукты","unit":"л","last_price":49000.0},
-{"id":"3","name":"Творог (Tvorog / Suzma)","category":"🥛 Молочные продукты","unit":"кг","last_price":42000.0},
-{"id":"4","name":"Каймак (Qaymoq)","category":"🥛 Молочные продукты","unit":"кг","last_price":60000.0},
-{"id":"5","name":"Сметана (Smetana / Qaymoqcha)","category":"🥛 Молочные продукты","unit":"кг","last_price":61000.0},
-{"id":"6","name":"Сыр твёрдый (Qattiq pishloq)","category":"🥛 Молочные продукты","unit":"кг","last_price":52000.0},
-{"id":"7","name":"Сыр плавленый (Eritilgan pishloq)","category":"🥛 Молочные продукты","unit":"кг","last_price":48000.0},
-{"id":"8","name":"Сыр моцарелла (Motsarella pishlog‘i)","category":"🥛 Молочные продукты","unit":"кг","last_price":30000.0},
-{"id":"9","name":"Сыр Ханский (Xon pishlog‘i)","category":"🥛 Молочные продукты","unit":"кг","last_price":17000.0},
-{"id":"10","name":"Сырок (Shirin pishloqcha)","category":"🥛 Молочные продукты","unit":"шт","last_price":null},
-{"id":"11","name":"Сливочное масло (Sariyog‘)","category":"🥛 Молочные продукты","unit":"кг","last_price":null},
-{"id":"12","name":"Маргарин «Шедрое лето» (Margarin)","category":"🥛 Молочные продукты","unit":"кг","last_price":null},
-{"id":"13","name":"Яйца куриные (Tovuq tuxumi)","category":"🥚 Яйца","unit":"шт","last_price":null},
-{"id":"14","name":"Яйца перепелиные (Bedana tuxumi)","category":"🥚 Яйца","unit":"шт","last_price":null},
-{"id":"15","name":"Индейка (Kurka go‘shti)","category":"🥩 Мясо","unit":"кг","last_price":null},
-{"id":"16","name":"Колбаса варёная (Qaynatilgan kolbasa)","category":"🥩 Мясо","unit":"кг","last_price":null},
-{"id":"17","name":"Колбаса копчёная (Dudlangan kolbasa)","category":"🥩 Мясо","unit":"кг","last_price":null},
-{"id":"18","name":"Сосиски (Sosiska)","category":"🥩 Мясо","unit":"кг","last_price":null},
-{"id":"19","name":"Мука (Un)","category":"🍞 Хлеб и мучное","unit":"кг","last_price":null},
-{"id":"20","name":"Лаваш (Lavash non)","category":"🍞 Хлеб и мучное","unit":"шт","last_price":null},
-{"id":"21","name":"Хлеб (Non)","category":"🍞 Хлеб и мучное","unit":"шт","last_price":null},
-{"id":"22","name":"Тостовый хлеб (Tost noni)","category":"🍞 Хлеб и мучное","unit":"шт","last_price":null},
-{"id":"23","name":"Манпар (тесто) (Xamir)","category":"🍞 Хлеб и мучное","unit":"кг","last_price":null},
-{"id":"24","name":"Макароны (Makaron)","category":"🍞 Хлеб и мучное","unit":"кг","last_price":null},
-{"id":"25","name":"Спагетти (Spagetti)","category":"🍞 Хлеб и мучное","unit":"кг","last_price":null},
-{"id":"26","name":"Вермишель (Vermishel)","category":"🍞 Хлеб и мучное","unit":"кг","last_price":null},
-{"id":"27","name":"Фунчоза (Funchuza)","category":"🍞 Хлеб и мучное","unit":"кг","last_price":null},
-{"id":"28","name":"Манная крупа (Manka yormasi)","category":"🍞 Хлеб и мучное","unit":"кг","last_price":null},
-{"id":"29","name":"Овсянка (Suli yormasi)","category":"🍞 Хлеб и мучное","unit":"кг","last_price":null},
-{"id":"30","name":"Рис (Guruch)","category":"🍚 Крупы и бобовые","unit":"кг","last_price":null},
-{"id":"31","name":"Рис обычный (Oddiy guruch)","category":"🍚 Крупы и бобовые","unit":"кг","last_price":null},
-{"id":"32","name":"Рис Лазер (Lazer guruch)","category":"🍚 Крупы и бобовые","unit":"кг","last_price":null},
-{"id":"33","name":"Перловка (Arpa yormasi)","category":"🍚 Крупы и бобовые","unit":"кг","last_price":null},
-{"id":"34","name":"Нут / горох (No‘xat)","category":"🍚 Крупы и бобовые","unit":"кг","last_price":null},
-{"id":"35","name":"Горох (консерва) (Konserva no‘xat)","category":"🍚 Крупы и бобовые","unit":"шт","last_price":null},
-{"id":"36","name":"Соль (Tuz)","category":"🧂 Специи и приправы","unit":"кг","last_price":null},
-{"id":"37","name":"Корейская соль (Koreys tuzi)","category":"🧂 Специи и приправы","unit":"кг","last_price":null},
-{"id":"38","name":"Зира (Zira)","category":"🧂 Специи и приправы","unit":"г","last_price":null},
-{"id":"39","name":"Приправа для лагмана (Lag‘mon ziravori)","category":"🧂 Специи и приправы","unit":"г","last_price":null},
-{"id":"40","name":"Лавровый лист (Dafna bargi)","category":"🧂 Специи и приправы","unit":"шт","last_price":null},
-{"id":"41","name":"Роллтон (приправа) (Rollton ziravori)","category":"🧂 Специи и приправы","unit":"шт","last_price":null},
-{"id":"42","name":"Кунжут (Kunjut)","category":"🧂 Специи и приправы","unit":"г","last_price":null},
-{"id":"43","name":"Какао (Kakao)","category":"☕ Напитки и сладкое","unit":"кг","last_price":null},
-{"id":"44","name":"Чёрный чай (Qora choy)","category":"☕ Напитки и сладкое","unit":"кг","last_price":null},
-{"id":"45","name":"Сахар (Shakar)","category":"☕ Напитки и сладкое","unit":"кг","last_price":null},
-{"id":"46","name":"Варенье (Murabbo)","category":"☕ Напитки и сладкое","unit":"кг","last_price":null},
-{"id":"47","name":"Шоколадная паста (Shokolad pastasi)","category":"☕ Напитки и сладкое","unit":"шт","last_price":null},
-{"id":"48","name":"Миллер (вафли) (Vafli)","category":"☕ Напитки и сладкое","unit":"шт","last_price":null},
-{"id":"49","name":"Изюм (Mayiz)","category":"☕ Напитки и сладкое","unit":"кг","last_price":null},
-{"id":"50","name":"Грецкий орех (Yong‘oq)","category":"☕ Напитки и сладкое","unit":"кг","last_price":null},
-{"id":"51","name":"Майонез (Mayonez)","category":"🥫 Соусы и добавки","unit":"кг","last_price":null},
-{"id":"52","name":"Соевый соус (Soya sousi)","category":"🥫 Соусы и добавки","unit":"л","last_price":null},
-{"id":"53","name":"Уксус (Sirka)","category":"🥫 Соусы и добавки","unit":"л","last_price":null},
-{"id":"54","name":"Томатная паста (Tomat pastasi)","category":"🥫 Соусы и добавки","unit":"кг","last_price":null},
-{"id":"55","name":"Кетчуп (Ketchup)","category":"🥫 Соусы и добавки","unit":"шт","last_price":null},
-{"id":"56","name":"Масло растительное (O‘simlik yog‘i)","category":"🥫 Соусы и добавки","unit":"л","last_price":null},
-{"id":"57","name":"Сода (Soda)","category":"🥫 Соусы и добавки","unit":"шт","last_price":null},
-{"id":"58","name":"Дрожжи (Xamirturush)","category":"🥫 Соусы и добавки","unit":"шт","last_price":null},
-{"id":"59","name":"Разрыхлитель (Pishirish kukuni)","category":"🥫 Соусы и добавки","unit":"шт","last_price":null},
-{"id":"60","name":"Картофель (Kartoshka)","category":"🥕 Овощи и зелень","unit":"кг","last_price":null},
-{"id":"61","name":"Морковь красная (Qizil sabzi)","category":"🥕 Овощи и зелень","unit":"кг","last_price":null},
-{"id":"62","name":"Морковь жёлтая (Sariq sabzi)","category":"🥕 Овощи и зелень","unit":"кг","last_price":null},
-{"id":"63","name":"Капуста зелёная (Yashil karam)","category":"🥕 Овощи и зелень","unit":"кг","last_price":null},
-{"id":"64","name":"Капуста красная (Qizil karam)","category":"🥕 Овощи и зелень","unit":"кг","last_price":null},
-{"id":"65","name":"Капуста квашеная (Tuzlangan karam)","category":"🥕 Овощи и зелень","unit":"кг","last_price":null},
-{"id":"66","name":"Помидоры (Pomidor)","category":"🥕 Овощи и зелень","unit":"кг","last_price":null},
-{"id":"67","name":"Огурцы (Bodring)","category":"🥕 Овощи и зелень","unit":"кг","last_price":null},
-{"id":"68","name":"Солёные огурцы (Tuzlangan bodring)","category":"🥕 Овощи и зелень","unit":"кг","last_price":null},
-{"id":"69","name":"Болгарский перец (Bulgar qalampiri)","category":"🥕 Овощи и зелень","unit":"кг","last_price":null},
-{"id":"70","name":"Болгарский перец «Светофор» (Rangli qalampir)","category":"🥕 Овощи и зелень","unit":"кг","last_price":null},
-{"id":"71","name":"Лук (Piyoz)","category":"🥕 Овощи и зелень","unit":"кг","last_price":null},
-{"id":"72","name":"Сельдерей (Selderey)","category":"🥕 Овощи и зелень","unit":"пучки","last_price":null},
-{"id":"73","name":"Корейская морковь (Koreyscha sabzi)","category":"🥕 Овощи и зелень","unit":"кг","last_price":null},
-{"id":"74","name":"Укроп (Shivit)","category":"🥕 Овощи и зелень","unit":"пучки","last_price":null},
-{"id":"75","name":"Кинза (Kashnich)","category":"🥕 Овощи и зелень","unit":"пучки","last_price":null},
-{"id":"76","name":"Свекла красная (Qizil lavlagi)","category":"🥕 Овощи и зелень","unit":"кг","last_price":null},
-{"id":"77","name":"Редька белая (Oq turup)","category":"🥕 Овощи и зелень","unit":"кг","last_price":null},
-{"id":"78","name":"Бананы (Banan)","category":"🍎 Фрукты","unit":"кг","last_price":null},
-{"id":"79","name":"Яблоки (Olma)","category":"🍎 Фрукты","unit":"кг","last_price":null},
-{"id":"80","name":"Груша (Nok)","category":"🍎 Фрукты","unit":"кг","last_price":null},
-{"id":"81","name":"Лимоны (Limon)","category":"🍎 Фрукты","unit":"кг","last_price":null},
-{"id":"82","name":"Мясо (Говядина)","category":"🥩 Мясо","unit":"кг","last_price":null},
-{"id":"83","name":"Мясо (Баранина)","category":"🥩 Мясо","unit":"кг","last_price":null},
-{"id":"84","name":"Фарш","category":"🥩 Мясо","unit":"кг","last_price":null},
-{"id":"85","name":"Куриное мясо (Крылышки)","category":"🥩 Мясо","unit":"кг","last_price":null},
-{"id":"86","name":"Куриное мясо (Бедро)","category":"🥩 Мясо","unit":"кг","last_price":null},
-{"id":"87","name":"Куриное мясо (Филе)","category":"🥩 Мясо","unit":"кг","last_price":null},
-{"id":"88","name":"Куриное мясо (Ножки)","category":"🥩 Мясо","unit":"кг","last_price":null},
-{"id":"89","name":"Куриное мясо (Целая курочка)","category":"🥩 Мясо","unit":"кг","last_price":null},
-{"id":"90","name":"Кости/Илик","category":"🥩 Мясо","unit":"кг","last_price":null}]
+[
+  {
+    "id": "1",
+    "name": "Молоко (Sut)",
+    "category": "🥛 Молочные продукты",
+    "unit": "л",
+    "last_price": null
+  },
+  {
+    "id": "2",
+    "name": "Кефир (Kefir)",
+    "category": "🥛 Молочные продукты",
+    "unit": "л",
+    "last_price": 49000.0
+  },
+  {
+    "id": "3",
+    "name": "Творог (Tvorog / Suzma)",
+    "category": "🥛 Молочные продукты",
+    "unit": "кг",
+    "last_price": 42000.0
+  },
+  {
+    "id": "4",
+    "name": "Каймак (Qaymoq)",
+    "category": "🥛 Молочные продукты",
+    "unit": "кг",
+    "last_price": 60000.0
+  },
+  {
+    "id": "5",
+    "name": "Сметана (Smetana / Qaymoqcha)",
+    "category": "🥛 Молочные продукты",
+    "unit": "кг",
+    "last_price": 61000.0
+  },
+  {
+    "id": "6",
+    "name": "Сыр твёрдый (Qattiq pishloq)",
+    "category": "🥛 Молочные продукты",
+    "unit": "кг",
+    "last_price": 52000.0
+  },
+  {
+    "id": "7",
+    "name": "Сыр плавленый (Eritilgan pishloq)",
+    "category": "🥛 Молочные продукты",
+    "unit": "кг",
+    "last_price": 48000.0
+  },
+  {
+    "id": "8",
+    "name": "Сыр моцарелла (Motsarella pishlog‘i)",
+    "category": "🥛 Молочные продукты",
+    "unit": "кг",
+    "last_price": 30000.0
+  },
+  {
+    "id": "9",
+    "name": "Сыр Ханский (Xon pishlog‘i)",
+    "category": "🥛 Молочные продукты",
+    "unit": "кг",
+    "last_price": 17000.0
+  },
+  {
+    "id": "10",
+    "name": "Сырок (Shirin pishloqcha)",
+    "category": "🥛 Молочные продукты",
+    "unit": "шт",
+    "last_price": null
+  },
+  {
+    "id": "11",
+    "name": "Сливочное масло (Sariyog‘)",
+    "category": "🥛 Молочные продукты",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "12",
+    "name": "Маргарин «Шедрое лето» (Margarin)",
+    "category": "🥛 Молочные продукты",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "13",
+    "name": "Яйца куриные (Tovuq tuxumi)",
+    "category": "🥚 Яйца и мясо",
+    "unit": "шт",
+    "last_price": null
+  },
+  {
+    "id": "14",
+    "name": "Яйца перепелиные (Bedana tuxumi)",
+    "category": "🥚 Яйца и мясо",
+    "unit": "шт",
+    "last_price": null
+  },
+  {
+    "id": "15",
+    "name": "Индейка (Kurka go‘shti)",
+    "category": "🥚 Яйца и мясо ",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "16",
+    "name": "Колбаса варёная (Qaynatilgan kolbasa)",
+    "category": "🥚 Яйца и мясо",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "17",
+    "name": "Колбаса копчёная (Dudlangan kolbasa)",
+    "category": "🥚 Яйца и мясо",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "18",
+    "name": "Сосиски (Sosiska)",
+    "category": "🥚 Яйца и мясо",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "19",
+    "name": "Мука (Un)",
+    "category": "🍞 Хлеб и мучное",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "20",
+    "name": "Лаваш (Lavash non)",
+    "category": "🍞 Хлеб и мучное",
+    "unit": "шт",
+    "last_price": null
+  },
+  {
+    "id": "21",
+    "name": "Хлеб (Non)",
+    "category": "🍞 Хлеб и мучное",
+    "unit": "шт",
+    "last_price": null
+  },
+  {
+    "id": "22",
+    "name": "Тостовый хлеб (Tost noni)",
+    "category": "🍞 Хлеб и мучное",
+    "unit": "шт",
+    "last_price": null
+  },
+  {
+    "id": "23",
+    "name": "Манпар (тесто) (Xamir)",
+    "category": "🍞 Хлеб и мучное",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "24",
+    "name": "Макароны (Makaron)",
+    "category": "🍞 Хлеб и мучное",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "25",
+    "name": "Спагетти (Spagetti)",
+    "category": "🍞 Хлеб и мучное",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "26",
+    "name": "Вермишель (Vermishel)",
+    "category": "🍞 Хлеб и мучное",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "27",
+    "name": "Фунчоза (Funchuza)",
+    "category": "🍞 Хлеб и мучное",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "28",
+    "name": "Манная крупа (Manka yormasi)",
+    "category": "🍞 Хлеб и мучное",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "29",
+    "name": "Овсянка (Suli yormasi)",
+    "category": "🍞 Хлеб и мучное",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "30",
+    "name": "Рис (Guruch)",
+    "category": "🍚 Крупы и бобовые",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "31",
+    "name": "Рис обычный (Oddiy guruch)",
+    "category": "🍚 Крупы и бобовые",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "32",
+    "name": "Рис Лазер (Lazer guruch)",
+    "category": "🍚 Крупы и бобовые",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "33",
+    "name": "Перловка (Arpa yormasi)",
+    "category": "🍚 Крупы и бобовые",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "34",
+    "name": "Нут / горох (No‘xat)",
+    "category": "🍚 Крупы и бобовые",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "35",
+    "name": "Горох (консерва) (Konserva no‘xat)",
+    "category": "🍚 Крупы и бобовые",
+    "unit": "шт",
+    "last_price": null
+  },
+  {
+    "id": "36",
+    "name": "Соль (Tuz)",
+    "category": "🧂 Специи и приправы",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "37",
+    "name": "Корейская соль (Koreys tuzi)",
+    "category": "🧂 Специи и приправы",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "38",
+    "name": "Зира (Zira)",
+    "category": "🧂 Специи и приправы",
+    "unit": "г",
+    "last_price": null
+  },
+  {
+    "id": "39",
+    "name": "Приправа для лагмана (Lag‘mon ziravori)",
+    "category": "🧂 Специи и приправы",
+    "unit": "г",
+    "last_price": null
+  },
+  {
+    "id": "40",
+    "name": "Лавровый лист (Dafna bargi)",
+    "category": "🧂 Специи и приправы",
+    "unit": "шт",
+    "last_price": null
+  },
+  {
+    "id": "41",
+    "name": "Роллтон (приправа) (Rollton ziravori)",
+    "category": "🧂 Специи и приправы",
+    "unit": "шт",
+    "last_price": null
+  },
+  {
+    "id": "42",
+    "name": "Кунжут (Kunjut)",
+    "category": "🧂 Специи и приправы",
+    "unit": "г",
+    "last_price": null
+  },
+  {
+    "id": "43",
+    "name": "Какао (Kakao)",
+    "category": "☕ Напитки и сладкое",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "44",
+    "name": "Чёрный чай (Qora choy)",
+    "category": "☕ Напитки и сладкое",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "45",
+    "name": "Сахар (Shakar)",
+    "category": "☕ Напитки и сладкое",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "46",
+    "name": "Варенье (Murabbo)",
+    "category": "☕ Напитки и сладкое",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "47",
+    "name": "Шоколадная паста (Shokolad pastasi)",
+    "category": "☕ Напитки и сладкое",
+    "unit": "шт",
+    "last_price": null
+  },
+  {
+    "id": "48",
+    "name": "Миллер (вафли) (Vafli)",
+    "category": "☕ Напитки и сладкое",
+    "unit": "шт",
+    "last_price": null
+  },
+  {
+    "id": "49",
+    "name": "Изюм (Mayiz)",
+    "category": "☕ Напитки и сладкое",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "50",
+    "name": "Грецкий орех (Yong‘oq)",
+    "category": "☕ Напитки и сладкое",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "51",
+    "name": "Майонез (Mayonez)",
+    "category": "🥫 Соусы и добавки",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "52",
+    "name": "Соевый соус (Soya sousi)",
+    "category": "🥫 Соусы и добавки",
+    "unit": "л",
+    "last_price": null
+  },
+  {
+    "id": "53",
+    "name": "Уксус (Sirka)",
+    "category": "🥫 Соусы и добавки",
+    "unit": "л",
+    "last_price": null
+  },
+  {
+    "id": "54",
+    "name": "Томатная паста (Tomat pastasi)",
+    "category": "🥫 Соусы и добавки",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "55",
+    "name": "Кетчуп (Ketchup)",
+    "category": "🥫 Соусы и добавки",
+    "unit": "шт",
+    "last_price": null
+  },
+  {
+    "id": "56",
+    "name": "Масло растительное (O‘simlik yog‘i)",
+    "category": "🥫 Соусы и добавки",
+    "unit": "л",
+    "last_price": null
+  },
+  {
+    "id": "57",
+    "name": "Сода (Soda)",
+    "category": "🥫 Соусы и добавки",
+    "unit": "шт",
+    "last_price": null
+  },
+  {
+    "id": "58",
+    "name": "Дрожжи (Xamirturush)",
+    "category": "🥫 Соусы и добавки",
+    "unit": "шт",
+    "last_price": null
+  },
+  {
+    "id": "59",
+    "name": "Разрыхлитель (Pishirish kukuni)",
+    "category": "🥫 Соусы и добавки",
+    "unit": "шт",
+    "last_price": null
+  },
+  {
+    "id": "60",
+    "name": "Картофель (Kartoshka)",
+    "category": "🥕 Овощи и зелень",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "61",
+    "name": "Морковь красная (Qizil sabzi)",
+    "category": "🥕 Овощи и зелень",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "62",
+    "name": "Морковь жёлтая (Sariq sabzi)",
+    "category": "🥕 Овощи и зелень",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "63",
+    "name": "Капуста зелёная (Yashil karam)",
+    "category": "🥕 Овощи и зелень",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "64",
+    "name": "Капуста красная (Qizil karam)",
+    "category": "🥕 Овощи и зелень",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "65",
+    "name": "Капуста квашеная (Tuzlangan karam)",
+    "category": "🥕 Овощи и зелень",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "66",
+    "name": "Помидоры (Pomidor)",
+    "category": "🥕 Овощи и зелень",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "67",
+    "name": "Огурцы (Bodring)",
+    "category": "🥕 Овощи и зелень",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "68",
+    "name": "Солёные огурцы (Tuzlangan bodring)",
+    "category": "🥕 Овощи и зелень",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "69",
+    "name": "Болгарский перец (Bulgar qalampiri)",
+    "category": "🥕 Овощи и зелень",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "70",
+    "name": "Болгарский перец «Светофор» (Rangli qalampir)",
+    "category": "🥕 Овощи и зелень",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "71",
+    "name": "Лук (Piyoz)",
+    "category": "🥕 Овощи и зелень",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "72",
+    "name": "Сельдерей (Selderey)",
+    "category": "🥕 Овощи и зелень",
+    "unit": "пучки",
+    "last_price": null
+  },
+  {
+    "id": "73",
+    "name": "Корейская морковь (Koreyscha sabzi)",
+    "category": "🥕 Овощи и зелень",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "74",
+    "name": "Укроп (Shivit)",
+    "category": "🥕 Овощи и зелень",
+    "unit": "пучки",
+    "last_price": null
+  },
+  {
+    "id": "75",
+    "name": "Кинза (Kashnich)",
+    "category": "🥕 Овощи и зелень",
+    "unit": "пучки",
+    "last_price": null
+  },
+  {
+    "id": "76",
+    "name": "Свекла красная (Qizil lavlagi)",
+    "category": "🥕 Овощи и зелень",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "77",
+    "name": "Редька белая (Oq turup)",
+    "category": "🥕 Овощи и зелень",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "78",
+    "name": "Бананы (Banan)",
+    "category": "🍎 Фрукты",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "79",
+    "name": "Яблоки (Olma)",
+    "category": "🍎 Фрукты",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "80",
+    "name": "Груша (Nok)",
+    "category": "🍎 Фрукты",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "81",
+    "name": "Лимоны (Limon)",
+    "category": "🍎 Фрукты",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "82",
+    "name": "Мясо (Говядина)",
+    "category": "🥩 Мясо",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "83",
+    "name": "Мясо (Баранина)",
+    "category": "🥩 Мясо",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "84",
+    "name": "Фарш",
+    "category": "🥩 Мясо",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "85",
+    "name": "Куриное мясо (Крылышки)",
+    "category": "🥩 Мясо",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "86",
+    "name": "Куриное мясо (Бедро)",
+    "category": "🥩 Мясо",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "87",
+    "name": "Куриное мясо (Филе)",
+    "category": "🥩 Мясо",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "88",
+    "name": "Куриное мясо (Ножки)",
+    "category": "🥩 Мясо",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "89",
+    "name": "Куриное мясо (Целая курочка)",
+    "category": "🥩 Мясо",
+    "unit": "кг",
+    "last_price": null
+  },
+  {
+    "id": "90",
+    "name": "Кости/Илик",
+    "category": "🥩 Мясо",
+    "unit": "кг",
+    "last_price": null
+  }
+]

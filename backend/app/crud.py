@@ -702,8 +702,7 @@ def validate_order_fields(order_data: dict) -> tuple[bool, str]:
         if not order_data.get('chefName'):
             return False, "Chef name is required when sending to chef"
     elif status == 'review_snabjenec':
-        if not order_data.get('snabjenecName'):
-            return False, "Snabjenec name is required in review status"
+        pass  # snabjenec name not known yet at this stage — set by snabjenec later
     elif status == 'sent_to_supplier':
         # supplierName is not required here — supplier hasn't responded yet
         if not order_data.get('chefName'):
