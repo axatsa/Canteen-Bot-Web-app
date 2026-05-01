@@ -735,12 +735,8 @@ def upsert_order(order_data: dict) -> tuple[bool, str]:
         products_json = json.dumps(order_data['products'])
 
         # Auto-determine order type if status is review_snabjenec
-        if order_data.get('status') == 'review_snabjenec':
-            has_meat, has_products = _determine_order_type(order_data['products'])
-            if not order_data.get('sentToMeatSupplier'):
-                order_data['sentToMeatSupplier'] = has_meat
-            if not order_data.get('sentToProductSupplier'):
-                order_data['sentToProductSupplier'] = has_products
+        # Removed automatic setting of sentToMeatSupplier/sentToProductSupplier here
+        # because it should be triggered by Snabjenec action, not automatically.
 
         cursor.execute('''
         INSERT INTO orders (id, status, products, createdAt, deliveredAt, estimatedDeliveryDate, branch,

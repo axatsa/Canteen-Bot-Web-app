@@ -70,25 +70,23 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
     // ── Review mode handlers ──────────────────────────────────────────────────
 
     const handleSendToMeatSupplier = () => {
-        const meatProducts = localProducts.filter(p => p.category === '🥩 Мясо' && p.quantity > 0);
         onUpdateOrder({
             ...order,
-            products: meatProducts,
+            products: localProducts, // Keep ALL products
             sentToMeatSupplier: true,
             status: 'sent_to_supplier'
         });
-        alert('Список мяса отправлен мяснику! 🥩');
+        alert('Список мяса доступен мяснику! 🥩');
     };
 
     const handleSendToProductSupplier = () => {
-        const productProducts = localProducts.filter(p => p.category !== '🥩 Мясо' && p.quantity > 0);
         onUpdateOrder({
             ...order,
-            products: productProducts,
+            products: localProducts, // Keep ALL products
             sentToProductSupplier: true,
             status: 'sent_to_supplier'
         });
-        alert('Список продуктов отправлен поставщику! 🛒');
+        alert('Список продуктов доступен поставщику! 🛒');
     };
 
     const handleSaveProgress = () => {
@@ -498,30 +496,32 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
 
                 {isReviewMode && (
                     <div className="flex flex-col gap-2 w-full">
-                        <button
-                            onClick={handleSendToMeatSupplier}
-                            disabled={!localProducts.some(p => p.category === '🥩 Мясо' && p.quantity > 0) || order.sentToMeatSupplier}
-                            className={`w-full font-bold py-3 px-6 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 ${
-                                order.sentToMeatSupplier
-                                    ? 'bg-green-600 text-white opacity-75'
-                                    : 'bg-[#8B0000] text-white disabled:opacity-50'
-                            }`}
-                        >
-                            {order.sentToMeatSupplier ? '✓ Отправлено' : <Send className="w-5 h-5" />}
-                            Мяснику 🥩
-                        </button>
-                        <button
-                            onClick={handleSendToProductSupplier}
-                            disabled={!localProducts.some(p => p.category !== '🥩 Мясо' && p.quantity > 0) || order.sentToProductSupplier}
-                            className={`w-full font-bold py-3 px-6 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 ${
-                                order.sentToProductSupplier
-                                    ? 'bg-green-600 text-white opacity-75'
-                                    : 'bg-[#2E7D32] text-white disabled:opacity-50'
-                            }`}
-                        >
-                            {order.sentToProductSupplier ? '✓ Отправлено' : <Send className="w-5 h-5" />}
-                            Поставщику 🛒
-                        </button>
+                        {localProducts.some(p => p.category === '🥩 Мясо' && p.quantity > 0) && (
+                            <button
+                                onClick={handleSendToMeatSupplier}
+                                disabled={order.sentToMeatSupplier}
+                                className={`w-full font-bold py-3 px-6 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 ${
+                                    order.sentToMeatSupplier
+                                        ? 'bg-green-600 text-white opacity-75'
+                                        : 'bg-[#8B0000] text-white'
+                                }`}
+                            >
+                                {order.sentToMeatSupplier ? '✓ Отправлено Мяснику' : <><Send className="w-5 h-5" /> Мяснику 🥩</>}
+                            </button>
+                        )}
+                        {localProducts.some(p => p.category !== '🥩 Мясо' && p.quantity > 0) && (
+                            <button
+                                onClick={handleSendToProductSupplier}
+                                disabled={order.sentToProductSupplier}
+                                className={`w-full font-bold py-3 px-6 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 ${
+                                    order.sentToProductSupplier
+                                        ? 'bg-green-600 text-white opacity-75'
+                                        : 'bg-[#2E7D32] text-white'
+                                }`}
+                            >
+                                {order.sentToProductSupplier ? '✓ Отправлено Поставщику' : <><Send className="w-5 h-5" /> Поставщику 🛒</>}
+                            </button>
+                        )}
                         {(order.sentToMeatSupplier || order.sentToProductSupplier) && (
                             <div className="text-xs text-gray-500 px-3 py-2 bg-blue-50 rounded-xl border border-blue-200 mb-2">
                                 ✓ Список(ки) отправлены поставщику
