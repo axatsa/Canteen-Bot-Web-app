@@ -10,6 +10,8 @@ import { useLanguage } from '@/app/context/LanguageContext';
 
 const UNKNOWN_DELIVERY_VALUES = new Set(['Неизвестно', "Noma'lum"]);
 const isUnknownDelivery = (d?: string) => !d || UNKNOWN_DELIVERY_VALUES.has(d);
+/** Returns true only for valid ISO "YYYY-MM-DD" strings */
+const isValidIso = (d?: string): boolean => !!d && /^\d{4}-\d{2}-\d{2}$/.test(d);
 
 // ── Date helpers ────────────────────────────────────────────────────────────
 /** "2026-04-17" → "17.04.2026" */
@@ -112,8 +114,8 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
         setLocalProducts(order.products.map(p => ({
             ...p,
             price: (p.price && p.price > 0) ? p.price : (p.lastPrice || 0),
-            // Pre-fill delivery date with global date if not set
-            deliveryDate: p.deliveryDate || initialDate,
+            // Use existing date only if it's a valid ISO format; otherwise fall back to global date
+            deliveryDate: isValidIso(p.deliveryDate) ? p.deliveryDate : initialDate,
         })));
     }, [order.products]);
 
@@ -145,6 +147,12 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
     };
 
     const handleSend = () => {
+        // Guard: order must still be in sent_to_supplier status
+        if (order.status !== 'sent_to_supplier') {
+            alert('Эта заявка уже обработана и не может быть отправлена повторно.');
+            return;
+        }
+
         // Validation: Check if all products have a price
         const missingPrice = localProducts.some(p => p.quantity > 0 && (!p.price || p.price <= 0));
 
