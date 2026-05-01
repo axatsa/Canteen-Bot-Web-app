@@ -99,18 +99,34 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
     const [localProducts, setLocalProducts] = useState(order.products);
     const [isCompact, setIsCompact] = useState(true);
     const [showHelp, setShowHelp] = useState(false);
+    const todayIso = new Date().toISOString().split('T')[0];
     const [estimatedDate, setEstimatedDate] = useState<string>(
-        order.estimatedDeliveryDate ? order.estimatedDeliveryDate.toISOString().split('T')[0] : ''
+        order.estimatedDeliveryDate ? order.estimatedDeliveryDate.toISOString().split('T')[0] : todayIso
     );
 
     // Синхронизация localProducts при изменении order.products
-    // Синхронизация localProducts при изменении order.products
     useEffect(() => {
+        const initialDate = order.estimatedDeliveryDate
+            ? order.estimatedDeliveryDate.toISOString().split('T')[0]
+            : todayIso;
         setLocalProducts(order.products.map(p => ({
             ...p,
-            price: (p.price && p.price > 0) ? p.price : (p.lastPrice || 0)
+            price: (p.price && p.price > 0) ? p.price : (p.lastPrice || 0),
+            // Pre-fill delivery date with global date if not set
+            deliveryDate: p.deliveryDate || initialDate,
         })));
     }, [order.products]);
+
+    // When global date changes — apply it to all products that haven't been manually overridden
+    const handleEstimatedDateChange = (iso: string) => {
+        setEstimatedDate(iso);
+        if (!iso) return;
+        setLocalProducts(prev => prev.map(p => ({
+            ...p,
+            // Only override if product date was the old global date or empty
+            deliveryDate: (!p.deliveryDate || p.deliveryDate === estimatedDate) ? iso : p.deliveryDate,
+        })));
+    };
 
     const handleUpdateProduct = (productId: string, field: 'price' | 'comment' | 'checked' | 'deliveryDate', value: any) => {
         setLocalProducts(prev =>
@@ -138,7 +154,7 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
         }
 
         // Validation: Check if all unsent products have a delivery date
-        const missingDate = localProducts.some(p => p.quantity > 0 && !p.checked && (!p.deliveryDate || p.deliveryDate === ''));
+        const missingDate = filteredProducts.some(p => !p.checked && (!p.deliveryDate || p.deliveryDate === ''));
         if (missingDate) {
             alert(t('alertSelectDates' as any) || 'Укажите дату доставки для всех товаров, которые не отправлены сегодня!');
             return;
@@ -432,9 +448,10 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                     <span className="text-xs text-gray-500 font-medium">{t('deliveryDate')}:</span>
                     <DateInput
                         value={estimatedDate}
-                        onChange={(iso) => setEstimatedDate(iso)}
+                        onChange={handleEstimatedDateChange}
                         className="flex-1 bg-gray-100 border-none rounded-xl px-3 py-2 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-orange-500 outline-none"
                     />
+                    <span className="text-[10px] text-gray-400 font-medium">→ всем</span>
                 </div>
 
                 <div className="flex items-center gap-4">
