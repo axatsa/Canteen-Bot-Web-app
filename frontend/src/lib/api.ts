@@ -68,7 +68,9 @@ export type Order = {
 export const api = {
     API_URL,
     getProducts: async (): Promise<Product[]> => {
-        const response = await fetch(`${API_URL}/products?t=${Date.now()}`);
+        const response = await fetch(`${API_URL}/products?t=${Date.now()}`, {
+            cache: 'no-store'
+        });
         if (!response.ok) throw new Error('Failed to fetch products');
         return response.json();
     },
@@ -79,7 +81,9 @@ export const api = {
         if (branch) params.append('branch', branch);
         if (userName) params.append('user_name', userName);
 
-        const response = await fetch(`${API_URL}/orders?${params.toString()}`);
+        const response = await fetch(`${API_URL}/orders?${params.toString()}`, {
+            cache: 'no-store'
+        });
         if (!response.ok) throw new Error('Failed to fetch orders');
         const data = await response.json();
         return data.map((o: any) => ({
@@ -178,13 +182,17 @@ export const api = {
         if (params?.status) q.set('status', params.status);
         if (params?.limit !== undefined) q.set('limit', String(params.limit));
         if (params?.offset !== undefined) q.set('offset', String(params.offset));
-        const response = await fetch(`${API_URL}/orders/financier/all?${q}`);
+        const response = await fetch(`${API_URL}/orders/financier/all?${q}`, {
+            cache: 'no-store'
+        });
         if (!response.ok) throw new Error('Failed to fetch financier orders');
         return response.json();
     },
 
     getFinancierOrderDetails: async (orderId: string): Promise<any> => {
-        const response = await fetch(`${API_URL}/orders/${orderId}/financier/details`);
+        const response = await fetch(`${API_URL}/orders/${orderId}/financier/details`, {
+            cache: 'no-store'
+        });
         if (!response.ok) throw new Error('Failed to fetch order details');
         return response.json();
     },
