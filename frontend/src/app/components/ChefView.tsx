@@ -137,6 +137,10 @@ export function ChefView({ order, onUpdateOrder, onBackToRoles: _onBackToRoles, 
   const getNonMeatProducts = () => localProducts.filter(p => p.category !== '🥩 Мясо');
 
   const handleSend = () => {
+    if (order.status !== 'sent_to_chef') {
+      alert('Невозможно отправить: заявка уже была отправлена снабженцу.');
+      return;
+    }
     const productsToSend = activeTab === 'meat' ? getMeatProducts() : getNonMeatProducts();
     const hasProducts = productsToSend.some(p => p.quantity > 0);
     if (!hasProducts) {

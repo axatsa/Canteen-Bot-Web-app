@@ -70,9 +70,13 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
     // ── Review mode handlers ──────────────────────────────────────────────────
 
     const handleSendToMeatSupplier = () => {
+        if (order.status !== 'review_snabjenec') {
+            alert('Невозможно: заявка уже была отправлена поставщику.');
+            return;
+        }
         onUpdateOrder({
             ...order,
-            products: localProducts, // Keep ALL products
+            products: localProducts,
             sentToMeatSupplier: true,
             status: 'sent_to_supplier'
         });
@@ -80,9 +84,13 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
     };
 
     const handleSendToProductSupplier = () => {
+        if (order.status !== 'review_snabjenec') {
+            alert('Невозможно: заявка уже была отправлена поставщику.');
+            return;
+        }
         onUpdateOrder({
             ...order,
-            products: localProducts, // Keep ALL products
+            products: localProducts,
             sentToProductSupplier: true,
             status: 'sent_to_supplier'
         });
@@ -97,6 +105,10 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
     // ── Mark supplier received ────────────────────────────────────────────────
 
     const handleMarkSupplierReceived = async () => {
+        if (order.status !== 'sent_to_supplier') {
+            alert('Невозможно: заявка не находится в статусе «Отправлено поставщику».');
+            return;
+        }
         if (!supplierDateInput.trim()) {
             alert('Введите дату получения');
             return;
@@ -151,6 +163,10 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
     };
 
     const handleSaveDelivery = async () => {
+        if (order.status !== 'waiting_snabjenec_receive') {
+            alert('Невозможно: приёмка уже завершена или заявка находится не на этом этапе.');
+            return;
+        }
         const tracking = initDeliveryTracking();
         Object.assign(tracking, localDeliveryTracking);
         setSavingDelivery(true);
@@ -182,6 +198,10 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
     // ── Legacy receive handlers ───────────────────────────────────────────────
 
     const handleCompleteReceive = () => {
+        if (order.status !== 'waiting_snabjenec_receive') {
+            alert('Невозможно: приёмка уже завершена или заявка находится не на этом этапе.');
+            return;
+        }
         const allReceived = supplierSent.every(p => p.received);
         if (!allReceived) {
             alert('Сначала отметьте все товары как полученные!');
