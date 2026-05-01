@@ -9,6 +9,8 @@ ORDERS = [
         "supplierResponded": False,
         "deliveryTracking": {},
         "extraItemsDelivered": {},
+        "chefName": "TestChef",
+        "snabjenecName": "TestSnabjenec",
     }
     for i, (status, branch) in enumerate([
         ("sent_to_financier", "beltepa_land"),
@@ -20,7 +22,7 @@ ORDERS = [
 
 def _seed(client):
     for o in ORDERS:
-        client.post("/orders/upsert", json=o)
+        client.post(f"/orders/upsert?role=snabjenec&user_name=TestSnabjenec&branch={o['branch']}", json=o)
 
 
 def test_financier_all_orders(client):

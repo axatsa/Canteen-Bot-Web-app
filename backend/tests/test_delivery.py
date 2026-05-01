@@ -8,11 +8,13 @@ SAMPLE_ORDER = {
     "supplierResponded": False,
     "deliveryTracking": {},
     "extraItemsDelivered": {},
+    "chefName": "TestChef",
+    "snabjenecName": "TestSnabjenec",
 }
 
 
 def _create_order(client):
-    client.post("/orders/upsert", json=SAMPLE_ORDER)
+    client.post("/orders/upsert?role=snabjenec&user_name=TestSnabjenec&branch=novza_school", json=SAMPLE_ORDER)
 
 
 def test_mark_supplier_received(client):

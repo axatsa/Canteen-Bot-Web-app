@@ -16,20 +16,21 @@ SAMPLE_ORDER = {
     "supplierResponded": False,
     "deliveryTracking": {},
     "extraItemsDelivered": {},
+    "chefName": "TestChef",
 }
 
 
 def test_order_createdAt_is_string(client):
-    client.post("/orders/upsert", json=SAMPLE_ORDER)
-    resp = client.get("/orders")
+    client.post("/orders/upsert?role=chef&user_name=TestChef&branch=uchtepa_land", json=SAMPLE_ORDER)
+    resp = client.get("/orders?role=chef&user_name=TestChef")
     order = resp.json()[0]
     assert isinstance(order["createdAt"], str), "createdAt must be string for new Date()"
     assert ISO_PATTERN.match(order["createdAt"]), "createdAt must be ISO format"
 
 
 def test_order_branch_is_valid(client):
-    client.post("/orders/upsert", json=SAMPLE_ORDER)
-    resp = client.get("/orders")
+    client.post("/orders/upsert?role=chef&user_name=TestChef&branch=uchtepa_land", json=SAMPLE_ORDER)
+    resp = client.get("/orders?role=chef&user_name=TestChef")
     order = resp.json()[0]
     valid_branches = {
         "beltepa_land", "uchtepa_land", "rakat_land", "mukumiy_land",
@@ -40,23 +41,23 @@ def test_order_branch_is_valid(client):
 
 
 def test_order_products_is_list(client):
-    client.post("/orders/upsert", json=SAMPLE_ORDER)
-    resp = client.get("/orders")
+    client.post("/orders/upsert?role=chef&user_name=TestChef&branch=uchtepa_land", json=SAMPLE_ORDER)
+    resp = client.get("/orders?role=chef&user_name=TestChef")
     order = resp.json()[0]
     assert isinstance(order["products"], list)
 
 
 def test_order_delivery_tracking_is_dict(client):
-    client.post("/orders/upsert", json=SAMPLE_ORDER)
-    resp = client.get("/orders")
+    client.post("/orders/upsert?role=chef&user_name=TestChef&branch=uchtepa_land", json=SAMPLE_ORDER)
+    resp = client.get("/orders?role=chef&user_name=TestChef")
     order = resp.json()[0]
     assert isinstance(order["deliveryTracking"], dict)
     assert isinstance(order["extraItemsDelivered"], dict)
 
 
 def test_order_supplier_responded_is_bool(client):
-    client.post("/orders/upsert", json=SAMPLE_ORDER)
-    resp = client.get("/orders")
+    client.post("/orders/upsert?role=chef&user_name=TestChef&branch=uchtepa_land", json=SAMPLE_ORDER)
+    resp = client.get("/orders?role=chef&user_name=TestChef")
     order = resp.json()[0]
     assert isinstance(order["supplierResponded"], bool)
 
