@@ -120,7 +120,11 @@ def get_orders_by_role(role: str, branch: str, user_name: Optional[str] = None) 
     cursor = conn.cursor()
 
     if role == 'chef':
-        cursor.execute("SELECT * FROM orders WHERE chef_name = ? OR status = 'sent_to_chef'", (user_name,))
+        cursor.execute("""
+            SELECT * FROM orders
+            WHERE chef_name = ?
+            OR (status = 'sent_to_chef' AND (chef_name IS NULL OR chef_name = '') AND branch = ?)
+        """, (user_name, branch))
     elif role == 'snabjenec':
         cursor.execute("SELECT * FROM orders WHERE status IN ('review_snabjenec', 'waiting_snabjenec_receive')")
     elif role == 'supplier_meat':

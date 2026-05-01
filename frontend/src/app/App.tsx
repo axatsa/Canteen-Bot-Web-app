@@ -280,7 +280,11 @@ export default function App() {
   let currentOrder: Order | undefined;
 
   if (selectedRole === 'chef') {
-    const draft = orders.find(o => o.branch === selectedBranch && o.status === 'sent_to_chef');
+    const draft = orders.find(o =>
+      o.branch === selectedBranch &&
+      o.status === 'sent_to_chef' &&
+      (!o.chefName || o.chefName === userName)
+    );
 
     if (isLoadingProducts) {
       return (
