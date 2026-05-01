@@ -72,6 +72,7 @@ def init_db():
         ("sent_to_product_supplier", "INTEGER DEFAULT 0"),
         ("archived_by", "TEXT"),
         ("archived_at", "TEXT"),
+        ("sent_to_financier_at", "TEXT"),
     ]
     for col_name, col_def in migrations:
         if col_name not in existing_cols:

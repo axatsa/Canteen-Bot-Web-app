@@ -16,7 +16,7 @@ export function ArchiveTable({ orders, onSelectOrder }: ArchiveTableProps) {
                         <th className="text-left p-3">Филиал</th>
                         <th className="text-right p-3">Отправлено пост.</th>
                         <th className="text-right p-3">Получено от пост.</th>
-                        <th className="text-right p-3">% Доставки</th>
+                        <th className="text-right p-3"></th>
                         <th className="text-right p-3 rounded-tr-xl">Сумма</th>
                     </tr>
                 </thead>
@@ -33,15 +33,11 @@ export function ArchiveTable({ orders, onSelectOrder }: ArchiveTableProps) {
                             <td className="p-3 text-right text-gray-500 text-xs">{order.received_from_supplier_at ?? '—'}</td>
                             <td className="p-3 text-right">
                                 <div className="flex items-center gap-2 justify-end">
-                                    <div className="w-16 bg-gray-200 rounded-full h-1.5">
-                                        <div className="h-1.5 rounded-full bg-green-500" style={{ width: `${Math.min(order.completion_rate, 100)}%` }} />
-                                    </div>
-                                    <span className="text-xs font-bold w-9 text-right">{order.completion_rate}%</span>
                                     <Eye className="w-4 h-4 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>
                             </td>
                             <td className="p-3 text-right font-bold text-gray-900 tabular-nums">
-                                {(order.total_received_sum || 0).toLocaleString()} <span className="text-[10px] text-gray-400 font-normal">UZS</span>
+                                {(order.total_ordered_sum || 0).toLocaleString()} <span className="text-[10px] text-gray-400 font-normal">UZS</span>
                             </td>
                         </tr>
                     ))}

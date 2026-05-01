@@ -1,6 +1,7 @@
 import json
 import uuid
 import logging
+from datetime import datetime
 from typing import Optional, List, Dict
 from .database import get_db_connection
 
@@ -307,10 +308,10 @@ def _compute_delivery_stats(delivery_tracking: dict, products: list) -> dict:
 
     completion_rate = round(total_received / total_ordered * 100) if total_ordered > 0 else 0
     return {
-        "total_ordered": total_ordered,
-        "total_received": total_received,
-        "total_ordered_sum": total_ordered_sum,
-        "total_received_sum": total_received_sum,
+        "total_ordered": round(total_ordered, 2),
+        "total_received": round(total_received, 2),
+        "total_ordered_sum": round(total_ordered_sum, 2),
+        "total_received_sum": round(total_received_sum, 2),
         "completion_rate": completion_rate,
         "delivered_items": delivered_items,
         "not_delivered_items": not_delivered_items,
@@ -354,6 +355,7 @@ def get_order_financier_details(order_id: str) -> Optional[dict]:
             "chefName": order.get('chef_name'),
             "snabjenecName": order.get('snabjenec_name'),
             "supplierName": order.get('supplier_name'),
+            "sent_to_financier_at": order.get('sent_to_financier_at'),
         },
         "delivery": {
             "sent_to_supplier_at": order.get('sent_to_supplier_at'),
@@ -776,6 +778,14 @@ def upsert_order(order_data: dict) -> tuple[bool, str]:
                 cursor.execute("UPDATE master_products SET last_price = ? WHERE id = ?", (p['price'], p['id']))
 
         conn.commit()
+
+        if order_data.get('status') == 'sent_to_financier':
+            cursor.execute(
+                "UPDATE orders SET sent_to_financier_at = ? WHERE id = ? AND sent_to_financier_at IS NULL",
+                (datetime.now().isoformat(), order_data['id'])
+            )
+            conn.commit()
+
         return True, ""
     except Exception as e:
         logger.error(f"Error upserting order: {e}")

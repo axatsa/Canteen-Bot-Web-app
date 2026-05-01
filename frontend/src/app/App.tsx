@@ -131,8 +131,8 @@ export default function App() {
       setSelectedOrderId(null);
     }
 
-    // Only reset branch if role is NOT chef (chef should stay on the same branch view)
-    if (selectedRole !== 'chef') {
+    // Only reset branch for financier — all other roles are branch-specific
+    if (selectedRole === 'financier') {
       setSelectedBranch(null);
     }
 

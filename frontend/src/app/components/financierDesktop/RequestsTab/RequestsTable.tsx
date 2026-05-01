@@ -45,7 +45,7 @@ interface RequestsTableProps {
     onSelectOrder: (orderId: string) => void;
 }
 
-type SortKey = 'created_at' | 'completion_rate' | 'id';
+type SortKey = 'created_at' | 'id';
 
 export function RequestsTable({ orders, onSelectOrder }: RequestsTableProps) {
     const [sortKey, setSortKey] = useState<SortKey>('created_at');
@@ -89,9 +89,6 @@ export function RequestsTable({ orders, onSelectOrder }: RequestsTableProps) {
                         <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Статус</th>
                         <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Филиал</th>
                         <th className="text-right px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Товаров</th>
-                        <th className="text-right px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide cursor-pointer hover:text-gray-600 select-none" onClick={() => handleSort('completion_rate')}>
-                            Доставка <SortIcon k="completion_rate" />
-                        </th>
                         <th className="text-right px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Сумма</th>
                         <th className="px-5 py-3 w-8" />
                     </tr>
@@ -99,7 +96,7 @@ export function RequestsTable({ orders, onSelectOrder }: RequestsTableProps) {
                 <tbody>
                     {sorted.length === 0 && (
                         <tr>
-                            <td colSpan={8} className="text-center py-16 text-gray-300 text-sm font-medium">
+                            <td colSpan={7} className="text-center py-16 text-gray-300 text-sm font-medium">
                                 Нет заявок
                             </td>
                         </tr>
@@ -133,27 +130,11 @@ export function RequestsTable({ orders, onSelectOrder }: RequestsTableProps) {
                                 {BRANCH_LABELS[order.branch] ?? order.branch}
                             </td>
                             <td className="px-5 py-4 text-right text-gray-500 tabular-nums">
-                                {order.total_items_received}/{order.total_items_ordered}
-                            </td>
-                            <td className="px-5 py-4">
-                                <div className="flex items-center gap-2 justify-end">
-                                    <div className="w-24 bg-gray-100 rounded-full h-1">
-                                        <div
-                                            className={`h-1 rounded-full transition-all ${
-                                                order.completion_rate >= 100 ? 'bg-green-500' :
-                                                order.completion_rate >= 50 ? 'bg-amber-400' : 'bg-red-400'
-                                            }`}
-                                            style={{ width: `${Math.min(order.completion_rate, 100)}%` }}
-                                        />
-                                    </div>
-                                    <span className="text-xs font-bold text-gray-700 w-9 text-right tabular-nums">
-                                        {order.completion_rate}%
-                                    </span>
-                                </div>
+                                {parseFloat((order.total_items_received ?? 0).toFixed(2))}/{parseFloat((order.total_items_ordered ?? 0).toFixed(2))}
                             </td>
                             <td className="px-5 py-4 text-right tabular-nums">
                                 <span className="text-gray-900 font-bold">
-                                    {(order.total_received_sum || 0).toLocaleString()} <span className="text-[10px] text-gray-400">UZS</span>
+                                    {(order.total_ordered_sum || 0).toLocaleString()} <span className="text-[10px] text-gray-400">UZS</span>
                                 </span>
                             </td>
                             <td className="px-5 py-4 text-right">

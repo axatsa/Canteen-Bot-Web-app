@@ -51,6 +51,7 @@ def fill_docx_template(template_path: str, context: dict) -> Optional[str]:
 
         day         = context.get('day', '')
         month_name  = context.get('month_name', '')
+        time_str    = context.get('time_str', '')
         branch      = context.get('branch', '')
         snabjenec   = context.get('snabjenec_name', '')
         supplier    = context.get('supplier_name', '')
@@ -61,7 +62,11 @@ def fill_docx_template(template_path: str, context: dict) -> Optional[str]:
             if 'Дата:' in full:
                 for r in para.runs:
                     r.text = re.sub(r'«[^»]*»', f'« {day} »', r.text)
-                    r.text = re.sub(r'_{5,}', f' {month_name} ', r.text)
+                    counter = [0]
+                    def _replace_underscores(m, _month=month_name, _time=time_str, _c=counter):
+                        _c[0] += 1
+                        return f' {_month} ' if _c[0] == 1 else f' {_time} '
+                    r.text = re.sub(r'_{5,}', _replace_underscores, r.text)
             
             if 'Филиал:' in full:
                 for r in para.runs:
@@ -116,7 +121,12 @@ def fill_docx_template(template_path: str, context: dict) -> Optional[str]:
                             break
 
                 if matched:
-                    if len(ucells) >= 5:
+                    if len(ucells) >= 6:
+                        _set_cell_text(ucells[2], str(matched.get('unit', '')))
+                        _set_cell_text(ucells[3], str(matched.get('ordered_qty', '')))
+                        _set_cell_text(ucells[4], str(matched.get('price', '')))
+                        _set_cell_text(ucells[5], str(matched.get('sum', '')))
+                    elif len(ucells) >= 5:
                         _set_cell_text(ucells[2], str(matched.get('unit', '')))
                         _set_cell_text(ucells[3], str(matched.get('ordered_qty', '')))
                         _set_cell_text(ucells[4], str(matched.get('received_qty', '')))
@@ -127,7 +137,12 @@ def fill_docx_template(template_path: str, context: dict) -> Optional[str]:
             still_unmatched = [ov for ok, ov in order_lookup.items() if ok not in matched_keys] + list(extra_items)
             for (row, ucells), item in zip(empty_rows, still_unmatched):
                 _set_cell_text(ucells[1], item['product_name'])
-                if len(ucells) >= 5:
+                if len(ucells) >= 6:
+                    _set_cell_text(ucells[2], str(item.get('unit', '')))
+                    _set_cell_text(ucells[3], str(item.get('ordered_qty', '')))
+                    _set_cell_text(ucells[4], str(item.get('price', '')))
+                    _set_cell_text(ucells[5], str(item.get('sum', '')))
+                elif len(ucells) >= 5:
                     _set_cell_text(ucells[2], str(item.get('unit', '')))
                     _set_cell_text(ucells[3], str(item.get('ordered_qty', '')))
                     _set_cell_text(ucells[4], str(item.get('received_qty', '')))
@@ -191,6 +206,13 @@ def build_export_context(order_details: dict, names: dict = None) -> dict:
     except:
         dt = datetime.now()
 
+    sent_at_str = order.get('sent_to_financier_at', '')
+    try:
+        sent_dt = datetime.fromisoformat(sent_at_str) if sent_at_str else dt
+    except:
+        sent_dt = dt
+    time_str = sent_dt.strftime('%H:%M')
+
     day         = str(dt.day)
     month       = MONTH_NAMES.get(dt.month, str(dt.month))
     year        = str(dt.year)
@@ -199,12 +221,16 @@ def build_export_context(order_details: dict, names: dict = None) -> dict:
 
     all_items = []
     for idx, item in enumerate(source_items, start=1):
+        price = item.get('price') or ''
+        qty = item.get('ordered_qty') or 0
         all_items.append({
             'number':       idx,
             'product_name': item.get('product_name', ''),
             'unit':         item.get('unit', ''),
             'ordered_qty':  item.get('ordered_qty', 0) or '',
             'received_qty': item.get('received_qty', 0) if item.get('received_qty') != '' else '',
+            'price':        price,
+            'sum':          round(price * qty, 2) if price != '' else '',
             'status':       item.get('status', ''),
         })
 
@@ -218,6 +244,7 @@ def build_export_context(order_details: dict, names: dict = None) -> dict:
         'day':              day,
         'month_name':       month,
         'year':             year,
+        'time_str':         time_str,
         'delivered_items':  delivered,
         'not_delivered_items': not_delivered,
         'extra_items':      extra,

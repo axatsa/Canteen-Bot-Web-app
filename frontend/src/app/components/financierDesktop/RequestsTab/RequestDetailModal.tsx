@@ -126,11 +126,10 @@ export function RequestDetailModal({ orderId, onClose, onArchive, templates, rol
                     ) : (
                         <>
                             {/* Meta */}
-                            <div className="grid grid-cols-4 gap-3">
+                            <div className="grid grid-cols-3 gap-3">
                                 {[
                                     { label: 'Дата', value: details.order.created_at?.slice(0, 10) },
                                     { label: 'Тип', value: details.order.branch.includes('_land') ? 'Садик' : 'Школа' },
-                                    { label: 'Выполнение', value: details.delivery?.completion_rate != null ? `${details.delivery.completion_rate}%` : '—' },
                                     { label: 'Статус', value: STATUS_LABELS[details.order.status] || details.order.status },
                                 ].map(m => (
                                     <div key={m.label} className="bg-gray-50 rounded-2xl px-4 py-3">
