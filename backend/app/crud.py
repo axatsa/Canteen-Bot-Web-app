@@ -122,27 +122,24 @@ def get_orders_by_role(role: str, branch: str, user_name: Optional[str] = None) 
     if role == 'chef':
         cursor.execute("SELECT * FROM orders WHERE chef_name = ? OR status = 'sent_to_chef'", (user_name,))
     elif role == 'snabjenec':
-        cursor.execute("SELECT * FROM orders WHERE branch = ? AND status IN ('review_snabjenec', 'waiting_snabjenec_receive')", (branch,))
+        cursor.execute("SELECT * FROM orders WHERE status IN ('review_snabjenec', 'waiting_snabjenec_receive')")
     elif role == 'supplier_meat':
-        # Show unresponded meat orders + own responded orders
         cursor.execute("""
             SELECT * FROM orders
             WHERE (status = 'sent_to_supplier' AND sent_to_meat_supplier = 1)
-               OR (status = 'waiting_snabjenec_receive' AND supplier_name = ?)
-        """, (user_name,))
+               OR status = 'waiting_snabjenec_receive'
+        """)
     elif role == 'supplier_products':
-        # Show unresponded product orders + own responded orders
         cursor.execute("""
             SELECT * FROM orders
             WHERE (status = 'sent_to_supplier' AND sent_to_product_supplier = 1)
-               OR (status = 'waiting_snabjenec_receive' AND supplier_name = ?)
-        """, (user_name,))
+               OR status = 'waiting_snabjenec_receive'
+        """)
     elif role == 'supplier':
         cursor.execute("""
             SELECT * FROM orders
-            WHERE (status = 'sent_to_supplier')
-               OR (status = 'waiting_snabjenec_receive' AND supplier_name = ?)
-        """, (user_name,))
+            WHERE status IN ('sent_to_supplier', 'waiting_snabjenec_receive')
+        """)
     elif role == 'financier':
         cursor.execute("SELECT * FROM orders WHERE branch = ? AND status IN ('sent_to_financier', 'archived')", (branch,))
     else:
