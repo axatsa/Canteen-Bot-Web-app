@@ -99,7 +99,7 @@ export function RequestDetailModal({ orderId, onClose, onArchive, templates, rol
 
     return (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[88vh] flex flex-col">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl max-h-[88vh] flex flex-col">
 
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
@@ -174,17 +174,17 @@ export function RequestDetailModal({ orderId, onClose, onArchive, templates, rol
                             <button
                                 onClick={handleSaveUnits}
                                 disabled={saving || loading}
-                                className="bg-emerald-600 text-white font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm disabled:opacity-40 hover:bg-emerald-700 transition-colors whitespace-nowrap"
+                                className="bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-2 text-xs disabled:opacity-40 hover:bg-emerald-700 transition-colors whitespace-nowrap"
                             >
-                                {saving ? 'Сохранение...' : 'Сохранить ед. изм.'}
+                                {saving ? '...' : 'Сохранить ед.'}
                             </button>
                             <button
                                 onClick={handleArchive}
                                 disabled={archiving || loading}
-                                className="bg-gray-700 text-white font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm disabled:opacity-40 hover:bg-gray-600 transition-colors whitespace-nowrap"
+                                className="bg-gray-700 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-2 text-xs disabled:opacity-40 hover:bg-gray-600 transition-colors whitespace-nowrap"
                             >
-                                <ArchiveIcon className="w-4 h-4" />
-                                {archiving ? 'Архивирование...' : 'Архивировать'}
+                                <ArchiveIcon className="w-3.5 h-3.5" />
+                                {archiving ? '...' : 'В архив'}
                             </button>
                         </>
                     )}
@@ -202,10 +202,10 @@ export function RequestDetailModal({ orderId, onClose, onArchive, templates, rol
                     <button
                         onClick={handleExport}
                         disabled={!selectedTemplate || exporting}
-                        className="bg-gray-900 text-white font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm disabled:opacity-40 hover:bg-gray-800 transition-colors whitespace-nowrap"
+                        className="bg-gray-900 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-2 text-xs disabled:opacity-40 hover:bg-gray-800 transition-colors whitespace-nowrap"
                     >
-                        <Download className="w-4 h-4" />
-                        {exporting ? 'Экспорт...' : 'Скачать DOCX'}
+                        <Download className="w-3.5 h-3.5" />
+                        {exporting ? '...' : 'DOCX'}
                     </button>
                 </div>
             </div>

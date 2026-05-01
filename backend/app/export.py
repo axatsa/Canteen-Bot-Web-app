@@ -60,12 +60,13 @@ def fill_docx_template(template_path: str, context: dict) -> Optional[str]:
         for para in doc.paragraphs:
             full = para.text
             if 'Дата:' in full:
+                counter = [0]
+                def _replace_underscores(m, _month=month_name, _time=time_str, _c=counter):
+                    _c[0] += 1
+                    return f' {_month} ' if _c[0] == 1 else f' {_time} '
+                
                 for r in para.runs:
                     r.text = re.sub(r'«[^»]*»', f'« {day} »', r.text)
-                    counter = [0]
-                    def _replace_underscores(m, _month=month_name, _time=time_str, _c=counter):
-                        _c[0] += 1
-                        return f' {_month} ' if _c[0] == 1 else f' {_time} '
                     r.text = re.sub(r'_{5,}', _replace_underscores, r.text)
             
             if 'Филиал:' in full:

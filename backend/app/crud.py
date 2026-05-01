@@ -422,6 +422,8 @@ def get_financier_all_orders(branch: Optional[str] = None, status: Optional[str]
                 "received_from_supplier_at": r.get('received_from_supplier_at'),
                 "extra_items_count": len(extra),
                 "supplier_responded": bool(r.get('supplier_responded', 0)),
+                "sent_to_meat_supplier": bool(r.get('sent_to_meat_supplier', 0)),
+                "sent_to_product_supplier": bool(r.get('sent_to_product_supplier', 0)),
             })
         return {"total": total, "orders": orders}
     finally:
@@ -586,6 +588,8 @@ def get_financier_archive(branch: Optional[str] = None, limit: int = 20, offset:
                 "total_received_sum": stats['total_received_sum'],
                 "sent_to_supplier_at": r.get('sent_to_supplier_at'),
                 "received_from_supplier_at": r.get('received_from_supplier_at'),
+                "sent_to_meat_supplier": bool(r.get('sent_to_meat_supplier', 0)),
+                "sent_to_product_supplier": bool(r.get('sent_to_product_supplier', 0)),
             })
         return {"total": total, "archived_orders": archived}
     finally:

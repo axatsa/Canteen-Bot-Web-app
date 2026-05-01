@@ -87,6 +87,7 @@ export function RequestsTable({ orders, onSelectOrder }: RequestsTableProps) {
                             Дата <SortIcon k="created_at" />
                         </th>
                         <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Статус</th>
+                        <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Тип</th>
                         <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Филиал</th>
                         <th className="text-right px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Товаров</th>
                         <th className="text-right px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide">Сумма</th>
@@ -120,6 +121,16 @@ export function RequestsTable({ orders, onSelectOrder }: RequestsTableProps) {
                                         {STATUS_LABELS[order.status] ?? order.status}
                                     </span>
                                 </span>
+                            </td>
+                            <td className="px-5 py-4">
+                                <div className="flex flex-wrap gap-1">
+                                    {order.sent_to_meat_supplier && (
+                                        <span className="bg-red-50 text-red-600 px-1.5 py-0.5 rounded text-[10px] font-bold border border-red-100">МЯСО</span>
+                                    )}
+                                    {order.sent_to_product_supplier && (
+                                        <span className="bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded text-[10px] font-bold border border-blue-100">ПРОД</span>
+                                    )}
+                                </div>
                             </td>
                             <td className="px-5 py-4 text-gray-600 text-sm flex items-center gap-2">
                                 <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
