@@ -65,8 +65,10 @@ export type Order = {
 
 export const api = {
     API_URL,
-    getProducts: async (): Promise<Product[]> => {
-        const response = await fetch(`${API_URL}/products?t=${Date.now()}`, {
+    getProducts: async (branch?: string): Promise<Product[]> => {
+        const params = new URLSearchParams({ t: Date.now().toString() });
+        if (branch) params.append('branch', branch);
+        const response = await fetch(`${API_URL}/products?${params.toString()}`, {
             cache: 'no-store'
         });
         if (!response.ok) throw new Error('Failed to fetch products');

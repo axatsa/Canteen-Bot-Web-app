@@ -17,9 +17,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/products", response_model=List[schemas.Product])
-async def get_products():
-    return crud.get_all_products()
+@app.get("/products")
+def get_products(branch: Optional[str] = None):
+    return crud.get_all_products(branch)
 
 @app.get("/orders", response_model=List[schemas.Order])
 async def get_orders(role: Optional[str] = None, branch: Optional[str] = None, user_name: Optional[str] = None):

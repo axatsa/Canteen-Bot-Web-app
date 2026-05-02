@@ -53,16 +53,27 @@ def get_users_by_role(role: str) -> List[dict]:
     finally:
         conn.close()
 
-def get_all_products() -> List[dict]:
+def get_all_products(branch: Optional[str] = None) -> List[dict]:
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM master_products")
+    
+    query = "SELECT * FROM master_products"
+    params = []
+    
+    if branch:
+        branch_lower = branch.lower()
+        if '_land' in branch_lower:
+            query += " WHERE branch_type = 'land'"
+        elif '_school' in branch_lower:
+            query += " WHERE branch_type = 'school'"
+            
+    cursor.execute(query, params)
     rows = cursor.fetchall()
     conn.close()
     
     products = []
     for row in rows:
-        # row: (id, name, category, unit, last_price)
+        # row: (id, name, category, unit, last_price, branch_type)
         last_price = row[4] if len(row) > 4 else None
         products.append({
             "id": row[0],

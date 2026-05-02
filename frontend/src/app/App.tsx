@@ -77,7 +77,7 @@ export default function App() {
     try {
       const [ordersData, productsData] = await Promise.all([
         api.getOrders(selectedRole || undefined, selectedBranch || undefined, userName || undefined),
-        api.getProducts()
+        api.getProducts(selectedBranch || undefined)
       ]);
 
       setOrders(ordersData);
