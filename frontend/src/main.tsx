@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './app/App';
-import TestingDashboard from './app/TestingDashboard';
-import { FinancierDesktop } from './app/components/financierDesktop/FinancierDesktop';
+import App from './App';
+import TestingDashboard from './features/testing/TestingDashboard';
+import { FinancierDesktop } from './features/financier/FinancierDesktop';
 import './styles/index.css';
 
-import { LanguageProvider } from './app/context/LanguageContext';
+import { LanguageProvider } from './store/LanguageContext';
 
 const Router = () => {
     const path = window.location.pathname;
