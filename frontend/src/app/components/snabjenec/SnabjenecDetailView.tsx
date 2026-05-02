@@ -57,10 +57,12 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
     };
 
     const isReviewMode = order.status === 'review_snabjenec';
-    const isSentToSupplierMode = order.status === 'sent_to_supplier';
     const isReceiveMode = order.status === 'waiting_snabjenec_receive';
-    const isDeliveryTrackingMode = isReceiveMode && order.supplierResponded;
-    const isLegacyReceiveMode = isReceiveMode && !order.supplierResponded;
+    const isSentToSupplierMode = order.status === 'sent_to_supplier';
+    
+    // Show tracking inputs in both "Sent to Supplier" and "Receive" modes
+    const isDeliveryTrackingMode = isReceiveMode || isSentToSupplierMode;
+    const isLegacyReceiveMode = false;
     const canArchive = ['waiting_snabjenec_receive', 'sent_to_financier'].includes(order.status);
 
     const displayProducts = localProducts.filter(p => p.quantity > 0);
@@ -429,7 +431,7 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                         <div className="bg-white p-5 rounded-3xl shadow-md border border-gray-100">
                             <div className="flex items-center gap-2 mb-4">
                                 <Package className="w-5 h-5 text-blue-600" />
-                                <h3 className="font-bold text-gray-900">Отметить получение от поставщика</h3>
+                                <h3 className="font-bold text-gray-900">Подтвердить получение (ДД.ММ.ГГГГ)</h3>
                             </div>
                             <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Дата получения (ДД.ММ.ГГГГ)</label>
                             <input
@@ -448,14 +450,10 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                             </button>
                         </div>
 
+                        {/* Tracking inputs moved here to be visible immediately */}
                         <div className="space-y-3">
-                            <h3 className="text-sm font-bold text-gray-500 uppercase pl-1">Товары в заказе</h3>
-                            {displayProducts.map(p => (
-                                <div key={p.id} className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100">
-                                    <p className="font-bold text-gray-900">{p.name}</p>
-                                    <p className="text-sm text-gray-500">{p.quantity} {p.unit}</p>
-                                </div>
-                            ))}
+                            <h3 className="text-sm font-bold text-gray-500 uppercase pl-1">Приёмка товара</h3>
+                            {displayProducts.map(renderDeliveryTrackingCard)}
                         </div>
                     </div>
                 )}
@@ -552,13 +550,15 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
 
                 {isDeliveryTrackingMode && (
                     <div className="flex gap-2">
-                        <button
-                            onClick={handleOpenExtraModal}
-                            className="flex-none bg-gray-100 text-gray-700 font-bold py-3 px-4 rounded-2xl active:scale-95 border border-gray-200 flex items-center gap-1"
-                        >
-                            <Plus className="w-4 h-4" />
-                            Доп.
-                        </button>
+                        {isReceiveMode && (
+                            <button
+                                onClick={handleOpenExtraModal}
+                                className="flex-none bg-gray-100 text-gray-700 font-bold py-3 px-4 rounded-2xl active:scale-95 border border-gray-200 flex items-center gap-1"
+                            >
+                                <Plus className="w-4 h-4" />
+                                Доп.
+                            </button>
+                        )}
                         <button
                             onClick={handleSaveDelivery}
                             disabled={savingDelivery}
