@@ -300,60 +300,66 @@ export function SupplierDetailView({ order, onUpdateOrder, onBackToRoles, branch
                                             className={`bg-white border border-gray-100 ${isCompact ? 'rounded-2xl' : 'rounded-[2.5rem] shadow-md p-5'}`}
                                         >
                                             {isCompact ? (
-                                                <div className="px-3 py-3">
-                                                    {/* Top: checkbox + name + qty */}
-                                                    <div className="flex items-center gap-2 mb-2">
+                                                <div className="px-3 py-2.5">
+                                                    {/* Top Row: Name, Unit, and smaller Checkbox on the right */}
+                                                    <div className="flex items-start justify-between gap-2 mb-2">
+                                                        <div className="flex-1 min-w-0">
+                                                            <h4 className={`font-bold text-sm leading-tight truncate ${product.checked ? 'text-gray-300 line-through' : 'text-gray-900'}`}>
+                                                                {product.name}
+                                                            </h4>
+                                                            <div className="flex items-center gap-1.5 mt-0.5">
+                                                                <span className={`text-[11px] font-black px-1.5 py-0.5 rounded-lg ${role === 'supplier_meat' ? 'bg-red-50 text-[#8B0000]' : 'bg-orange-50 text-orange-600'}`}>
+                                                                    {product.quantity} {product.unit}
+                                                                </span>
+                                                                {(product.price || 0) > 0 && (
+                                                                    <span className="text-[10px] font-bold text-gray-400">
+                                                                        · {((product.price || 0) * product.quantity).toLocaleString()} {t('sum')}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
                                                         <button
                                                             onClick={() => handleUpdateProduct(product.id, 'checked', !product.checked)}
-                                                            className={`w-7 h-7 rounded-lg border-2 transition-all flex items-center justify-center flex-shrink-0 ${
+                                                            className={`w-5 h-5 rounded-md border-2 transition-all flex items-center justify-center flex-shrink-0 mt-0.5 ${
                                                                 product.checked
                                                                     ? role === 'supplier_meat' ? 'bg-[#8B0000] border-[#8B0000] text-white' : 'bg-orange-500 border-orange-500 text-white'
                                                                     : 'bg-white border-gray-200 text-transparent'
                                                             }`}
                                                         >
-                                                            <Check className="w-4 h-4" />
+                                                            <Check className="w-3 h-3" />
                                                         </button>
-                                                        <div className="flex-1 min-w-0">
-                                                            <h4 className={`font-semibold text-sm leading-tight ${product.checked ? 'text-gray-300 line-through' : 'text-gray-900'}`}>
-                                                                {product.name}
-                                                            </h4>
-                                                            <div className="flex items-center gap-1.5 text-xs mt-0.5">
-                                                                <span className={role === 'supplier_meat' ? 'text-[#8B0000] font-bold' : 'text-orange-500 font-bold'}>{product.quantity} {product.unit}</span>
-                                                                {(product.price || 0) > 0 && (
-                                                                    <>
-                                                                        <span className="text-gray-200">·</span>
-                                                                        <span className="text-gray-500">{((product.price || 0) * product.quantity).toLocaleString()} {t('sum')}</span>
-                                                                    </>
-                                                                )}
-                                                                {product.lastPrice && !product.price && (
-                                                                    <span className="text-gray-300 text-[10px]">(пред: {product.lastPrice})</span>
-                                                                )}
-                                                            </div>
-                                                        </div>
                                                     </div>
-                                                    {/* Bottom: price + comment + date */}
-                                                    <div className="flex items-center gap-2">
-                                                        <DecimalInput
-                                                            value={product.price || 0}
-                                                            onChange={(val) => handleUpdateProduct(product.id, 'price', val)}
-                                                            placeholder="Цена"
-                                                            min={0}
-                                                            className="flex-1 min-w-0 bg-gray-50 rounded-xl px-3 py-2.5 text-sm font-bold text-right focus:ring-1 focus:ring-orange-500 outline-none border-none"
-                                                        />
-                                                        <div className="relative flex-1 min-w-0">
+
+                                                    {/* Bottom Row: Triple inputs (Price, Comment, Date) */}
+                                                    <div className="flex items-center gap-1.5">
+                                                        {/* Price: Narrower */}
+                                                        <div className="w-20 flex-none relative">
+                                                            <DecimalInput
+                                                                value={product.price || 0}
+                                                                onChange={(val) => handleUpdateProduct(product.id, 'price', val)}
+                                                                placeholder="Цена"
+                                                                className="w-full bg-gray-50 rounded-xl px-2 py-2 text-[11px] font-bold text-center focus:ring-1 focus:ring-orange-500 outline-none border-none tabular-nums"
+                                                            />
+                                                        </div>
+                                                        
+                                                        {/* Comment: Widest (flex-1) */}
+                                                        <div className="flex-1 relative min-w-0">
                                                             <input
-                                                                placeholder="Комм."
+                                                                placeholder="Коммент..."
                                                                 value={product.comment || ''}
                                                                 onChange={(e) => handleUpdateProduct(product.id, 'comment', e.target.value)}
-                                                                className="w-full bg-gray-50 rounded-xl px-3 py-2.5 text-sm pl-8 focus:ring-1 focus:ring-orange-500 outline-none border-none"
+                                                                className="w-full bg-gray-50 rounded-xl px-2 py-2 text-[11px] font-medium focus:ring-1 focus:ring-orange-500 outline-none border-none truncate"
                                                             />
-                                                            <MessageSquare className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-300 pointer-events-none" />
                                                         </div>
-                                                        <DateInput
-                                                            value={!isUnknownDelivery(product.deliveryDate) ? product.deliveryDate! : ''}
-                                                            onChange={(iso) => handleUpdateProduct(product.id, 'deliveryDate', iso)}
-                                                            className="flex-1 min-w-0 bg-gray-50 rounded-xl px-3 py-2.5 text-sm font-bold text-gray-700 focus:ring-1 focus:ring-orange-500 outline-none border-none"
-                                                        />
+
+                                                        {/* Date: Compact but enough for DD.MM.YY */}
+                                                        <div className="w-22 flex-none relative">
+                                                            <DateInput
+                                                                value={!isUnknownDelivery(product.deliveryDate) ? product.deliveryDate! : ''}
+                                                                onChange={(iso) => handleUpdateProduct(product.id, 'deliveryDate', iso)}
+                                                                className="w-full bg-gray-50 rounded-xl px-1.5 py-2 text-[11px] font-bold text-gray-700 text-center focus:ring-1 focus:ring-orange-500 outline-none border-none"
+                                                            />
+                                                        </div>
                                                     </div>
                                                 </div>
                                             ) : (
