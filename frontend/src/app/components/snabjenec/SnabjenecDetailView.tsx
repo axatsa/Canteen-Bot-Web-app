@@ -342,6 +342,12 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
 
     const renderDeliveryTrackingCard = (product: Product) => {
         const tracking = getTracking(product.id, product.quantity);
+        const isFull = tracking.received_qty === tracking.ordered_qty && tracking.ordered_qty > 0;
+
+        const toggleFull = () => {
+            const newQty = isFull ? 0 : tracking.ordered_qty;
+            handleReceivedQtyChange(product.id, tracking.ordered_qty, newQty);
+        };
         const statusColors: Record<string, string> = {
             delivered: 'text-green-600 bg-green-50 border-green-200',
             partial: 'text-yellow-600 bg-yellow-50 border-yellow-200',
@@ -357,7 +363,17 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
 
         return (
             <div key={product.id} className="bg-white p-4 rounded-3xl shadow-md border border-gray-100">
-                <p className="font-bold text-gray-900 mb-3">{product.name}</p>
+                <div className="flex items-center justify-between mb-3">
+                    <p className="font-bold text-gray-900">{product.name}</p>
+                    <button
+                        onClick={toggleFull}
+                        className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all active:scale-90 ${
+                            isFull ? 'bg-[#2E7D32]/10 text-[#2E7D32]' : 'bg-gray-50 text-gray-300'
+                        }`}
+                    >
+                        <CheckSquare className={isFull ? "w-5 h-5 fill-current" : "w-5 h-5"} />
+                    </button>
+                </div>
                 <div className="grid grid-cols-2 gap-3 mb-3">
                     <div>
                         <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Заказано ({product.unit})</label>
