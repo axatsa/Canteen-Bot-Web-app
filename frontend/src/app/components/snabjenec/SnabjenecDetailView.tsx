@@ -165,7 +165,7 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
     };
 
     const handleSaveDelivery = async () => {
-        if (order.status !== 'waiting_snabjenec_receive') {
+        if (order.status !== 'waiting_snabjenec_receive' && order.status !== 'sent_to_supplier') {
             alert('Невозможно: приёмка уже завершена или заявка находится не на этом этапе.');
             return;
         }
@@ -178,6 +178,25 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
             onRefresh?.();
         } catch {
             alert('Ошибка при сохранении приёмки');
+        } finally {
+            setSavingDelivery(false);
+        }
+    };
+
+    const handleSendToFinancier = async () => {
+        if (!confirm('Завершить приёмку и отправить финансисту?')) return;
+        setSavingDelivery(true);
+        try {
+            const tracking = initDeliveryTracking();
+            Object.assign(tracking, localDeliveryTracking);
+            // First save tracking
+            await api.updateDelivery(order.id, tracking, localExtraItems);
+            // Then update status to sent_to_financier
+            onUpdateOrder({ ...order, status: 'sent_to_financier' });
+            alert('✅ Заявка отправлена финансисту');
+            onBackToRoles();
+        } catch {
+            alert('Ошибка при отправке');
         } finally {
             setSavingDelivery(false);
         }
@@ -562,10 +581,18 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                         <button
                             onClick={handleSaveDelivery}
                             disabled={savingDelivery}
-                            className="flex-1 bg-[#2E7D32] text-white font-bold py-3 px-4 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                            className="bg-gray-100 text-gray-700 font-bold py-3 px-4 rounded-2xl active:scale-95 border border-gray-200 flex items-center justify-center gap-1.5"
                         >
                             <Save className="w-4 h-4" />
-                            {savingDelivery ? 'Сохранение...' : 'Сохранить приёмку'}
+                            {savingDelivery ? '...' : 'Сохранить'}
+                        </button>
+                        <button
+                            onClick={handleSendToFinancier}
+                            disabled={savingDelivery}
+                            className="flex-1 bg-[#2E7D32] text-white font-bold py-3 px-4 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                            <Send className="w-4 h-4" />
+                            {savingDelivery ? '...' : 'Отправить финансисту'}
                         </button>
                     </div>
                 )}
