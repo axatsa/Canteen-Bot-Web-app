@@ -4,9 +4,9 @@ import uvicorn
 import logging
 import asyncio
 from dotenv import load_dotenv
-from app.database import init_db, seed_db
-from app.api import app
-from app.bot import get_bot_handler
+from src.common.database.connection import init_db, seed_db
+from src.api.main import app
+from src.bot.main import get_bot_handler
 from telegram.ext import Application
 from telegram import Update
 
