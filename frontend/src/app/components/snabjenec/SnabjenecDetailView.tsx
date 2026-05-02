@@ -31,7 +31,9 @@ interface SnabjenecDetailViewProps {
 
 export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branch, onRefresh }: SnabjenecDetailViewProps) {
     const { t } = useLanguage();
-    const [localProducts, setLocalProducts] = useState<Product[]>(order.products);
+    const [localProducts, setLocalProducts] = useState<Product[]>(() =>
+        order.products.map(p => ({ ...p, received: p.received ?? false }))
+    );
     const [supplierDateInput, setSupplierDateInput] = useState('');
     const [showHelp, setShowHelp] = useState(false);
     const [markingReceived, setMarkingReceived] = useState(false);
@@ -47,7 +49,7 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
     );
 
     useEffect(() => {
-        setLocalProducts(order.products);
+        setLocalProducts(order.products.map(p => ({ ...p, received: p.received ?? false })));
         setLocalDeliveryTracking(order.deliveryTracking ?? {});
         setLocalExtraItems(order.extraItemsDelivered ?? {});
     }, [order.products, order.deliveryTracking, order.extraItemsDelivered]);
@@ -430,7 +432,7 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                 </h2>
             </header>
 
-            <main className="flex-1 overflow-y-auto p-4 pb-[200px]">
+            <main className="flex-1 overflow-y-auto p-4 pb-24">
 
                 {/* ── Review mode ─────────────────────────────────────────── */}
                 {isReviewMode && (
@@ -545,67 +547,69 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
             </main>
 
             {/* ── Bottom action bar ──────────────────────────────────────── */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-gray-200 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex flex-col gap-2 z-20 rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
+            <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-gray-200 px-3 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] flex flex-col gap-1.5 z-20 rounded-t-2xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] max-h-[40vh] overflow-y-auto">
 
                 {isReviewMode && (
-                    <div className="flex flex-col gap-2 w-full">
+                    <div className="flex flex-col gap-1.5 w-full">
                         {localProducts.some(p => p.category === '🥩 Мясо' && p.quantity > 0) && (
                             <button
                                 onClick={handleSendToMeatSupplier}
                                 disabled={order.sentToMeatSupplier}
-                                className={`w-full font-bold py-3 px-6 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 ${
+                                className={`w-full font-bold py-2.5 px-4 rounded-xl shadow-md active:scale-95 transition-all flex items-center justify-center gap-1.5 text-sm ${
                                     order.sentToMeatSupplier
                                         ? 'bg-green-600 text-white opacity-75'
                                         : 'bg-[#8B0000] text-white'
                                 }`}
                             >
-                                {order.sentToMeatSupplier ? '✓ Отправлено Мяснику' : <><Send className="w-5 h-5" /> Мяснику 🥩</>}
+                                {order.sentToMeatSupplier ? '✓ Мяснику' : <><Send className="w-4 h-4" /> Мяснику 🥩</>}
                             </button>
                         )}
                         {localProducts.some(p => p.category !== '🥩 Мясо' && p.quantity > 0) && (
                             <button
                                 onClick={handleSendToProductSupplier}
                                 disabled={order.sentToProductSupplier}
-                                className={`w-full font-bold py-3 px-6 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 ${
+                                className={`w-full font-bold py-2.5 px-4 rounded-xl shadow-md active:scale-95 transition-all flex items-center justify-center gap-1.5 text-sm ${
                                     order.sentToProductSupplier
                                         ? 'bg-green-600 text-white opacity-75'
                                         : 'bg-[#2E7D32] text-white'
                                 }`}
                             >
-                                {order.sentToProductSupplier ? '✓ Отправлено Поставщику' : <><Send className="w-5 h-5" /> Поставщику 🛒</>}
+                                {order.sentToProductSupplier ? '✓ Поставщику' : <><Send className="w-4 h-4" /> Поставщику 🛒</>}
                             </button>
                         )}
                         {(order.sentToMeatSupplier || order.sentToProductSupplier) && (
-                            <div className="text-xs text-gray-500 px-3 py-2 bg-blue-50 rounded-xl border border-blue-200 mb-2">
-                                ✓ Список(ки) отправлены поставщику
+                            <div className="text-xs text-gray-500 px-2.5 py-1.5 bg-blue-50 rounded-lg border border-blue-200">
+                                ✓ Отправлены поставщику
                             </div>
                         )}
                     </div>
                 )}
 
                 {isDeliveryTrackingMode && (
-                    <div className="flex gap-2">
-                        {isReceiveMode && (
+                    <div className="flex flex-col gap-1.5 w-full">
+                        <div className="flex gap-1.5 w-full">
+                            {isReceiveMode && (
+                                <button
+                                    onClick={handleOpenExtraModal}
+                                    className="flex-none bg-gray-100 text-gray-700 font-bold py-2.5 px-3 rounded-lg active:scale-95 border border-gray-200 flex items-center gap-1 text-sm"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                    Доп.
+                                </button>
+                            )}
                             <button
-                                onClick={handleOpenExtraModal}
-                                className="flex-none bg-gray-100 text-gray-700 font-bold py-3 px-4 rounded-2xl active:scale-95 border border-gray-200 flex items-center gap-1"
+                                onClick={handleSaveDelivery}
+                                disabled={savingDelivery}
+                                className="flex-1 bg-gray-100 text-gray-700 font-bold py-2.5 px-3 rounded-lg active:scale-95 border border-gray-200 flex items-center justify-center gap-1 text-sm"
                             >
-                                <Plus className="w-4 h-4" />
-                                Доп.
+                                <Save className="w-4 h-4" />
+                                {savingDelivery ? '...' : 'Сохранить'}
                             </button>
-                        )}
-                        <button
-                            onClick={handleSaveDelivery}
-                            disabled={savingDelivery}
-                            className="bg-gray-100 text-gray-700 font-bold py-3 px-4 rounded-2xl active:scale-95 border border-gray-200 flex items-center justify-center gap-1.5"
-                        >
-                            <Save className="w-4 h-4" />
-                            {savingDelivery ? '...' : 'Сохранить'}
-                        </button>
+                        </div>
                         <button
                             onClick={handleSendToFinancier}
                             disabled={savingDelivery}
-                            className="flex-1 bg-[#2E7D32] text-white font-bold py-3 px-4 rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                            className="w-full bg-[#2E7D32] text-white font-bold py-2.5 px-4 rounded-xl shadow-md active:scale-95 transition-all flex items-center justify-center gap-1.5 text-sm disabled:opacity-50"
                         >
                             <Send className="w-4 h-4" />
                             {savingDelivery ? '...' : 'Отправить финансисту'}
@@ -614,10 +618,10 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                 )}
 
                 {isLegacyReceiveMode && (
-                    <div className="flex w-full gap-2">
+                    <div className="flex w-full gap-1.5">
                         <button
                             onClick={handleSaveProgress}
-                            className="flex-1 bg-gray-100 text-gray-700 font-bold py-3 px-2 rounded-2xl active:scale-95 transition-all text-sm flex items-center justify-center gap-1 border border-gray-200"
+                            className="flex-1 bg-gray-100 text-gray-700 font-bold py-2.5 px-2 rounded-lg active:scale-95 transition-all text-xs flex items-center justify-center gap-0.5 border border-gray-200"
                         >
                             <Save className="w-4 h-4" />
                             {t('saveProgress')}
@@ -625,7 +629,7 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                         <button
                             onClick={handleCompleteReceive}
                             disabled={supplierSent.some(p => !p.received)}
-                            className={`flex-[1.5] text-white font-bold py-3 px-2 rounded-2xl shadow-lg active:scale-95 transition-all text-sm flex items-center justify-center gap-1 ${supplierSent.every(p => p.received) ? 'bg-[#2E7D32]' : 'bg-gray-300 opacity-50'}`}
+                            className={`flex-[1.5] text-white font-bold py-2.5 px-2 rounded-lg shadow-md active:scale-95 transition-all text-xs flex items-center justify-center gap-0.5 ${supplierSent.every(p => p.received) ? 'bg-[#2E7D32]' : 'bg-gray-300 opacity-50'}`}
                         >
                             <Send className="w-4 h-4" />
                             {t('completeReceive')}
@@ -637,10 +641,10 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                     <button
                         onClick={handleArchive}
                         disabled={archiving}
-                        className="w-full bg-gray-700 text-white font-bold py-2.5 px-6 rounded-2xl active:scale-95 transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-50"
+                        className="w-full bg-gray-700 text-white font-bold py-2.5 px-4 rounded-lg active:scale-95 transition-all flex items-center justify-center gap-1.5 text-sm disabled:opacity-50"
                     >
                         <Archive className="w-4 h-4" />
-                        {archiving ? 'Архивирование...' : 'Отправить в архив'}
+                        {archiving ? 'Архивирование...' : 'В архив'}
                     </button>
                 )}
             </div>
