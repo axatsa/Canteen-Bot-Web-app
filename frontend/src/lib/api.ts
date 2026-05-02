@@ -26,8 +26,6 @@ export type Status =
     | 'sent_to_chef'
     | 'review_snabjenec'
     | 'sent_to_supplier'
-    | 'supplier_collecting'
-    | 'supplier_delivering'
     | 'waiting_snabjenec_receive'
     | 'sent_to_financier'
     | 'archived'

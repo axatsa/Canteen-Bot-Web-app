@@ -12,8 +12,6 @@ const statusConfig: Record<Status, { labelKey: string; color: string; bgColor: s
   waiting_snabjenec_receive:   { labelKey: 'statusWaitingSnabjenecReceive',    color: '#006064', bgColor: '#e0f7fa' },
   sent_to_financier:           { labelKey: 'statusSentToFinancier',            color: '#1a237e', bgColor: '#e8eaf6' },
   archived:                    { labelKey: 'statusArchived',                   color: '#424242', bgColor: '#eeeeee' },
-  supplier_collecting:         { labelKey: 'statusSupplierCollecting',         color: '#f57c00', bgColor: '#fff3e0' },
-  supplier_delivering:         { labelKey: 'statusSupplierDelivering',         color: '#f57c00', bgColor: '#fff3e0' },
   completed:                   { labelKey: 'statusCompleted',                  color: '#388e3c', bgColor: '#e8f5e9' },
 };
 

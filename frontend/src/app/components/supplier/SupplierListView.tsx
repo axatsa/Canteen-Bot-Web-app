@@ -32,7 +32,7 @@ export function SupplierListView({ orders, onSelectOrder, onBackToRoles, onRefre
     const { t, language } = useLanguage();
     const [showHelp, setShowHelp] = useState(false);
     const activeOrders = orders.filter(o => {
-        if (o.status !== 'sent_to_supplier' && o.status !== 'waiting_snabjenec_receive' && o.status !== 'supplier_collecting' && o.status !== 'supplier_delivering') return false;
+        if (o.status !== 'sent_to_supplier' && o.status !== 'waiting_snabjenec_receive') return false;
         
         if (role === 'supplier_meat') return o.sentToMeatSupplier === true;
         if (role === 'supplier_products') return o.sentToProductSupplier === true;

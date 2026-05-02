@@ -22,8 +22,6 @@ const BRANCH_LABELS: Record<string, string> = {
 const STATUS_PILL: Record<string, { label: string; cls: string }> = {
     review_snabjenec:           { label: 'Новая',       cls: 'bg-green-100 text-green-700' },
     sent_to_supplier:           { label: 'У постав.',   cls: 'bg-blue-100 text-blue-700' },
-    supplier_collecting:        { label: 'Сборка',      cls: 'bg-orange-100 text-orange-700' },
-    supplier_delivering:        { label: 'В пути',      cls: 'bg-purple-100 text-purple-700' },
     waiting_snabjenec_receive:  { label: 'Приёмка',     cls: 'bg-amber-100 text-amber-700' },
     sent_to_financier:          { label: 'Финансист',   cls: 'bg-indigo-100 text-indigo-700' },
 };
@@ -43,8 +41,6 @@ export function SnabjenecListView({ orders, onSelectOrder, onBackToRoles, onRefr
     const activeOrders = orders.filter(o =>
         o.status === 'review_snabjenec' ||
         o.status === 'sent_to_supplier' ||
-        o.status === 'supplier_collecting' ||
-        o.status === 'supplier_delivering' ||
         o.status === 'waiting_snabjenec_receive' ||
         o.status === 'sent_to_financier'
     );

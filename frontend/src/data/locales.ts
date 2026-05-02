@@ -118,8 +118,6 @@ export const translations = {
         statusSentToFinancier: 'У финансиста',
         statusArchived: 'В архиве',
         statusSentToSupplier: 'У поставщика',
-        statusSupplierCollecting: 'Сборка заказа',
-        statusSupplierDelivering: 'Доставка',
         statusChefChecking: 'Проверка шефа',
         statusFinancierChecking: 'Финальная проверка',
         statusCompleted: 'Завершено',
