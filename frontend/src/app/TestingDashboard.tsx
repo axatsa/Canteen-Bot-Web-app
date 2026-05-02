@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
-import { Smartphone, User, Briefcase, MapPin, Play, Loader2, RefreshCw } from 'lucide-react';
+import { Smartphone, User, Briefcase, MapPin, Play, Loader2, RefreshCw, Sprout, GraduationCap } from 'lucide-react';
 import { api } from '@/lib/api';
 
 type Role = 'chef' | 'financier' | 'supplier' | 'snabjenec' | 'supplier_meat' | 'supplier_products';
-type Branch = 'beltepa_land' | 'uchtepa_land' | 'rakat_land' | 'mukumiy_land' | 'yunusabad_land' | 'novoi_land';
+type InstitutionType = 'land' | 'school';
+
+interface BranchInfo {
+    id: string;
+    name: string;
+}
 
 interface PhoneState {
     id: number;
     fio: string;
     role: Role;
-    branch: Branch;
+    instType: InstitutionType;
+    branch: string;
     isActive: boolean;
     url: string;
     isRegistering: boolean;
@@ -17,14 +23,31 @@ interface PhoneState {
 }
 
 const ROLES: Role[] = ['chef', 'snabjenec', 'supplier_meat', 'supplier_products', 'financier', 'supplier'];
-const BRANCHES: Branch[] = ['beltepa_land', 'uchtepa_land', 'rakat_land', 'mukumiy_land', 'yunusabad_land', 'novoi_land'];
+
+const LAND_BRANCHES: BranchInfo[] = [
+    { id: 'beltepa_land', name: 'Белтепа-Land' },
+    { id: 'uchtepa_land', name: 'Учтепа-Land' },
+    { id: 'rakat_land', name: 'Ракат-Land' },
+    { id: 'mukumiy_land', name: 'Мукумий-Land' },
+    { id: 'yunusabad_land', name: 'Юнусабад-Land' },
+    { id: 'novoi_land', name: 'Новои-Land' },
+];
+
+const SCHOOL_BRANCHES: BranchInfo[] = [
+    { id: 'novza_school', name: 'Новза-School' },
+    { id: 'uchtepa_school', name: 'Учтепа-School' },
+    { id: 'almazar_school', name: 'Алмазар-School' },
+    { id: 'general_uzakov_school', name: 'Генерал Узоков-School' },
+    { id: 'namangan_school', name: 'Наманган-School' },
+    { id: 'novoi_school', name: 'Новои-School' },
+];
 
 export default function TestingDashboard() {
     const [phones, setPhones] = useState<PhoneState[]>([
-        { id: 1, fio: 'Шеф Повар', role: 'chef', branch: 'beltepa_land', isActive: false, url: '', isRegistering: false, telegramId: 1001 },
-        { id: 2, fio: 'Снабженец', role: 'snabjenec', branch: 'beltepa_land', isActive: false, url: '', isRegistering: false, telegramId: 1002 },
-        { id: 3, fio: 'Мясник', role: 'supplier_meat', branch: 'beltepa_land', isActive: false, url: '', isRegistering: false, telegramId: 1003 },
-        { id: 4, fio: 'Поставщик', role: 'supplier_products', branch: 'beltepa_land', isActive: false, url: '', isRegistering: false, telegramId: 1004 },
+        { id: 1, fio: 'Шеф Повар', role: 'chef', instType: 'land', branch: 'beltepa_land', isActive: false, url: '', isRegistering: false, telegramId: 1001 },
+        { id: 2, fio: 'Снабженец', role: 'snabjenec', instType: 'land', branch: 'all', isActive: false, url: '', isRegistering: false, telegramId: 1002 },
+        { id: 3, fio: 'Мясник', role: 'supplier_meat', instType: 'land', branch: 'all', isActive: false, url: '', isRegistering: false, telegramId: 1003 },
+        { id: 4, fio: 'Поставщик', role: 'supplier_products', instType: 'land', branch: 'all', isActive: false, url: '', isRegistering: false, telegramId: 1004 },
     ]);
 
     const handleUpdatePhone = (id: number, field: keyof PhoneState, value: any) => {
