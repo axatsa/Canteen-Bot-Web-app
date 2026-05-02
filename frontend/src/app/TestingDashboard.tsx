@@ -51,7 +51,26 @@ export default function TestingDashboard() {
     ]);
 
     const handleUpdatePhone = (id: number, field: keyof PhoneState, value: any) => {
-        setPhones(prev => prev.map(p => p.id === id ? { ...p, [field]: value, isActive: false } : p));
+        setPhones(prev => prev.map(p => {
+            if (p.id === id) {
+                const newState = { ...p, [field]: value, isActive: false };
+                
+                // If type changes, reset branch if it's not 'all'
+                if (field === 'instType' && p.branch !== 'all') {
+                    const branches = value === 'land' ? LAND_BRANCHES : SCHOOL_BRANCHES;
+                    newState.branch = branches[0].id;
+                }
+                
+                // If role changes to non-chef, default branch to 'all' for easier testing 
+                // but still allow overriding it later in the UI
+                if (field === 'role' && value !== 'chef' && p.branch !== 'all') {
+                    // newState.branch = 'all'; // Optional: auto-set to all
+                }
+                
+                return newState;
+            }
+            return p;
+        }));
     };
 
     const handleStart = async (id: number) => {
@@ -150,7 +169,7 @@ export default function TestingDashboard() {
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-2">
+                                <div className="space-y-3">
                                     <div className="relative">
                                         <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
                                         <select 
@@ -161,6 +180,30 @@ export default function TestingDashboard() {
                                             {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
                                         </select>
                                     </div>
+
+                                    {/* Institution Type Toggle */}
+                                    <div className="flex bg-slate-900 border border-slate-700 rounded-xl p-1">
+                                        <button
+                                            onClick={() => handleUpdatePhone(phone.id, 'instType', 'land')}
+                                            className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-lg text-[10px] font-bold transition-all ${
+                                                phone.instType === 'land' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200'
+                                            }`}
+                                        >
+                                            <Sprout size={12} />
+                                            САДИК
+                                        </button>
+                                        <button
+                                            onClick={() => handleUpdatePhone(phone.id, 'instType', 'school')}
+                                            className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-lg text-[10px] font-bold transition-all ${
+                                                phone.instType === 'school' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-200'
+                                            }`}
+                                        >
+                                            <GraduationCap size={12} />
+                                            ШКОЛА
+                                        </button>
+                                    </div>
+
+                                    {/* Branch Selection */}
                                     <div className="relative">
                                         <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
                                         <select 
@@ -168,7 +211,10 @@ export default function TestingDashboard() {
                                             onChange={(e) => handleUpdatePhone(phone.id, 'branch', e.target.value)}
                                             className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2 pl-9 pr-2 text-xs appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                                         >
-                                            {BRANCHES.map(b => <option key={b} value={b}>{b}</option>)}
+                                            <option value="all">Все филиалы (all)</option>
+                                            {(phone.instType === 'land' ? LAND_BRANCHES : SCHOOL_BRANCHES).map(b => (
+                                                <option key={b.id} value={b.id}>{b.name}</option>
+                                            ))}
                                         </select>
                                     </div>
                                 </div>
