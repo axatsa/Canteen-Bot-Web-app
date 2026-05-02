@@ -2,9 +2,9 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock
 from telegram import Update, User, Message, Chat, CallbackQuery
 from telegram.ext import ContextTypes
-import backend.app.bot as bot
-from backend.app.database import init_db, seed_db
-import backend.app.database as db_module
+import src.bot.main as bot
+from src.common.database.connection import init_db, seed_db
+import src.common.database.connection as db_module
 
 @pytest.fixture
 def mock_update():

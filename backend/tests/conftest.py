@@ -1,8 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
-import backend.app.database as db_module
-from backend.app.database import init_db, seed_db
-from backend.app.api import app
+import src.common.database.connection as db_module
+from src.common.database.connection import init_db, seed_db
+from src.api.main import app
 
 
 @pytest.fixture

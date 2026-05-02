@@ -1,6 +1,6 @@
 import os
 import pytest
-from backend.app.export import fill_docx_template, TEMPLATES_DIR, EXPORTS_DIR
+from src.services.export import fill_docx_template, TEMPLATES_DIR, EXPORTS_DIR
 from docx import Document
 
 def test_export_content_validation():
