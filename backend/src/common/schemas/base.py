@@ -56,6 +56,11 @@ class UpdateDeliveryRequest(BaseModel):
 class ArchiveRequest(BaseModel):
     archived_by: str = "snabjenec"
 
+class UpdateParticipantsRequest(BaseModel):
+    snabjenec_name: Optional[str] = None
+    supplier_name: Optional[str] = None
+    chef_name: Optional[str] = None
+
 
 # ── Template schemas ───────────────────────────────────────────────────────────
 

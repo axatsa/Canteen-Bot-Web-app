@@ -7,6 +7,7 @@ from src.common.schemas import base as schemas
 from src.common.database import crud
 from src.services import notifications
 from src.services.export import TEMPLATES_DIR, ensure_dirs, fill_docx_template, build_export_context
+from src.common.schemas.base import UpdateParticipantsRequest
 
 app = FastAPI(title="Optimizer API")
 
@@ -115,6 +116,22 @@ async def archive_order(order_id: str, body: schemas.ArchiveRequest, background_
     background_tasks.add_task(notifications.notify_order_archived, order_id)
     
     return {"status": "success", "order_id": order_id, "status_new": "archived"}
+
+
+@app.post("/orders/{order_id}/update_participants")
+async def update_order_participants(order_id: str, body: UpdateParticipantsRequest):
+    order = crud.get_order_by_id(order_id)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    success = crud.update_participant_names(
+        order_id,
+        body.snabjenec_name,
+        body.supplier_name,
+        body.chef_name,
+    )
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to update participants")
+    return {"status": "success", "message": "Участники обновлены"}
 
 
 @app.get("/orders/financier/delivery_report")

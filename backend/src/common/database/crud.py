@@ -808,3 +808,28 @@ def upsert_order(order_data: dict) -> tuple[bool, str]:
         return False, str(e)
     finally:
         conn.close()
+
+
+def update_participant_names(order_id: str, snabjenec_name: Optional[str], supplier_name: Optional[str], chef_name: Optional[str]) -> bool:
+    """Update participant names without status restrictions — for financier corrections."""
+    conn = get_db_connection()
+    try:
+        conn.execute('''
+            UPDATE orders SET
+                snabjenec_name = CASE WHEN ? IS NOT NULL THEN ? ELSE snabjenec_name END,
+                supplier_name  = CASE WHEN ? IS NOT NULL THEN ? ELSE supplier_name  END,
+                chef_name      = CASE WHEN ? IS NOT NULL THEN ? ELSE chef_name      END
+            WHERE id = ?
+        ''', (
+            snabjenec_name, snabjenec_name,
+            supplier_name,  supplier_name,
+            chef_name,      chef_name,
+            order_id,
+        ))
+        conn.commit()
+        return True
+    except Exception as e:
+        logger.error(f"Error updating participant names: {e}")
+        return False
+    finally:
+        conn.close()

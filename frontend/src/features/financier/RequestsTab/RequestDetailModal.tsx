@@ -27,14 +27,23 @@ export function RequestDetailModal({ orderId, onClose, onArchive, templates, rol
     const [selectedTemplate, setSelectedTemplate] = useState('');
     const [localProducts, setLocalProducts] = useState<any[]>([]);
     const [saving, setSaving] = useState(false);
+    const [savingParticipants, setSavingParticipants] = useState(false);
     const [archiving, setArchiving] = useState(false);
     const [exporting, setExporting] = useState(false);
+
+    // Editable participant names
+    const [snabjenecName, setSnabjenecName] = useState('');
+    const [supplierName, setSupplierName] = useState('');
+    const [recipientName, setRecipientName] = useState('');
 
     useEffect(() => {
         api.getFinancierOrderDetails(orderId)
             .then(data => {
                 setDetails(data);
                 setLocalProducts(data.order.products || []);
+                setSnabjenecName(data.order.snabjenecName || data.order.snabjenec_name || '');
+                setSupplierName(data.order.supplierName || data.order.supplier_name || '');
+                setRecipientName(data.order.chefName || data.order.chef_name || '');
             })
             .catch(console.error)
             .finally(() => setLoading(false));
@@ -48,12 +57,10 @@ export function RequestDetailModal({ orderId, onClose, onArchive, templates, rol
                 ...details.order,
                 products: localProducts,
                 createdAt: new Date(details.order.created_at),
-                // names must be included so validate_order_fields passes
-                chefName: details.order.chefName,
-                snabjenecName: details.order.snabjenecName,
-                supplierName: details.order.supplierName,
+                chefName: recipientName || details.order.chefName,
+                snabjenecName: snabjenecName || details.order.snabjenecName,
+                supplierName: supplierName || details.order.supplierName,
             };
-            // Use order's own branch as fallback so the request always has branch
             const effectiveBranch = branch || details.order.branch;
             await api.upsertOrder(updatedOrder, role, userName, effectiveBranch);
             alert('✅ Единицы измерения сохранены');
@@ -62,6 +69,28 @@ export function RequestDetailModal({ orderId, onClose, onArchive, templates, rol
             alert('Ошибка сохранения');
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleSaveParticipants = async () => {
+        if (!details) return;
+        setSavingParticipants(true);
+        try {
+            await api.updateParticipants(orderId, {
+                snabjenec_name: snabjenecName,
+                supplier_name: supplierName,
+                chef_name: recipientName,
+            });
+            setDetails((prev: any) => ({
+                ...prev,
+                order: { ...prev.order, snabjenecName, supplierName, chefName: recipientName }
+            }));
+            alert('✅ Участники сохранены');
+        } catch (error) {
+            console.error(error);
+            alert('Ошибка сохранения участников');
+        } finally {
+            setSavingParticipants(false);
         }
     };
 
@@ -139,6 +168,38 @@ export function RequestDetailModal({ orderId, onClose, onArchive, templates, rol
                                 ))}
                             </div>
 
+                            {/* Participants */}
+                            <div className="bg-emerald-50/60 border border-emerald-100 rounded-2xl p-4">
+                                <div className="flex items-center justify-between mb-3">
+                                    <p className="text-xs font-black text-emerald-700 uppercase tracking-wider">Участники акта</p>
+                                    <button
+                                        onClick={handleSaveParticipants}
+                                        disabled={savingParticipants}
+                                        className="text-xs font-bold bg-emerald-600 text-white px-3 py-1 rounded-lg hover:bg-emerald-700 disabled:opacity-40 transition-colors"
+                                    >
+                                        {savingParticipants ? 'Сохранение...' : '✓ Сохранить'}
+                                    </button>
+                                </div>
+                                <div className="grid grid-cols-3 gap-3">
+                                    {[
+                                        { label: 'Снабженец', value: snabjenecName, setter: setSnabjenecName, placeholder: 'ФИО снабженца' },
+                                        { label: 'Поставщик', value: supplierName, setter: setSupplierName, placeholder: 'ФИО поставщика' },
+                                        { label: 'Получатель', value: recipientName, setter: setRecipientName, placeholder: 'ФИО получателя' },
+                                    ].map(({ label, value, setter, placeholder }) => (
+                                        <div key={label}>
+                                            <p className="text-[10px] text-emerald-600 font-bold uppercase mb-1.5">{label}</p>
+                                            <input
+                                                type="text"
+                                                value={value}
+                                                onChange={e => setter(e.target.value)}
+                                                placeholder={placeholder}
+                                                className="w-full bg-white rounded-xl px-3 py-2 text-sm font-medium text-gray-800 border border-emerald-200 focus:ring-1 focus:ring-emerald-400 focus:outline-none placeholder:text-gray-300"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
                             {/* Financial Summary */}
                             <div className="bg-gray-900 rounded-2xl px-6 py-5 flex items-center justify-between text-white shadow-lg">
                                 <div>
@@ -156,9 +217,9 @@ export function RequestDetailModal({ orderId, onClose, onArchive, templates, rol
                             </div>
 
                             {/* Unified color-coded product table */}
-                            <ColorTable 
-                                details={details} 
-                                localProducts={localProducts} 
+                            <ColorTable
+                                details={details}
+                                localProducts={localProducts}
                                 onUpdateUnit={(pid: string, newUnit: string) => {
                                     setLocalProducts(prev => prev.map(p => p.id === pid ? { ...p, unit: newUnit } : p));
                                 }}
@@ -241,8 +302,8 @@ function ColorTable({ details, localProducts, onUpdateUnit }: { details: any; lo
                             <tr key={i} className="bg-white">
                                 <td className="px-4 py-3 font-medium text-gray-500">{item.name}</td>
                                 <td className="px-4 py-3 text-center">
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={item.unit}
                                         onChange={(e) => onUpdateUnit(item.id, e.target.value)}
                                         className="w-12 text-center bg-gray-50 rounded-lg py-1 border-none focus:ring-1 focus:ring-emerald-500 text-xs"
@@ -305,8 +366,8 @@ function ColorTable({ details, localProducts, onUpdateUnit }: { details: any; lo
                             <tr key={i} className="bg-white hover:bg-gray-50 transition-colors">
                                 <td className="px-4 py-3 font-medium text-gray-800">{item.product_name}</td>
                                 <td className="px-4 py-3 text-center">
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={localP?.unit || item.unit}
                                         onChange={(e) => {
                                             if (localP) onUpdateUnit(localP.id, e.target.value);

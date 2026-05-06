@@ -399,6 +399,28 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
         );
     };
 
+    const renderCompactProductCard = (product: Product) => {
+        const tracking = getTracking(product.id, product.quantity);
+        return (
+            <div key={product.id} className="bg-white px-3 py-2.5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                    <p className="font-bold text-gray-900 text-sm truncate">{product.name}</p>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase">
+                        {tracking.received_qty} / {tracking.ordered_qty} {product.unit}
+                    </p>
+                </div>
+                <div className={`flex-none px-2 py-1 rounded-lg text-[10px] font-black uppercase ${
+                    tracking.status === 'delivered' ? 'bg-green-50 text-green-600' :
+                    tracking.status === 'partial' ? 'bg-yellow-50 text-yellow-600' :
+                    'bg-gray-50 text-gray-400'
+                }`}>
+                    {tracking.status === 'delivered' ? 'OK' : 
+                     tracking.status === 'partial' ? 'Часть' : 'Нет'}
+                </div>
+            </div>
+        );
+    };
+
     // ── Extra items (from extra_items_delivered) ───────────────────────────────
 
     const extraItemEntries = Object.entries(localExtraItems).filter(([, qty]) => qty > 0);
@@ -542,7 +564,28 @@ export function SnabjenecDetailView({ order, onUpdateOrder, onBackToRoles, branc
                 )}
 
                 {(!isReviewMode && !isSentToSupplierMode && !isReceiveMode) && (
-                    <div className="text-center py-12 text-gray-400 font-bold">{t('readOnly')}</div>
+                    <div className="space-y-4">
+                        <div className="text-center py-4 text-gray-400 font-bold text-sm uppercase tracking-widest">
+                            {t('readOnly')}
+                        </div>
+                        <div className="grid grid-cols-1 gap-2">
+                             {displayProducts.map(renderCompactProductCard)}
+                        </div>
+                        {extraItemEntries.length > 0 && (
+                            <div className="mt-6 space-y-2">
+                                <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Доп. товары</h3>
+                                {extraItemEntries.map(([pid, qty]) => {
+                                    const name = localProducts.find(p => p.id === pid)?.name ?? `ID:${pid}`;
+                                    return (
+                                        <div key={pid} className="bg-yellow-50/50 px-3 py-2 rounded-xl border border-yellow-100 flex items-center justify-between">
+                                            <span className="font-bold text-gray-900 text-sm">{name}</span>
+                                            <span className="text-yellow-700 font-black text-xs">+{qty}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
                 )}
             </main>
 

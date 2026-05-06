@@ -246,4 +246,16 @@ export const api = {
         if (!response.ok) throw new Error('Failed to export order');
         return response.blob();
     },
+
+    updateParticipants: async (
+        orderId: string,
+        names: { snabjenec_name?: string; supplier_name?: string; chef_name?: string }
+    ): Promise<void> => {
+        const response = await fetch(`${API_URL}/orders/${orderId}/update_participants`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(names),
+        });
+        if (!response.ok) throw new Error('Failed to update participants');
+    },
 };
